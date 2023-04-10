@@ -88,3 +88,18 @@ func getRenewablesForCountriesByYears(w http.ResponseWriter, countries []string,
 		renewablesOutput = append(renewablesOutput, outputCountry)
 	}
 }
+
+/*
+Get renewables data for all counties in the database between start and end year
+
+	w			- Responsewriter for sending error messages
+	startYear	- The first year we will get data from
+	endYear		- The last year we will get data from
+
+	return		- list of countryouput structs which can will be sent as json in the response, as well as error
+*/
+func getRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, endYear int) ([]structs.CountryOutput, error) {
+	// var renewablesOutput []structs.CountryOutput
+
+	// TODO: For all countries, get data, get country name, append to renewablesOutput, and return
+}
