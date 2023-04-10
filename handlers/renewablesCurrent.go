@@ -78,3 +78,35 @@ func getCountriesToQuery(w http.ResponseWriter, r *http.Request) ([]string, erro
 	return countries, nil
 
 }
+
+/*
+Get renewables data for the current year from specified countires or all countries
+
+	w			- Responsewriter for sending error messages
+	countires	- Either a list of countries we want to get data from, or an empty list if we want all
+
+	return		- Returns a list of countryouput structs which can will be sent as json in the response
+*/
+func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string) ([]structs.CountryOutput, error) {
+	var renewablesOutput []structs.CountryOutput
+
+	// Get current year
+	// TODO: Get current Year
+	currentYear := 2021
+
+	// If the users specified countries, get renewables data from them in the current year
+	if len(countries) != 0 {
+		renewablesOutput, err := getRenewablesForCountriesByYears(w, countries, currentYear, currentYear)
+		if err != nil {
+			return renewablesOutput, err
+		}
+		// If the user did not specify countires, we get renewables data from all countires in the current year
+	} else {
+		renewablesOutput, err := getRenewablesForAllCountriesByYears(w, currentYear, currentYear)
+		if err != nil {
+			return renewablesOutput, err
+		}
+	}
+
+	return renewablesOutput, nil
+}
