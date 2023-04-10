@@ -3,6 +3,7 @@ package main
 import (
 	"assignment2/handlers"
 	"assignment2/utils/constants"
+	"assignment2/utils/db"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +11,12 @@ import (
 )
 
 func main() {
+
+	// Set up Firestore
+	db.InitializeFirestore()
+
+	// Close down client when service is done running
+	defer db.CloseFirebaseClient()
 
 	// Save start time of service to calculate uptime
 	handlers.Start = time.Now()
