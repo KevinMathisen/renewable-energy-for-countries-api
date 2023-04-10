@@ -6,9 +6,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
+
+	// Save start time of service to calculate uptime
+	handlers.Start = time.Now()
 
 	// Handle port assignment
 	port := os.Getenv(("PORT"))
