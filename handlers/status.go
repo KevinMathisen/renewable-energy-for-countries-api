@@ -57,3 +57,12 @@ func createStatusResponse(start time.Time) (structs.Status, error) {
 
 	return statusResponse, nil
 }
+
+/*
+Calculates time elapsed since start of service in seconds
+
+	return	- Returns in seconds uptime of service
+*/
+func calculateUptimeInSeconds() float64 {
+	return float64(time.Since(Start).Seconds())
+}
