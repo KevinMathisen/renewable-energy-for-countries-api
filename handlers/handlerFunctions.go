@@ -2,6 +2,7 @@
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/structs"
 	"encoding/json"
 	"net/http"
 )
@@ -60,4 +61,30 @@ func httpRequestFromUrl(url string, method string) (http.Response, error) {
 
 	// Return response
 	return *res, nil
+}
+
+/*
+Get renewables data for all countries given between start and end year
+
+	w			- Responsewriter for sending error messages
+	countries	- A list of countries we want to get data from
+	startYear	- The first year we will get data from
+	endYear		- The last year we will get data from
+
+	return		- list of countryouput structs which can will be sent as json in the response, as well as error
+*/
+func getRenewablesForCountriesByYears(w http.ResponseWriter, countries []string, startYear int, endYear int) ([]structs.CountryOutput, error) {
+	var renewablesOutput []structs.CountryOutput
+
+	// For each country
+	for _, country := range countries {
+		// Get the renwables data from year range
+		renewablesCountry, err := getRenewablesYearsFromCountry(w, country, startYear, endYear) // TODO: Create function
+		if err != nil {
+			return renewablesOutput, err
+		}
+		// TODO: Create a CountryOutput struct with renewabled and correct iso code and country name
+
+		renewablesOutput = append(renewablesOutput, outputCountry)
+	}
 }
