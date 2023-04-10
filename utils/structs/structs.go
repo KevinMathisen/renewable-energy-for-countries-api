@@ -28,3 +28,14 @@ type Webhook struct {
 	Country   string `json:"country,omitempty"`
 	Calls     string `json:"calls,omitempty"`
 }
+
+/*
+Struct for status endpoint response
+*/
+type Status struct {
+	CountriesApi   string  `json:"countries_api"`
+	NotificationDb string  `json:"notification_db"`
+	Webhooks       string  `json:"webhooks"`
+	Version        string  `json:"version"`
+	Uptime         float64 `json:"uptime"`
+}
