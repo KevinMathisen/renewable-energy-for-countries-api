@@ -37,3 +37,13 @@ func InitializeFirestore() {
 	}
 
 }
+
+/*
+Closes the firebase client, or logs a fatal error if it failed
+*/
+func CloseFirebaseClient() {
+	err := firebaseClient.Close()
+	if err != nil {
+		log.Fatal("CLosing of firebase client failed. Error: ", err)
+	}
+}
