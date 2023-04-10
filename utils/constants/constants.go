@@ -14,3 +14,8 @@ const STATUS_PATH = SERVICE_PATH + "/status"
 
 // Content type
 const CONT_TYPE_JSON = "application/json"
+
+// Country API
+const COUNTRIES_API_URL = "http://129.241.150.113:8080/v3.1"
+const COUNTRY_NAME_SEARCH_PATH = "/name/"
+const ISO_SEARCH_PATH = "/alpha/"
