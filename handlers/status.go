@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"assignment2/utils/constants"
+	"assignment2/utils/structs"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -25,4 +28,32 @@ func Status(w http.ResponseWriter, r *http.Request) {
 
 	// Handle get request
 	respondToGetRequestWithJSON(w, statusRes)
+}
+
+/*
+Creates the status json response.
+
+	start - Start time of service
+	return - Returns json of status response
+*/
+func createStatusResponse(start time.Time) (structs.Status, error) {
+	// Get request from countries api
+	resCountry, err := httpRequestFromUrl(constants.COUNTRIES_API_URL, http.MethodHead)
+	if err != nil {
+		return structs.Status{}, err
+	}
+
+	// TODO: Get request from Notification Database in Firebase
+	// TODO: Get amount of webhooks from Firebase
+
+	// Initialize the status response struct
+	statusResponse := structs.Status{
+		CountriesApi:   resCountry.Status,
+		NotificationDb: strconv.Itoa(http.StatusNotImplemented),
+		Webhooks:       0,
+		Version:        constants.VERSION,
+		Uptime:         calculateUptimeInSeconds(),
+	}
+
+	return statusResponse, nil
 }
