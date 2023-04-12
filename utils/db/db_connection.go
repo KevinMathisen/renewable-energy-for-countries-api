@@ -8,6 +8,7 @@ import (
 
 	"cloud.google.com/go/firestore" // Firestore-specific support
 	firebase "firebase.google.com/go"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -136,4 +137,36 @@ func GetRenewablesCountryFromFirestore(w http.ResponseWriter, isoCode string) (m
 
 	// Return the data
 	return countrySnapshot.Data(), nil
+}
+
+/*
+Gets all data from all countries
+
+	w		- Responsewriter for error handling
+
+	return 	- Map containing key (isoCode) and elements containing maps with each countrys name and percentages
+*/
+func GetRenewablesAllCountriesFromFirestore(w http.ResponseWriter) (map[string]map[string]interface{}, error) {
+	// Initialize map for saving countries
+	data := make(map[string]map[string]interface{})
+
+	// Get reference to documents in collection
+	iter := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Documents(firestoreContext)
+
+	for {
+		// Try to go to next document in collection
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			http.Error(w, "Failed to iterate through countires on firebase", http.StatusInternalServerError)
+			return nil, err
+		}
+
+		// Save each country document with isoCode/document reference as the key
+		data[doc.Ref.ID] = doc.Data()
+	}
+
+	return data, nil
 }
