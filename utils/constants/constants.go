@@ -23,3 +23,8 @@ const ISO_SEARCH_PATH = "/alpha/"
 // Years for renewables database
 const OLDEST_YEAR_DB = 1965
 const LATEST_YEAR_DB = 2021
+
+// Forestore constants
+const RENEWABLES_COLLECTION = "renewables"
+const WEBHOOKS_COLLECTION = "webhooks"
+const CACHE_COLLECTION = "cache"
