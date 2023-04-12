@@ -17,8 +17,8 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If cache hit, send cached response
-	hit := checkCache(w, r)
-	if hit {
+	hit, err := checkCache(w, r)
+	if hit || err != nil {
 		return
 	}
 
