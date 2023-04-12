@@ -130,3 +130,30 @@ func checkCache(w http.ResponseWriter, r *http.Request) (bool, error) {
 	// No cache hit
 	return false, nil
 }
+
+/*
+Get mean renewables data for all countries given between start and end year
+
+	w			- Responsewriter for sending error messages
+	countries	- A list of countries we want to get data from
+	startYear	- The first year we will get data from
+	endYear		- The last year we will get data from
+
+	return		- list of countryouput structs with no year and percentage as mean value, which can will be sent as json in the response, as well as error
+*/
+func getMeanRenewablesForCountriesByYears(w http.ResponseWriter, countries []string, startYear int, endYear int) ([]structs.CountryOutput, error) {
+	var renewablesOutput []structs.CountryOutput
+
+	// For each country
+	for _, country := range countries {
+		// Get the renwables data from year range
+		renewablesCountry, err := getRenewablesYearsFromCountry(w, country, startYear, endYear) // TODO: Create function
+		if err != nil {
+			return renewablesOutput, err
+		}
+		// TODO: Create a CountryOutput struct with mean percentage, and correct iso code and country name
+		// TODO: Create a way to calculate mean percentage given list of renewables data
+
+		renewablesOutput = append(renewablesOutput, outputCountry)
+	}
+}
