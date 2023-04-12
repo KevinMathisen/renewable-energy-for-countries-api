@@ -47,3 +47,14 @@ func CloseFirebaseClient() {
 		log.Fatal("CLosing of firebase client failed. Error: ", err)
 	}
 }
+
+/*
+Return if a country is in the renewables collection
+
+	isoCode	- Code of country to find
+
+	return 	- If country given exists in database
+*/
+func isoCodeInDB(isoCode string) bool {
+
+}
