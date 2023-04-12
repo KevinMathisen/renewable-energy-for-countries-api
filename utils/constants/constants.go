@@ -28,3 +28,7 @@ const LATEST_YEAR_DB = 2021
 const RENEWABLES_COLLECTION = "renewables"
 const WEBHOOKS_COLLECTION = "webhooks"
 const CACHE_COLLECTION = "cache"
+
+// Name of Files
+const RENEWABLES_CSV_FILE = "./renewable-share-energy.csv"
+const CREDENTIALS_FILE = "./assignment2-prog2005-service-account.json"
