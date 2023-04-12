@@ -9,6 +9,8 @@ import (
 	firebase "firebase.google.com/go"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Firebase context used by Firestore functions
@@ -57,8 +59,18 @@ Return if a country is in the renewables collection
 
 	return 	- If country given exists in database
 */
-func isoCodeInDB(isoCode string) bool {
-	return false
+func isoCodeInDB(isoCode string) (bool, error) {
+	// Check if country with ISO code exists in renewables collection
+	_, err := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Doc(isoCode).Get(firestoreContext)
+
+	// If we got error not found, return false
+	if status.Code(err) == codes.NotFound {
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+	// IF the country was found
+	return true, nil
 }
 
 func Firestore_test() error {
