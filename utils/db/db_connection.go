@@ -7,7 +7,6 @@ import (
 
 	"cloud.google.com/go/firestore" // Firestore-specific support
 	firebase "firebase.google.com/go"
-	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -80,20 +79,6 @@ func Firestore_test() error {
 
 	message := doc.Data()
 	log.Println(message)
-
-	iter := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Documents(firestoreContext)
-	log.Println("loop?")
-	for {
-		log.Println("Start of loop")
-		doc, err := iter.Next()
-
-		if err == iterator.Done {
-			break
-		}
-
-		m := doc.Data()
-		log.Println(m)
-	}
 
 	return nil
 }
