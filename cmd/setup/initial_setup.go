@@ -28,7 +28,7 @@ func main() {
 	data := createRenewablesDataStructForAppending()
 
 	// Add data to firestore
-	_ = db.AppendDataToFirestore(data, "renewables")
+	_ = db.AppendDataToFirestore(data, constants.RENEWABLES_COLLECTION)
 
 }
 
