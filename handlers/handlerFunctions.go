@@ -103,3 +103,30 @@ func getRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, e
 
 	// TODO: For all countries, get data, get country name, append to renewablesOutput, and return
 }
+
+/*
+Should check if request is in the cache, then respond with cached response
+
+	w	- Http responsewriter
+	r 	- Http request
+
+	return	- bool, true if there was a cache git
+*/
+func checkCache(w http.ResponseWriter, r *http.Request) (bool, error) {
+	var hit []structs.CountryOutput
+
+	// Check if request URL and response is in database
+	hit, err := checkCacheDBForURL(w, r.URL.Path)
+	if err != nil {
+		return false, err
+	}
+
+	// Cache hit
+	if len(hit) != 0 {
+		respondToGetRequestWithJSON(w, hit)
+		return true, nil
+	}
+
+	// No cache hit
+	return false, nil
+}
