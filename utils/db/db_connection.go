@@ -4,6 +4,7 @@ import (
 	"assignment2/utils/constants"
 	"context"
 	"log"
+	"net/http"
 
 	"cloud.google.com/go/firestore" // Firestore-specific support
 	firebase "firebase.google.com/go"
@@ -115,4 +116,24 @@ func AppendDocumentToFirestore(id string, doc map[string]interface{}, collection
 		return err
 	}
 	return nil
+}
+
+/*
+Get a country from firestore
+
+	w		- Responsewriter for error handling
+	isoCode	- isoCode of country used for finding document by ID
+
+	return	- Map containing name and percentages for country
+*/
+func GetRenewablesCountryFromFirestore(w http.ResponseWriter, isoCode string) (map[string]interface{}, error) {
+	// Get reference to document
+	countrySnapshot, err := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Doc(isoCode).Get(firestoreContext)
+	if err != nil {
+		http.Error(w, "Error extracting body of country "+isoCode, http.StatusInternalServerError)
+		return nil, err
+	}
+
+	// Return the data
+	return countrySnapshot.Data(), nil
 }
