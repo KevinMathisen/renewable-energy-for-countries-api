@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"assignment2/utils/structs"
+	"errors"
 	"net/http"
 )
 
@@ -27,7 +28,10 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get current percentage of renewables for countries specified as a list of countryoutput structs
-	response = getCurrentRenewablesForCountries(w, countries)
+	response, err = getCurrentRenewablesForCountries(w, countries)
+	if err != nil {
+		return
+	}
 
 	// Respond with list of countryoutput struct encoded as json to user
 	respondToGetRequestWithJSON(w, response)
@@ -65,14 +69,22 @@ func getCountriesToQuery(w http.ResponseWriter, r *http.Request) ([]string, erro
 	if len(countryCodeOrName) != 3 {
 		// TODO: Implement how to get the ISO code if name is given
 
-		// Else if the user specified ISO code, add the code the list of countries
-	} else {
+	} else if isoCodeInDB(countryCodeOrName) {
+		// Else if the user specified ISO code and it exists in the database, add the code the list of countries
 		countries = append(countries, countryCodeOrName)
 	}
 
 	// If the user specified the neighbour parameter
 	if neigbours {
-		// TODO: Get neighbour ISO code with Restcountries API, and append to countries
+		// TODO: Get neighbour ISO code with Restcountries API
+
+		// TODO: Check if each isoCode is in database, if so add to list of countires
+	}
+
+	// If no countries existed in the database
+	if len(countries) == 0 {
+		http.Error(w, "No country with given ISO code or name exists in our service", http.StatusNotFound)
+		return nil, errors.New("No country with given ISO code or name exists in our service")
 	}
 
 	return countries, nil
@@ -100,8 +112,8 @@ func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string)
 		if err != nil {
 			return renewablesOutput, err
 		}
-		// If the user did not specify countires, we get renewables data from all countires in the current year
 	} else {
+		// If the user did not specify countires, we get renewables data from all countires in the current year
 		renewablesOutput, err := getRenewablesForAllCountriesByYears(w, currentYear, currentYear)
 		if err != nil {
 			return renewablesOutput, err
