@@ -1,11 +1,13 @@
 ﻿package db
 
 import (
+	"assignment2/utils/constants"
 	"context"
 	"log"
 
 	"cloud.google.com/go/firestore" // Firestore-specific support
 	firebase "firebase.google.com/go"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
@@ -23,7 +25,7 @@ func InitializeFirestore() {
 	firestoreContext = context.Background()
 
 	// Load credentials from json file containing service account
-	serviceAccount := option.WithCredentialsFile("./assignment2-prog2005-service-account.json")
+	serviceAccount := option.WithCredentialsFile(constants.CREDENTIALS_FILE)
 	// Create a firebase app with context and credentials
 	app, err := firebase.NewApp(firestoreContext, nil, serviceAccount)
 	if err != nil {
@@ -56,5 +58,30 @@ Return if a country is in the renewables collection
 	return 	- If country given exists in database
 */
 func isoCodeInDB(isoCode string) bool {
+	return false
+}
 
+func Firestore_test() error {
+	res := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Doc("NOR")
+
+	doc, _ := res.Get(firestoreContext)
+
+	message := doc.Data()
+	log.Println(message)
+
+	iter := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Documents(firestoreContext)
+	log.Println("loop?")
+	for {
+		log.Println("Start of loop")
+		doc, err := iter.Next()
+
+		if err == iterator.Done {
+			break
+		}
+
+		m := doc.Data()
+		log.Println(m)
+	}
+
+	return nil
 }
