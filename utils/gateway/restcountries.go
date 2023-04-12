@@ -51,5 +51,6 @@ func getCountry(name string) (*structs.Country, error) {
 
 		RcCache[country.Name] = country
 	}
+	// Return pointer to country
 	return country, nil
 }
