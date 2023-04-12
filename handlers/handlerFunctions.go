@@ -37,7 +37,7 @@ Create a request and returns response from a specified URL using specified metho
 
 	return	- http response from request or error
 */
-func httpRequestFromUrl(url string, method string) (http.Response, error) {
+func HttpRequestFromUrl(url string, method string) (http.Response, error) {
 	// Create empty response in case of error
 	var response http.Response
 
