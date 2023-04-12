@@ -85,3 +85,37 @@ func Firestore_test() error {
 
 	return nil
 }
+
+/*
+Appends data from a map to firestore
+
+	data			- Map of data, where each key will be the name of a document, and each element will be the document content
+	collectionName	- Name of collection to add data to
+*/
+func AppendDataToFirestore(data map[string]map[string]interface{}, collectionName string) error {
+
+	// For each key value pair in map, add the map to firestore
+	for code, element := range data {
+		err := AppendDocumentToFirestore(code, element, collectionName)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+/*
+Appends a single map with specified id to firestore
+
+	id				- Id of document we are creating
+	doc				- Map of data, where each key will be one field in a document
+	collectionName	- Name of collection to add data to
+*/
+func AppendDocumentToFirestore(id string, doc map[string]interface{}, collectionName string) error {
+	_, err := firebaseClient.Collection(collectionName).Doc(id).Set(firestoreContext, doc)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+	return nil
+}
