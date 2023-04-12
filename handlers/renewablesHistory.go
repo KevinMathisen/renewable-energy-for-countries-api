@@ -35,7 +35,7 @@ func RenewablesHistory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the historical percentage of renewables for countires specified as a list of countryoutput structs
-	response, err = getHistoryRenewablesForCountries(w, countries)
+	response, err = getHistoryRenewablesForCountries(w, countries, beginYear, endYear, sortByValue, getMean)
 	if err != nil {
 		return
 	}
