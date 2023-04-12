@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"assignment2/utils/constants"
 	"assignment2/utils/structs"
 	"errors"
 	"net/http"
@@ -104,7 +105,7 @@ func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string)
 
 	// Get current year
 	// TODO: Get current Year
-	currentYear := 2021
+	currentYear := constants.LATEST_YEAR_DB
 
 	// If the users specified countries, get renewables data from them in the current year
 	if len(countries) != 0 {

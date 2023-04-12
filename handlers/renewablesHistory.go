@@ -63,13 +63,13 @@ func getHistoryRenewablesForCountries(w http.ResponseWriter, countries []string,
 	// If beginYear not specified set to default
 	if beginYear == -1 {
 		// TODO: Find beginyear
-		beginYear = 1965
+		beginYear = constants.OLDEST_YEAR_DB
 	}
 
 	// If endYear not specified, set to default
 	if endYear == -1 {
 		// TODO: Get current year, as this will be default
-		endYear = 2021
+		endYear = constants.LATEST_YEAR_DB
 	}
 
 	// If countires specified and we don't want mean data, get renewables data from them in year range given
