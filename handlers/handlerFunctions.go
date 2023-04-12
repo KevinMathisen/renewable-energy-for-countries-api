@@ -4,6 +4,7 @@ import (
 	"assignment2/utils/constants"
 	"assignment2/utils/structs"
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -61,6 +62,60 @@ func httpRequestFromUrl(url string, method string) (http.Response, error) {
 
 	// Return response
 	return *res, nil
+}
+
+/*
+Get country code or name, and neighbours parameter from request, then returns appropiate list of countries from these
+
+	w	- Responsewriter
+	r	- Request
+
+	return	- Either empty list of no country specified, or one country, or country and it's neighbours
+*/
+func getCountriesToQuery(w http.ResponseWriter, r *http.Request) ([]string, error) {
+	var countries []string
+
+	// Get country code or name from request
+	countryCodeOrName, err := getCountryCodeOrNameFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get neigbour bool from request if it is specified
+	neigbours, err := getNeigboursParameterFromRequest(r)
+	if err != nil {
+		return nil, err
+	}
+
+	// If user didn't specify any country
+	if countryCodeOrName == "" {
+		return nil, nil
+	}
+
+	// If the user specified the name only
+	if len(countryCodeOrName) != 3 {
+		// TODO: Implement how to get the ISO code if name is given
+
+	} else if isoCodeInDB(countryCodeOrName) {
+		// Else if the user specified ISO code and it exists in the database, add the code the list of countries
+		countries = append(countries, countryCodeOrName)
+	}
+
+	// If the user specified the neighbour parameter
+	if neigbours {
+		// TODO: Get neighbour ISO code with Restcountries API
+
+		// TODO: Check if each isoCode is in database, if so add to list of countires
+	}
+
+	// If no countries existed in the database
+	if len(countries) == 0 {
+		http.Error(w, "No country with given ISO code or name exists in our service", http.StatusNotFound)
+		return nil, errors.New("No country with given ISO code or name exists in our service")
+	}
+
+	return countries, nil
+
 }
 
 /*
