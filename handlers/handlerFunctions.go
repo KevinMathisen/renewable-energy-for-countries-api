@@ -2,10 +2,12 @@
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/db"
 	"assignment2/utils/structs"
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 )
 
 /*
@@ -133,15 +135,26 @@ func getRenewablesForCountriesByYears(w http.ResponseWriter, countries []string,
 
 	// For each country
 	for _, country := range countries {
-		// Get the renwables data from year range
-		renewablesCountry, err := getRenewablesYearsFromCountry(w, country, startYear, endYear) // TODO: Create function
+		// Get the renwables data from firestore
+		renewablesCountry, err := db.GetRenewablesCountryFromFirestore(w, country)
 		if err != nil {
 			return renewablesOutput, err
 		}
-		// TODO: Create a CountryOutput struct with renewabled and correct iso code and country name
 
-		renewablesOutput = append(renewablesOutput, outputCountry)
+		// Create structs with percentage renewable value for each year specified, and save in slice
+		outputCountry, err := createCountryOutputFromData(w, renewablesCountry, country, startYear, endYear)
+		if err != nil {
+			return renewablesOutput, err
+		}
+
+		// TODO: Sort output
+
+		renewablesOutput = append(renewablesOutput, outputCountry...)
 	}
+
+	// TODO: Sort output
+
+	return renewablesOutput, nil
 }
 
 /*
@@ -154,9 +167,64 @@ Get renewables data for all counties in the database between start and end year
 	return		- list of countryouput structs which can will be sent as json in the response, as well as error
 */
 func getRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, endYear int) ([]structs.CountryOutput, error) {
-	// var renewablesOutput []structs.CountryOutput
+	var renewablesOutput []structs.CountryOutput
 
-	// TODO: For all countries, get data, get country name, append to renewablesOutput, and return
+	// Get data from all countries from firestore
+	countriesData, err := db.GetRenewablesAllCountriesFromFirestore(w)
+	if err != nil {
+		return nil, err
+	}
+
+	// For each country create structs with percentage renewable value for each year specified, and save in slice
+	for key, country := range countriesData {
+		outputCountry, err := createCountryOutputFromData(w, country, key, startYear, endYear)
+		if err != nil {
+			return renewablesOutput, err
+		}
+
+		// TODO: Sort output
+
+		renewablesOutput = append(renewablesOutput, outputCountry...)
+	}
+
+	// TODO: Sort output
+
+	return renewablesOutput, nil
+}
+
+/*
+Get mean renewables data for all countries in the database between start and end year
+
+	w			- Responsewriter for sending error messages
+	startYear	- The first year we will get data from
+	endYear		- The last year we will get data from
+
+	return		- list of countryouput structs which can will be sent as json in the response, as well as error
+*/
+func getMeanRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, endYear int) ([]structs.CountryOutput, error) {
+	var renewablesOutput []structs.CountryOutput
+
+	// Get data from all countries from firestore
+	countriesData, err := db.GetRenewablesAllCountriesFromFirestore(w)
+	if err != nil {
+		return nil, err
+	}
+
+	// For each country create a struct with mean value and save in slice
+	for key, country := range countriesData {
+		outputCountry, err := createMeanCountryOutputFromData(w, country, key, startYear, endYear)
+		if err != nil {
+			return renewablesOutput, err
+		}
+
+		// TODO: Sort output
+
+		renewablesOutput = append(renewablesOutput, outputCountry)
+	}
+
+	// TODO: Sort output
+
+	return renewablesOutput, nil
 }
 
 /*
@@ -202,13 +270,151 @@ func getMeanRenewablesForCountriesByYears(w http.ResponseWriter, countries []str
 	// For each country
 	for _, country := range countries {
 		// Get the renwables data from year range
-		renewablesCountry, err := getRenewablesYearsFromCountry(w, country, startYear, endYear) // TODO: Create function
+		renewablesCountry, err := db.GetRenewablesCountryFromFirestore(w, country)
 		if err != nil {
 			return renewablesOutput, err
 		}
-		// TODO: Create a CountryOutput struct with mean percentage, and correct iso code and country name
-		// TODO: Create a way to calculate mean percentage given list of renewables data
+
+		// Create a struct with mean value for years specified
+		outputCountry, err := createMeanCountryOutputFromData(w, renewablesCountry, country, startYear, endYear)
+		if err != nil {
+			return renewablesOutput, err
+		}
 
 		renewablesOutput = append(renewablesOutput, outputCountry)
 	}
+
+	// TODO: sort output
+
+	return renewablesOutput, nil
+}
+
+/*
+Creates a slice of countryOutput structs which can be sendt as response to requests
+Goes through each year for a country, filters out the ones we want, and create a struct for each year
+
+	w			- Responsewriter for error handling
+	data		- Map which contain name of country and renewable percentages for all years of data
+	isoCode		- isoCode of country we are creating structs for
+	startYear	- The year in which we want to start returning data from
+	endYear		- The year in which we want to stop returning data from
+
+	return		- List of countryOutput structs which can be encoded into Json and sent as reponse to requests
+*/
+func createCountryOutputFromData(w http.ResponseWriter, data map[string]interface{}, isoCode string, startYear int, endYear int) ([]structs.CountryOutput, error) {
+	var output []structs.CountryOutput
+
+	// Save country name as a string
+	countryName := data["name"].(string)
+
+	// For each year of country renewables
+	for year, percentage := range data {
+
+		// Ignore name field
+		if year == "name" {
+			continue
+		}
+
+		// Try to convert year to an int
+		yearInt, err := strconv.Atoi(year)
+		if err != nil {
+			http.Error(w, "Error when creating data, could not convert year to int", http.StatusInternalServerError)
+			return output, err
+		}
+
+		// Ignore years outside of scope defined by user
+		if yearInt < startYear || yearInt > endYear {
+			continue
+		}
+
+		// Create countryoutput with year and percentage
+		countryOutput := structs.CountryOutput{
+			Name:       countryName,
+			IsoCode:    isoCode,
+			Year:       year,
+			Percentage: percentage.(float64),
+		}
+
+		// Save each countryoutput to slice
+		output = append(output, countryOutput)
+	}
+
+	return output, nil
+}
+
+/*
+Creates a slice of countryOutput structs with Mean value hich can be sendt as response to requests
+Goes through each year for a country, filters out the ones we want, and caulcates the mean value for all years.
+Then returnes a struct with the mean value.
+
+	w			- Responsewriter for error handling
+	data		- Map which contain name of country and renewable percentages for all years of data
+	isoCode		- isoCode of country we are creating struct for
+	startYear	- The year in which we want to start calculating mean from
+	endYear		- The year in which we want to stop calculating mean from
+
+	return		- CountryOutput struct with no year value and mean value as percentage, can be encoded into Json and sent as reponse to requests
+*/
+func createMeanCountryOutputFromData(w http.ResponseWriter, data map[string]interface{}, isoCode string, startYear int, endYear int) (structs.CountryOutput, error) {
+	var percentages []float64
+
+	// Save country name as a string
+	countryName := data["name"].(string)
+
+	// For each year of country renewables
+	for year, percentage := range data {
+
+		// Ignore name field
+		if year == "name" {
+			continue
+		}
+
+		// Try to convert year to an int
+		yearInt, err := strconv.Atoi(year)
+		if err != nil {
+			http.Error(w, "Error when creating data, could not convert year to int", http.StatusInternalServerError)
+			return output, err
+		}
+
+		// Ignore years outside of scope defined by user
+		if yearInt < startYear || yearInt > endYear {
+			continue
+		}
+
+		// Add each percentage to a list of all percentages in time range
+		percentages = append(percentages, percentage.(float64))
+	}
+
+	// Create a countryOutput without year and mean value as percentage
+	countryOutput := structs.CountryOutput{
+		Name:       countryName,
+		IsoCode:    isoCode,
+		Percentage: mean(percentages),
+	}
+
+	return countryOutput, nil
+}
+
+/*
+Calculate mean value of list of numbers
+
+	input	- List of float values
+
+	return	- Average of list
+*/
+func mean(input []float64) float64 {
+	// If there are no input
+	if len(input) == 0 {
+		return 0
+	}
+
+	var sum float64
+
+	// Add all values in input to get sum
+	for _, value := range input {
+		sum += value
+	}
+
+	// Return mean value of input
+	return sum / float64(len(input))
 }
