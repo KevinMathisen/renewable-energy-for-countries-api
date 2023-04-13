@@ -49,6 +49,7 @@ Get renewables data for the current year from specified countires or all countri
 */
 func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
+	var err error
 
 	// Get current year
 	// TODO: Get current Year
@@ -56,13 +57,13 @@ func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string)
 
 	// If the users specified countries, get renewables data from them in the current year
 	if len(countries) != 0 {
-		renewablesOutput, err := getRenewablesForCountriesByYears(w, countries, currentYear, currentYear)
+		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, currentYear, currentYear)
 		if err != nil {
 			return renewablesOutput, err
 		}
 	} else {
 		// If the user did not specify countires, we get renewables data from all countires in the current year
-		renewablesOutput, err := getRenewablesForAllCountriesByYears(w, currentYear, currentYear)
+		renewablesOutput, err = getRenewablesForAllCountriesByYears(w, currentYear, currentYear)
 		if err != nil {
 			return renewablesOutput, err
 		}
