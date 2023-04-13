@@ -75,25 +75,37 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 	// Get beginYear param
 	begin := (r.URL.Query()).Get("begin")
 
-	// Try to convert string to int
-	beginYear, err = strconv.Atoi(begin)
-	if err != nil && begin != "" {
-		http.Error(w, "Malformed URL, invalid begin parameter set", http.StatusBadRequest)
-		return -1, -1, false, false, err
+	// If the parameter is not specified
+	if begin == "" {
+		beginYear = -1
+	} else {
+		// If the parameter is specified
+		// Try to convert string to int
+		beginYear, err = strconv.Atoi(begin)
+		if err != nil && begin != "" {
+			http.Error(w, "Malformed URL, invalid begin parameter set", http.StatusBadRequest)
+			return -1, -1, false, false, err
+		}
 	}
 
-	// Get emdYear param
+	// Get endYear param
 	end := (r.URL.Query()).Get("end")
 
-	// Try to convert string to int
-	endYear, err = strconv.Atoi(end)
-	if err != nil && begin != "" {
-		http.Error(w, "Malformed URL, invalid end parameter set", http.StatusBadRequest)
-		return -1, -1, false, false, err
+	// If the parameter is not specified
+	if end == "" {
+		endYear = -1
+	} else {
+		// If the parameter is specified
+		// Try to convert string to int
+		endYear, err = strconv.Atoi(end)
+		if err != nil && end != "" {
+			http.Error(w, "Malformed URL, invalid end parameter set", http.StatusBadRequest)
+			return -1, -1, false, false, err
+		}
 	}
 
 	// If years set are outside of database scope
-	if beginYear < constants.OLDEST_YEAR_DB || endYear > constants.LATEST_YEAR_DB {
+	if (beginYear < constants.OLDEST_YEAR_DB && beginYear != -1) || (endYear > constants.LATEST_YEAR_DB && endYear != -1) {
 		http.Error(w, "Malformed URL, begin and end years have to be between "+strconv.Itoa(constants.OLDEST_YEAR_DB)+" and "+strconv.Itoa(constants.LATEST_YEAR_DB), http.StatusBadRequest)
 		return -1, -1, false, false, err
 	}
@@ -103,7 +115,7 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 
 	// Try to convert string to int
 	sortByValue, err = strconv.ParseBool(sortBy)
-	if err != nil && begin != "" {
+	if err != nil && sortBy != "" {
 		http.Error(w, "Malformed URL, invalid sortByValue parameter set", http.StatusBadRequest)
 		return -1, -1, false, false, err
 	}
@@ -113,7 +125,7 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 
 	// Try to convert string to int
 	getMean, err = strconv.ParseBool(mean)
-	if err != nil && begin != "" {
+	if err != nil && mean != "" {
 		http.Error(w, "Malformed URL, invalid mean parameter set", http.StatusBadRequest)
 		return -1, -1, false, false, err
 	}
