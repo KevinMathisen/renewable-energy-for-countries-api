@@ -24,7 +24,7 @@ func RenewablesHistory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the countries we are interested in finding, or empty if everyone
-	countries, err := params.GetCountriesToQuery(w, r)
+	countries, err := params.GetCountriesToQuery(w, r, constants.RENEWABLES_HISTORY_PATH)
 	if err != nil {
 		return
 	}
