@@ -56,7 +56,7 @@ If the user has no preference for type of data returned, the user will get histo
 	sortByvalue	- If output is to be sorted by percentage value decending
 	getMean		- If the user wants to get mean values, even if countires are specified, this should be true. Does not affect output if no countries are specified, as this will always result in mean value being displayed
 
-	return		- List of countryoutput structs which will be sent as json response. The struct will not have the field "year" defined if mean values are returned.
+	return		- List of CountryOutPut structs which will be sent as json response. The struct will not have the field "year" defined if mean values are returned.
 */
 func getHistoryRenewablesForCountries(w http.ResponseWriter, countries []string, beginYear int, endYear int, sortByValue bool, getMean bool) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput

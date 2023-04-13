@@ -6,7 +6,7 @@ import (
 )
 
 /*
-Creates a slice of countryOutput structs which can be sendt as response to requests
+Creates a slice of countryOutput structs which can be sent as response to requests
 Goes through each year for a country, filters out the ones we want, and create a struct for each year
 
 	w			- Responsewriter for error handling
@@ -119,7 +119,7 @@ Calculate mean value of list of numbers
 	return	- Average of list
 */
 func mean(input []float64) float64 {
-	// If there are no input
+	// If there is no input
 	if len(input) == 0 {
 		return 0
 	}

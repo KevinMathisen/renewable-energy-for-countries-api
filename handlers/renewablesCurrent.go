@@ -35,7 +35,7 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Respond with list of countryoutput struct encoded as json to user
+	// Respond with list of CountryOutPut struct encoded as json to user
 	gateway.RespondToGetRequestWithJSON(w, response)
 }
 
@@ -45,7 +45,7 @@ Get renewables data for the current year from specified countires or all countri
 	w			- Responsewriter for sending error messages
 	countires	- Either a list of countries we want to get data from, or an empty list if we want all
 
-	return		- Returns a list of countryouput structs which can will be sent as json in the response
+	return		- Returns a list of CountryOutPut structs which can will be sent as json in the response
 */
 func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput

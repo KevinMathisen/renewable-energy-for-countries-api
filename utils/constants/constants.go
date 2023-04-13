@@ -1,9 +1,9 @@
 package constants
 
-// Service Version
+// Service version
 const VERSION = "v1"
 
-// Endpoint Paths
+// Endpoint paths
 const DEFAULT_PATH = "/"
 const SERVICE_PATH = "/energy/" + VERSION
 const RENEWABLES_PATH = SERVICE_PATH + "/renewables"
@@ -24,11 +24,11 @@ const ISO_SEARCH_PATH = "/v3.1/alpha/"
 const OLDEST_YEAR_DB = 1965
 const LATEST_YEAR_DB = 2021
 
-// Forestore constants
+// Firestore constants
 const RENEWABLES_COLLECTION = "renewables"
 const WEBHOOKS_COLLECTION = "webhooks"
 const CACHE_COLLECTION = "cache"
 
-// Name of Files
+// Name of files
 const RENEWABLES_CSV_FILE = "./renewable-share-energy.csv"
 const CREDENTIALS_FILE = "./assignment2-prog2005-service-account.json"
