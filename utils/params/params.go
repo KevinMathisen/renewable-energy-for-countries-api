@@ -1,4 +1,4 @@
-package params
+﻿package params
 
 import (
 	"assignment2/utils/constants"
@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 /*
@@ -16,11 +17,11 @@ Get country code or name, and neighbours parameter from request, then returns ap
 
 	return	- Either empty list of no country specified, or one country, or country and it's neighbours
 */
-func GetCountriesToQuery(w http.ResponseWriter, r *http.Request) ([]string, error) {
+func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([]string, error) {
 	var countries []string
 
 	// Get country code or name from request
-	countryCodeOrName, err := getCountryCodeOrNameFromRequest(w, r)
+	countryCodeOrName, err := getCountryCodeOrNameFromRequest(w, r, path)
 	if err != nil {
 		return nil, err
 	}
@@ -120,10 +121,49 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 	return beginYear, endYear, sortByValue, getMean, nil
 }
 
-func getCountryCodeOrNameFromRequest(w http.ResponseWriter, r *http.Request) (string, error) {
-	return "", nil
+/*
+Get coyntry code or name from the requests url
+
+	w		- Responsewriter
+	r		- Request
+	path	- Path of endpoint used for giving correct error handling message
+
+	return 	- Country code or name, or empty
+*/
+func getCountryCodeOrNameFromRequest(w http.ResponseWriter, r *http.Request, path string) (string, error) {
+
+	// Split path into args
+	args := strings.Split(r.URL.Path, "/")
+
+	// Check if URl is correctly formated
+	if (len(args) != 6 && len(args) != 7) || args[5] == "" {
+		http.Error(w, "Malformed URL, Expecting format "+path+"{country?}", http.StatusBadRequest)
+		return "", errors.New("malformed URL")
+	}
+
+	// Return name of country / isoCode
+	return args[5], nil
 }
 
+/*
+Get neighbour parameter from request
+
+	w		- Responsewriter
+	r		- Request
+
+	return	- Bool which indicated wether user want data from neighbours of country returned
+*/
 func getNeighboursParameterFromRequest(w http.ResponseWriter, r *http.Request) (bool, error) {
-	return false, nil
+	// Get CountryCodeOrName param
+	neighboursString := (r.URL.Query()).Get("neighbours")
+
+	// Try to convert string to int
+	neighbours, err := strconv.ParseBool(neighboursString)
+	if err != nil && neighboursString != "" {
+		http.Error(w, "Malformed URL, invalid neighbours parameter set", http.StatusBadRequest)
+		return false, err
+	}
+
+	// Return neighbours bool
+	return neighbours, nil
 }
