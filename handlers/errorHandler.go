@@ -5,13 +5,13 @@ import (
 	"net/http"
 )
 
-type RootHandler func(http.ResponseWriter, *http.Request) error
+type RootHandler func(http.ResponseWriter, *http.Request) WrappedError
 
 // Handles all errors in same place.
 func (fn RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	err := fn(w, r) // Calls original function, then awaits error to "bubble" back up
-	if err == nil { // If there are no errors
+	err := fn(w, r)         // Calls original function, then awaits error to "bubble" back up
+	if err.OrigErr == nil { // If there are no errors
 		return
 	}
 
