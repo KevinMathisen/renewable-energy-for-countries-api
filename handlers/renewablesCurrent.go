@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/gateway"
+	"assignment2/utils/params"
 	"assignment2/utils/structs"
 	"net/http"
 )
@@ -22,7 +24,7 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the countries we are interested in finding, or empty if everyone
-	countries, err := getCountriesToQuery(w, r)
+	countries, err := params.GetCountriesToQuery(w, r)
 	if err != nil {
 		return
 	}
@@ -34,7 +36,7 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Respond with list of countryoutput struct encoded as json to user
-	respondToGetRequestWithJSON(w, response)
+	gateway.RespondToGetRequestWithJSON(w, response)
 }
 
 /*

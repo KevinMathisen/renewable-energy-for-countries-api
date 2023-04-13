@@ -2,6 +2,7 @@ package params
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/db"
 	"errors"
 	"net/http"
 	"strconv"
@@ -15,17 +16,17 @@ Get country code or name, and neighbours parameter from request, then returns ap
 
 	return	- Either empty list of no country specified, or one country, or country and it's neighbours
 */
-func getCountriesToQuery(w http.ResponseWriter, r *http.Request) ([]string, error) {
+func GetCountriesToQuery(w http.ResponseWriter, r *http.Request) ([]string, error) {
 	var countries []string
 
 	// Get country code or name from request
-	countryCodeOrName, err := getCountryCodeOrNameFromRequest(r)
+	countryCodeOrName, err := getCountryCodeOrNameFromRequest(w, r)
 	if err != nil {
 		return nil, err
 	}
 
 	// Get neigbour bool from request if it is specified
-	neigbours, err := getNeigboursParameterFromRequest(r)
+	neighbours, err := getNeighboursParameterFromRequest(w, r)
 	if err != nil {
 		return nil, err
 	}
@@ -39,13 +40,13 @@ func getCountriesToQuery(w http.ResponseWriter, r *http.Request) ([]string, erro
 	if len(countryCodeOrName) != 3 {
 		// TODO: Implement how to get the ISO code if name is given
 
-	} else if isoCodeInDB(countryCodeOrName) {
+	} else if db.IsoCodeInDB(countryCodeOrName) {
 		// Else if the user specified ISO code and it exists in the database, add the code the list of countries
 		countries = append(countries, countryCodeOrName)
 	}
 
 	// If the user specified the neighbour parameter
-	if neigbours {
+	if neighbours {
 		// TODO: Get neighbour ISO code with Restcountries API
 
 		// TODO: Check if each isoCode is in database, if so add to list of countires
@@ -69,7 +70,7 @@ Get parameters from request to renewables history endpoint if any are given
 
 	return	- Parameters from request. Ints are -1 if empty, bool values are false if empty
 */
-func getRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beginYear int, endYear int, sortByValue bool, getMean bool, err error) {
+func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beginYear int, endYear int, sortByValue bool, getMean bool, err error) {
 	// Get beginYear param
 	begin := (r.URL.Query()).Get("begin")
 
@@ -117,4 +118,12 @@ func getRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 	}
 
 	return beginYear, endYear, sortByValue, getMean, nil
+}
+
+func getCountryCodeOrNameFromRequest(w http.ResponseWriter, r *http.Request) (string, error) {
+	return "", nil
+}
+
+func getNeighboursParameterFromRequest(w http.ResponseWriter, r *http.Request) (bool, error) {
+	return false, nil
 }

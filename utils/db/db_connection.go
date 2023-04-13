@@ -2,6 +2,7 @@
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/structs"
 	"context"
 	"log"
 	"net/http"
@@ -60,18 +61,16 @@ Return if a country is in the renewables collection
 
 	return 	- If country given exists in database
 */
-func isoCodeInDB(isoCode string) (bool, error) {
+func IsoCodeInDB(isoCode string) bool {
 	// Check if country with ISO code exists in renewables collection
 	_, err := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Doc(isoCode).Get(firestoreContext)
 
 	// If we got error not found, return false
 	if status.Code(err) == codes.NotFound {
-		return false, nil
-	} else if err != nil {
-		return false, err
+		return false
 	}
 	// IF the country was found
-	return true, nil
+	return true
 }
 
 func Firestore_test() error {
@@ -169,4 +168,8 @@ func GetRenewablesAllCountriesFromFirestore(w http.ResponseWriter) (map[string]m
 	}
 
 	return data, nil
+}
+
+func CheckCacheDBForURL(w http.ResponseWriter, url string) ([]structs.CountryOutput, error) {
+	return nil, nil
 }

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
 	"net/http"
 	"strconv"
@@ -27,7 +28,7 @@ func Status(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Handle get request
-	respondToGetRequestWithJSON(w, statusRes)
+	gateway.RespondToGetRequestWithJSON(w, statusRes)
 }
 
 /*
@@ -38,7 +39,7 @@ Creates the status json response.
 */
 func createStatusResponse(start time.Time) (structs.Status, error) {
 	// Get request from countries api
-	resCountry, err := httpRequestFromUrl(constants.COUNTRIES_API_URL, http.MethodHead)
+	resCountry, err := gateway.HttpRequestFromUrl(constants.COUNTRIES_API_URL, http.MethodHead)
 	if err != nil {
 		return structs.Status{}, err
 	}

@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"assignment2/handlers"
 	"assignment2/utils/constants"
 	"assignment2/utils/structs"
 	"encoding/json"
@@ -26,7 +25,7 @@ func getCountry(name string) (*structs.Country, error) {
 		url := strings.Join(urlParts, "")
 
 		//Send get request to restcountries API
-		res, err := handlers.HttpRequestFromUrl(url, "GET")
+		res, err := HttpRequestFromUrl(url, "GET")
 		if err != nil {
 			return nil, err
 		}

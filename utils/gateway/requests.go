@@ -12,7 +12,7 @@ Responds to GET request with JSON content and body specified
 	w			- Responsewriter
 	jsonBody	- Any struct which will be encoded into json and sent as response body
 */
-func respondToGetRequestWithJSON(w http.ResponseWriter, jsonBody interface{}) {
+func RespondToGetRequestWithJSON(w http.ResponseWriter, jsonBody interface{}) {
 	// Write to content type field in response header
 	w.Header().Add("content-type", constants.CONT_TYPE_JSON)
 
