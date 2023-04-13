@@ -136,7 +136,7 @@ func getCountryCodeOrNameFromRequest(w http.ResponseWriter, r *http.Request, pat
 	args := strings.Split(r.URL.Path, "/")
 
 	// Check if URl is correctly formated
-	if (len(args) != 6 && len(args) != 7) || args[5] == "" {
+	if len(args) != 6 && len(args) != 7 {
 		http.Error(w, "Malformed URL, Expecting format "+path+"{country?}", http.StatusBadRequest)
 		return "", errors.New("malformed URL")
 	}
