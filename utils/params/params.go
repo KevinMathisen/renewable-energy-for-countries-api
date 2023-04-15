@@ -15,7 +15,7 @@ Get country code or name, and neighbours parameter from request, then returns ap
 	w	- Responsewriter
 	r	- Request
 
-	return	- Either empty list of no country specified, or one country, or country and it's neighbours
+	return	- Either empty list of no country specified, or one country, or country and its neighbours
 */
 func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([]string, error) {
 	var countries []string
@@ -110,7 +110,7 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 		return -1, -1, false, false, err
 	}
 
-	// Get stortByValue param
+	// Get sortByValue param
 	sortBy := (r.URL.Query()).Get("sortByValue")
 
 	// Try to convert string to int
@@ -134,7 +134,7 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 }
 
 /*
-Get coyntry code or name from the requests url
+Get country code or name from the requests url
 
 	w		- Responsewriter
 	r		- Request
@@ -147,7 +147,7 @@ func getCountryCodeOrNameFromRequest(w http.ResponseWriter, r *http.Request, pat
 	// Split path into args
 	args := strings.Split(r.URL.Path, "/")
 
-	// Check if URl is correctly formated
+	// Check if URL is correctly formatted
 	if len(args) != 6 && len(args) != 7 {
 		http.Error(w, "Malformed URL, Expecting format "+path+"{country?}", http.StatusBadRequest)
 		return "", errors.New("malformed URL")
@@ -163,7 +163,7 @@ Get neighbour parameter from request
 	w		- Responsewriter
 	r		- Request
 
-	return	- Bool which indicated wether user want data from neighbours of country returned
+	return	- Bool which indicated whether user want data from neighbours of country returned
 */
 func getNeighboursParameterFromRequest(w http.ResponseWriter, r *http.Request) (bool, error) {
 	// Get CountryCodeOrName param

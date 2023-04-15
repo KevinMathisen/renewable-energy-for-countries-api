@@ -7,10 +7,10 @@ import (
 
 type RootHandler func(http.ResponseWriter, *http.Request) WrappedError
 
-// Handles all errors in same place.
+// Handles all errors in the same place.
 func (fn RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	err := fn(w, r)         // Calls original function, then awaits error to "bubble" back up
+	err := fn(w, r)         // Calls original function, then awaits errors to "bubble" back up
 	if err.OrigErr == nil { // If there are no errors
 		return
 	}

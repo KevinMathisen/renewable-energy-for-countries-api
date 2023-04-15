@@ -50,7 +50,7 @@ Closes the firebase client, or logs a fatal error if it failed
 func CloseFirebaseClient() {
 	err := firebaseClient.Close()
 	if err != nil {
-		log.Fatal("CLosing of firebase client failed. Error: ", err)
+		log.Fatal("Closing of firebase client failed. Error: ", err)
 	}
 }
 
@@ -69,7 +69,7 @@ func IsoCodeInDB(isoCode string) bool {
 	if status.Code(err) == codes.NotFound {
 		return false
 	}
-	// IF the country was found
+	// If the country was found
 	return true
 }
 

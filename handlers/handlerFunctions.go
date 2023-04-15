@@ -15,14 +15,14 @@ Get renewables data for all countries given between start and end year
 	startYear	- The first year we will get data from
 	endYear		- The last year we will get data from
 
-	return		- list of countryouput structs which can will be sent as json in the response, as well as error
+	return		- list of CountryOutPut structs which will be sent as json in the response, as well as error
 */
 func getRenewablesForCountriesByYears(w http.ResponseWriter, countries []string, startYear int, endYear int) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
 
 	// For each country
 	for _, country := range countries {
-		// Get the renwables data from firestore
+		// Get the renwables data from Firestore
 		renewablesCountry, err := db.GetRenewablesCountryFromFirestore(w, country)
 		if err != nil {
 			return renewablesOutput, err
@@ -52,7 +52,7 @@ Get mean renewables data for all countries given between start and end year
 	startYear	- The first year we will get data from
 	endYear		- The last year we will get data from
 
-	return		- list of countryouput structs with no year and percentage as mean value, which can will be sent as json in the response, as well as error
+	return		- list of CountryOutPut structs with no year and percentage as mean value, which will be sent as json in the response, as well as error
 */
 func getMeanRenewablesForCountriesByYears(w http.ResponseWriter, countries []string, startYear int, endYear int) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
@@ -80,13 +80,13 @@ func getMeanRenewablesForCountriesByYears(w http.ResponseWriter, countries []str
 }
 
 /*
-Get renewables data for all counties in the database between start and end year
+Get renewables data for all counrties in the database between start and end year
 
 	w			- Responsewriter for sending error messages
 	startYear	- The first year we will get data from
 	endYear		- The last year we will get data from
 
-	return		- list of countryouput structs which can will be sent as json in the response, as well as error
+	return		- list of CountryOutPut structs which can will be sent as json in the response, as well as error
 */
 func getRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, endYear int) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
@@ -121,7 +121,7 @@ Get mean renewables data for all countries in the database between start and end
 	startYear	- The first year we will get data from
 	endYear		- The last year we will get data from
 
-	return		- list of countryouput structs which can will be sent as json in the response, as well as error
+	return		- list of CountryOutPut structs which can will be sent as json in the response, as well as error
 */
 func getMeanRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, endYear int) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
@@ -155,7 +155,7 @@ Should check if request is in the cache, then respond with cached response
 	w	- Http responsewriter
 	r 	- Http request
 
-	return	- bool, true if there was a cache git
+	return	- bool, true if there was a cache hit
 */
 func checkCache(w http.ResponseWriter, r *http.Request) (bool, error) {
 	var hit []structs.CountryOutput

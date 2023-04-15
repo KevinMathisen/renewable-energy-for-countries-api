@@ -19,7 +19,7 @@ type Country struct {
 }
 
 /*
-* Struct for decoding JSON POST request for Registration of Webhooks in Notification endpoint.
+* Struct for decoding JSON POST request for registration of webhooks in Notification endpoint.
  */
 type NewWebhook struct {
 	Url     string `json:"url"`
