@@ -29,8 +29,13 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sortByValue, err := params.GetBoolParameterFromRequest(w, r, "sortByValue")
+	if err != nil {
+		return
+	}
+
 	// Get current percentage of renewables for countries specified as a list of countryoutput structs
-	response, err = getCurrentRenewablesForCountries(w, countries)
+	response, err = getCurrentRenewablesForCountries(w, countries, sortByValue)
 	if err != nil {
 		return
 	}
@@ -47,7 +52,7 @@ Get renewables data for the current year from specified countires or all countri
 
 	return		- Returns a list of CountryOutPut structs which can will be sent as json in the response
 */
-func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string) ([]structs.CountryOutput, error) {
+func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string, sortByValue bool) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
 	var err error
 
@@ -56,14 +61,14 @@ func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string)
 	currentYear := constants.LATEST_YEAR_DB
 
 	// If the users specified countries, get renewables data from them in the current year
-	if len(countries) != 0 {
-		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, currentYear, currentYear)
+	if len(countries) != 0 && !sortByValue {
+		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}
 	} else {
 		// If the user did not specify countires, we get renewables data from all countires in the current year
-		renewablesOutput, err = getRenewablesForAllCountriesByYears(w, currentYear, currentYear)
+		renewablesOutput, err = getRenewablesForAllCountriesByYears(w, currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}
