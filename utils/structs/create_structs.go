@@ -71,7 +71,7 @@ Then returnes a struct with the mean value.
 
 	return		- CountryOutput struct with no year value and mean value as percentage, can be encoded into Json and sent as reponse to requests
 */
-func CreateMeanCountryOutputFromData(w http.ResponseWriter, data map[string]interface{}, isoCode string, startYear int, endYear int) (CountryOutput, error) {
+func CreateMeanCountryOutputFromData(w http.ResponseWriter, data map[string]interface{}, isoCode string, startYear int, endYear int) ([]CountryOutput, error) {
 	var percentages []float64
 
 	// Save country name as a string
@@ -89,7 +89,7 @@ func CreateMeanCountryOutputFromData(w http.ResponseWriter, data map[string]inte
 		yearInt, err := strconv.Atoi(year)
 		if err != nil {
 			http.Error(w, "Error when creating data, could not convert year to int", http.StatusInternalServerError)
-			return CountryOutput{}, err
+			return nil, err
 		}
 
 		// Ignore years outside of scope defined by user
@@ -108,7 +108,7 @@ func CreateMeanCountryOutputFromData(w http.ResponseWriter, data map[string]inte
 		Percentage: mean(percentages),
 	}
 
-	return countryOutput, nil
+	return []CountryOutput{countryOutput}, nil
 }
 
 /*
