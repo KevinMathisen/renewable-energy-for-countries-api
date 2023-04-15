@@ -76,21 +76,21 @@ func getHistoryRenewablesForCountries(w http.ResponseWriter, countries []string,
 
 	// If countires specified and we don't want mean data, get renewables data from them in year range given
 	if len(countries) != 0 && !getMean {
-		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, beginYear, endYear)
+		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, beginYear, endYear, structs.CreateCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}
 
 	} else if len(countries) != 0 && getMean {
 		// If countires specified and we want mean data, get renewabled mean data from them in year range given
-		renewablesOutput, err = getMeanRenewablesForCountriesByYears(w, countries, beginYear, endYear)
+		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, beginYear, endYear, structs.CreateMeanCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}
 
 	} else if len(countries) == 0 {
 		// If no countries specified, get renewables mean data from all in year range given
-		renewablesOutput, err = getMeanRenewablesForAllCountriesByYears(w, beginYear, endYear)
+		renewablesOutput, err = getRenewablesForAllCountriesByYears(w, beginYear, endYear, structs.CreateMeanCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}
