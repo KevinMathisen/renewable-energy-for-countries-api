@@ -5,6 +5,8 @@ import (
 	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
 	"net/http"
+	"sort"
+	"strings"
 )
 
 /*
@@ -122,4 +124,41 @@ func checkCache(w http.ResponseWriter, r *http.Request) (bool, error) {
 
 	// No cache hit
 	return false, nil
+}
+
+/*
+Sorts a list of countryoutput by their isoCode alphabetically
+
+	input	- Slice of slices where each subslice is countryoutputs from one country
+
+	return 	- Slice of countryoutput sorted by isoCode
+*/
+func sortByIsoCode(input [][]structs.CountryOutput) []structs.CountryOutput {
+	var output []structs.CountryOutput
+
+	// Sort by isoCode alphabetically
+	sort.Slice(input, func(i, j int) bool {
+		return strings.Compare(input[i][0].IsoCode, input[j][0].IsoCode) == -1
+	})
+
+	// Append each subslice for each country to one slice
+	for _, country := range input {
+		output = append(output, country...)
+	}
+
+	return output
+}
+
+/*
+Sorts a slice of countryputputs by percentage descending
+
+	input	- Slice of countryOutput structs to be sorted
+
+	return	- Slice of countryOutput structs sorted
+*/
+func sortOutputByPercentage(input []structs.CountryOutput) []structs.CountryOutput {
+	sort.Slice(input, func(i, j int) bool {
+		return input[i].Percentage > input[j].Percentage
+	})
+	return input
 }
