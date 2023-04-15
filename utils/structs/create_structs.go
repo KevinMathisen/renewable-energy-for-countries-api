@@ -2,11 +2,12 @@
 
 import (
 	"net/http"
+	"sort"
 	"strconv"
 )
 
 /*
-Creates a slice of countryOutput structs which can be sent as response to requests
+Creates a slice of countryOutput structs sorted by year which can be sent as response to requests
 Goes through each year for a country, filters out the ones we want, and create a struct for each year
 
 	w			- Responsewriter for error handling
@@ -54,6 +55,11 @@ func CreateCountryOutputFromData(w http.ResponseWriter, data map[string]interfac
 		// Save each countryoutput to slice
 		output = append(output, countryOutput)
 	}
+
+	// Sort output based on year
+	sort.Slice(output, func(i, j int) bool {
+		return output[i].Year < output[j].Year
+	})
 
 	return output, nil
 }
