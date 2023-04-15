@@ -27,7 +27,7 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 	}
 
 	// Get neigbour bool from request if it is specified
-	neighbours, err := getNeighboursParameterFromRequest(w, r)
+	neighbours, err := GetBoolParameterFromRequest(w, r, "neighbours")
 	if err != nil {
 		return nil, err
 	}
@@ -51,6 +51,9 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 		// TODO: Get neighbour ISO code with Restcountries API
 
 		// TODO: Check if each isoCode is in database, if so add to list of countires
+
+		// Temporary hardcoded for testing
+		countries = append(countries, []string{"SWE", "DNK", "FIN"}...)
 	}
 
 	// If no countries existed in the database
@@ -111,22 +114,14 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 	}
 
 	// Get sortByValue param
-	sortBy := (r.URL.Query()).Get("sortByValue")
-
-	// Try to convert string to int
-	sortByValue, err = strconv.ParseBool(sortBy)
-	if err != nil && sortBy != "" {
-		http.Error(w, "Malformed URL, invalid sortByValue parameter set", http.StatusBadRequest)
+	sortByValue, err = GetBoolParameterFromRequest(w, r, "sortByValue")
+	if err != nil {
 		return -1, -1, false, false, err
 	}
 
 	// Get getMean param
-	mean := (r.URL.Query()).Get("mean")
-
-	// Try to convert string to int
-	getMean, err = strconv.ParseBool(mean)
-	if err != nil && mean != "" {
-		http.Error(w, "Malformed URL, invalid mean parameter set", http.StatusBadRequest)
+	getMean, err = GetBoolParameterFromRequest(w, r, "mean")
+	if err != nil {
 		return -1, -1, false, false, err
 	}
 
@@ -165,17 +160,17 @@ Get neighbour parameter from request
 
 	return	- Bool which indicated whether user want data from neighbours of country returned
 */
-func getNeighboursParameterFromRequest(w http.ResponseWriter, r *http.Request) (bool, error) {
+func GetBoolParameterFromRequest(w http.ResponseWriter, r *http.Request, paramName string) (bool, error) {
 	// Get CountryCodeOrName param
-	neighboursString := (r.URL.Query()).Get("neighbours")
+	paramString := (r.URL.Query()).Get(paramName)
 
 	// Try to convert string to int
-	neighbours, err := strconv.ParseBool(neighboursString)
-	if err != nil && neighboursString != "" {
-		http.Error(w, "Malformed URL, invalid neighbours parameter set", http.StatusBadRequest)
+	paramBool, err := strconv.ParseBool(paramString)
+	if err != nil && paramString != "" {
+		http.Error(w, "Malformed URL, invalid "+paramName+" parameter set", http.StatusBadRequest)
 		return false, err
 	}
 
 	// Return neighbours bool
-	return neighbours, nil
+	return paramBool, nil
 }
