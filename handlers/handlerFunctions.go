@@ -10,15 +10,18 @@ import (
 /*
 Get renewables data for all countries given between start and end year
 
-	w			- Responsewriter for sending error messages
-	countries	- A list of countries we want to get data from
-	startYear	- The first year we will get data from
-	endYear		- The last year we will get data from
+	w					- Responsewriter for sending error messages
+	countries			- A list of countries we want to get data from
+	startYear			- The first year we will get data from
+	endYear				- The last year we will get data from
+	createCountryOutput	- Function for creating the countryOutputs. Alternatives are creating based on years or mean.
+	sortByPercentage	- If the output should be sorted by percentage. If not the output is sorted by year and IsoCode.
 
-	return		- list of CountryOutPut structs which will be sent as json in the response, as well as error
+	return				- list of CountryOutPut structs which will be sent as json in the response, as well as error
 */
-func getRenewablesForCountriesByYears(w http.ResponseWriter, countries []string, startYear int, endYear int) ([]structs.CountryOutput, error) {
+func getRenewablesForCountriesByYears(w http.ResponseWriter, countries []string, startYear int, endYear int, createCountryOutput func(http.ResponseWriter, map[string]interface{}, string, int, int) ([]structs.CountryOutput, error), sortByPercentage bool) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
+	var outputNotSorted [][]structs.CountryOutput
 
 	// For each country
 	for _, country := range countries {
@@ -29,52 +32,21 @@ func getRenewablesForCountriesByYears(w http.ResponseWriter, countries []string,
 		}
 
 		// Create structs with percentage renewable value for each year specified, and save in slice
-		outputCountry, err := structs.CreateCountryOutputFromData(w, renewablesCountry, country, startYear, endYear)
+		outputCountry, err := createCountryOutput(w, renewablesCountry, country, startYear, endYear)
 		if err != nil {
 			return renewablesOutput, err
 		}
 
-		// TODO: Sort output
-
-		renewablesOutput = append(renewablesOutput, outputCountry...)
+		outputNotSorted = append(outputNotSorted, outputCountry)
 	}
 
-	// TODO: Sort output
+	// Sort output by IsoCode
+	renewablesOutput = sortByIsoCode(outputNotSorted)
 
-	return renewablesOutput, nil
-}
-
-/*
-Get mean renewables data for all countries given between start and end year
-
-	w			- Responsewriter for sending error messages
-	countries	- A list of countries we want to get data from
-	startYear	- The first year we will get data from
-	endYear		- The last year we will get data from
-
-	return		- list of CountryOutPut structs with no year and percentage as mean value, which will be sent as json in the response, as well as error
-*/
-func getMeanRenewablesForCountriesByYears(w http.ResponseWriter, countries []string, startYear int, endYear int) ([]structs.CountryOutput, error) {
-	var renewablesOutput []structs.CountryOutput
-
-	// For each country
-	for _, country := range countries {
-		// Get the renwables data from year range
-		renewablesCountry, err := db.GetRenewablesCountryFromFirestore(w, country)
-		if err != nil {
-			return renewablesOutput, err
-		}
-
-		// Create a struct with mean value for years specified
-		outputCountry, err := structs.CreateMeanCountryOutputFromData(w, renewablesCountry, country, startYear, endYear)
-		if err != nil {
-			return renewablesOutput, err
-		}
-
-		renewablesOutput = append(renewablesOutput, outputCountry)
+	// Sort output by percentage if specified
+	if sortByPercentage {
+		renewablesOutput = sortOutputByPercentage(renewablesOutput)
 	}
-
-	// TODO: sort output
 
 	return renewablesOutput, nil
 }
@@ -82,14 +54,17 @@ func getMeanRenewablesForCountriesByYears(w http.ResponseWriter, countries []str
 /*
 Get renewables data for all counrties in the database between start and end year
 
-	w			- Responsewriter for sending error messages
-	startYear	- The first year we will get data from
-	endYear		- The last year we will get data from
+	w					- Responsewriter for sending error messages
+	startYear			- The first year we will get data from
+	endYear				- The last year we will get data from
+	createCountryOutput	- Function for creating the countryOutputs. Alternatives are creating based on years or mean.
+	sortByPercentage	- If the output should be sorted by percentage. If not the output is sorted by year and IsoCode.
 
-	return		- list of CountryOutPut structs which can will be sent as json in the response, as well as error
+	return				- list of CountryOutPut structs which can will be sent as json in the response, as well as error
 */
-func getRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, endYear int) ([]structs.CountryOutput, error) {
+func getRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, endYear int, createCountryOutput func(http.ResponseWriter, map[string]interface{}, string, int, int) ([]structs.CountryOutput, error), sortByPercentage bool) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
+	var outputNotSorted [][]structs.CountryOutput
 
 	// Get data from all countries from firestore
 	countriesData, err := db.GetRenewablesAllCountriesFromFirestore(w)
@@ -99,52 +74,25 @@ func getRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, e
 
 	// For each country create structs with percentage renewable value for each year specified, and save in slice
 	for key, country := range countriesData {
-		outputCountry, err := structs.CreateCountryOutputFromData(w, country, key, startYear, endYear)
+		outputCountry, err := createCountryOutput(w, country, key, startYear, endYear)
 		if err != nil {
 			return renewablesOutput, err
 		}
 
-		// TODO: Sort output
-
-		renewablesOutput = append(renewablesOutput, outputCountry...)
-	}
-
-	// TODO: Sort output
-
-	return renewablesOutput, nil
-}
-
-/*
-Get mean renewables data for all countries in the database between start and end year
-
-	w			- Responsewriter for sending error messages
-	startYear	- The first year we will get data from
-	endYear		- The last year we will get data from
-
-	return		- list of CountryOutPut structs which can will be sent as json in the response, as well as error
-*/
-func getMeanRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, endYear int) ([]structs.CountryOutput, error) {
-	var renewablesOutput []structs.CountryOutput
-
-	// Get data from all countries from firestore
-	countriesData, err := db.GetRenewablesAllCountriesFromFirestore(w)
-	if err != nil {
-		return nil, err
-	}
-
-	// For each country create a struct with mean value and save in slice
-	for key, country := range countriesData {
-		outputCountry, err := structs.CreateMeanCountryOutputFromData(w, country, key, startYear, endYear)
-		if err != nil {
-			return renewablesOutput, err
+		// If there was valid data for the year range, save to slice
+		if len(outputCountry) != 0 {
+			outputNotSorted = append(outputNotSorted, outputCountry)
 		}
 
-		// TODO: Sort output
-
-		renewablesOutput = append(renewablesOutput, outputCountry)
 	}
 
-	// TODO: Sort output
+	// Sort output by IsoCode
+	renewablesOutput = sortByIsoCode(outputNotSorted)
+
+	// Sort output by percentage if specified
+	if sortByPercentage {
+		renewablesOutput = sortOutputByPercentage(renewablesOutput)
+	}
 
 	return renewablesOutput, nil
 }
