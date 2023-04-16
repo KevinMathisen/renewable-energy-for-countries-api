@@ -1,7 +1,7 @@
 package main
 
 import (
-	"assignment2/handlers"
+	h "assignment2/handlers"
 	"assignment2/utils/constants"
 	"assignment2/utils/db"
 	"log"
@@ -19,7 +19,7 @@ func main() {
 	defer db.CloseFirebaseClient()
 
 	// Save start time of service to calculate uptime
-	handlers.Start = time.Now()
+	h.Start = time.Now()
 
 	// Handle port assignment
 	port := os.Getenv(("PORT"))
@@ -28,7 +28,8 @@ func main() {
 		port = "8080"
 	}
 
-	// Set up handler enpoints
+	//!!! OLD HANDLERS
+	/* Set up handler enpoints
 	http.HandleFunc(constants.DEFAULT_PATH, handlers.Default)
 	http.HandleFunc(constants.SERVICE_PATH, handlers.Service)
 	http.HandleFunc(constants.RENEWABLES_PATH, handlers.Renewables)
@@ -36,6 +37,16 @@ func main() {
 	http.HandleFunc(constants.RENEWABLES_HISTORY_PATH, handlers.RenewablesHistory)
 	http.HandleFunc(constants.NOTIFICATION_PATH, handlers.Notification)
 	http.HandleFunc(constants.STATUS_PATH, handlers.Status)
+	*/
+
+	// Set up handler endpoints throuh root error handler
+	http.Handle(constants.DEFAULT_PATH, h.RootHandler(h.Default))
+	http.Handle(constants.SERVICE_PATH, h.RootHandler(h.Service))
+	http.Handle(constants.RENEWABLES_PATH, h.RootHandler(h.Renewables))
+	http.Handle(constants.RENEWABLES_CURRENT_PATH, h.RootHandler(h.RenewablesCurrent))
+	http.Handle(constants.RENEWABLES_HISTORY_PATH, h.RootHandler(h.RenewablesHistory))
+	http.Handle(constants.NOTIFICATION_PATH, h.RootHandler(h.Notification))
+	http.Handle(constants.STATUS_PATH, h.RootHandler(h.Status))
 
 	// Start server
 	log.Println("Starting server on port " + port + " ...")
