@@ -8,40 +8,42 @@ import (
 	"net/http"
 )
 
-func RenewablesCurrent(w http.ResponseWriter, r *http.Request) {
+func RenewablesCurrent(w http.ResponseWriter, r *http.Request) error {
 	var response []structs.CountryOutput
 
 	// Send error message if request method is not get
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid method, currently only GET is supported", http.StatusNotImplemented)
-		return
+		return nil // TODO: Return error
 	}
 
 	// If cache hit, send cached response
 	hit, err := checkCache(w, r)
 	if hit || err != nil {
-		return
+		return err
 	}
 
 	// Get the countries we are interested in finding, or empty if everyone
 	countries, err := params.GetCountriesToQuery(w, r, constants.RENEWABLES_CURRENT_PATH)
 	if err != nil {
-		return
+		return err
 	}
 
 	sortByValue, err := params.GetBoolParameterFromRequest(w, r, "sortByValue")
 	if err != nil {
-		return
+		return err
 	}
 
 	// Get current percentage of renewables for countries specified as a list of countryoutput structs
 	response, err = getCurrentRenewablesForCountries(w, countries, sortByValue)
 	if err != nil {
-		return
+		return err
 	}
 
 	// Respond with list of CountryOutPut struct encoded as json to user
 	gateway.RespondToGetRequestWithJSON(w, response)
+
+	return nil
 }
 
 /*
