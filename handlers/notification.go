@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"assignment2/utils/constants"
+	"assignment2/utils/db"
 	"assignment2/utils/div"
 	"assignment2/utils/gateway"
 	"assignment2/utils/params"
@@ -53,6 +55,33 @@ func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	gateway.RespondToGetRequestWithJSON(w, response)
+
+	return nil
+}
+
+/*
+Saves a webhook to the correct database collection and document
+
+	w		- Responsewriter for error handling
+	webhook	- Struct which contain all relevant information about webhook to save
+
+	return	- Type of error or nil if none
+*/
+func saveWebhook(w http.ResponseWriter, webhook structs.Webhook) error {
+	// Create map containing data to insert into database
+	webhookData := map[string]interface{}{
+		"url":         webhook.Url,
+		"country":     webhook.Country,
+		"calls":       webhook.Calls,
+		"invocations": 0,
+	}
+
+	// Save webhook to the database
+	err := db.AppendDocumentToWebhooksFirestore(webhookData, constants.WEBHOOK_COLLECTIONNAME, webhook.Country, webhook.WebhookId)
+	if err != nil {
+		// TODO: Error handling
+		return err
+	}
 
 	return nil
 }
