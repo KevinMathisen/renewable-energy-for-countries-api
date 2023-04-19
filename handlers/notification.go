@@ -85,3 +85,15 @@ func saveWebhook(w http.ResponseWriter, webhook structs.Webhook) error {
 
 	return nil
 }
+
+func deletionOfWebhook(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func viewWebhook(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func sendNotification(w http.ResponseWriter, webhookID string) error {
+	return nil
+}
