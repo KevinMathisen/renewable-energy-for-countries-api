@@ -19,7 +19,7 @@ type Country struct {
 }
 
 /*
-* Struct for decoding JSON POST request for registration of webhooks in Notification endpoint.
+* Struct for decoding JSON POST request for Registration of Webhooks in Notification endpoint.
  */
 type NewWebhook struct {
 	Url     string `json:"url"`
@@ -76,4 +76,9 @@ func NewError(origErr error, statusCode int, userMsg, devMsg string) error {
 // Returns original error in string form
 func (err WrappedError) Error() string {
 	return err.OrigErr.Error()
+}
+
+// Unwraps error
+func (err WrappedError) Unwrap() error {
+	return err.OrigErr
 }

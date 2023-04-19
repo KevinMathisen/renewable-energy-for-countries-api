@@ -12,23 +12,25 @@ import (
 // Create time of service start variable to calculate uptime
 var Start time.Time
 
-func Status(w http.ResponseWriter, r *http.Request) {
+func Status(w http.ResponseWriter, r *http.Request) error {
 
 	// Send error if request is not GET:
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid method, currently only GET is supported", http.StatusNotImplemented)
-		return
+		return nil // TODO: Return error
 	}
 
 	// Generate status response
 	statusRes, err := createStatusResponse(Start)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	// Handle get request
 	gateway.RespondToGetRequestWithJSON(w, statusRes)
+
+	return nil
 }
 
 /*

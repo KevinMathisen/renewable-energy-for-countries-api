@@ -1,52 +1,29 @@
 package handlers
 
 import (
+	"assignment2/utils/structs"
 	"log"
 	"net/http"
 )
 
-type RootHandler func(http.ResponseWriter, *http.Request) WrappedError
+type RootHandler func(http.ResponseWriter, *http.Request) error
 
 // Handles all errors in the same place.
 func (fn RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	err := fn(w, r)         // Calls original function, then awaits errors to "bubble" back up
-	if err.OrigErr == nil { // If there are no errors
+	err := fn(w, r) // Calls original function, then awaits errors to "bubble" back up
+	if err == nil { // If there are no errors
 		return
 	}
 
-	log.Println(err.DevMessage)                   //Logs dev message
-	log.Println("\t" + err.Error())               //Logs original error
-	http.Error(w, err.UsrMessage, err.StatusCode) //Returns user message and error code
-
-}
-
-/*
-* Struct for wrapping errors for standardized error handling.
-*
-* OrigErr: Original error message
-* StatusCode: Status code to show user
-* UsrMessage: Error message to show user.
-* DevMessage: Error message to display in logs.
- */
-type WrappedError struct {
-	OrigErr    error
-	StatusCode int
-	UsrMessage string
-	DevMessage string
-}
-
-// Function for creating a new error message.
-func NewError(origErr error, statusCode int, userMsg, devMsg string) error {
-	return WrappedError{
-		OrigErr:    origErr,
-		StatusCode: statusCode,
-		UsrMessage: userMsg,
-		DevMessage: devMsg,
+	// If error is of type wrappederror, special logging actions will be taken.
+	switch e := err.(type) {
+	case structs.WrappedError:
+		log.Println(e.DevMessage)                 //Logs dev message
+		http.Error(w, e.UsrMessage, e.StatusCode) //Returns user message and error code
+	default:
+		log.Println("Non-wrapped error:")
+		http.Error(w, "", http.StatusInternalServerError)
 	}
-}
-
-// Returns original error in string form
-func (err WrappedError) Error() string {
-	return err.OrigErr.Error()
+	log.Println("\t" + err.Error()) //Logs original error
 }
