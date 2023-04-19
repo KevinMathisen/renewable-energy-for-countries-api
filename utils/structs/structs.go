@@ -19,22 +19,13 @@ type Country struct {
 }
 
 /*
-* Struct for decoding JSON POST request for Registration of Webhooks in Notification endpoint.
- */
-type NewWebhook struct {
-	Url     string `json:"url"`
-	Country string `json:"country"`
-	Calls   string `json:"calls"`
-}
-
-/*
 * Struct for encoding JSON response for deleting and viewing a webhook/all webhooks in Notification endpoint.
  */
 type Webhook struct {
 	WebhookId string `json:"webook_id"`
 	Url       string `json:"url,omitempty"`
 	Country   string `json:"country,omitempty"`
-	Calls     string `json:"calls,omitempty"`
+	Calls     int    `json:"calls,omitempty"`
 }
 
 /*
