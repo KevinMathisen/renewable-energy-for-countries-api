@@ -1,6 +1,10 @@
 package handlers
 
 import (
+	"assignment2/utils/div"
+	"assignment2/utils/gateway"
+	"assignment2/utils/params"
+	"assignment2/utils/structs"
 	"net/http"
 )
 
@@ -23,4 +27,32 @@ func Notification(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return err
+}
+
+func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
+	// Get request json body
+	webhook, err := params.GetWebhookFromRequest(w, r)
+	if err != nil {
+		//error handling
+		return err
+	}
+
+	// Create and set webhookID
+	webhook.WebhookId = div.CreateWebhookId()
+
+	// Save webhook to database
+	err = saveWebhook(w, webhook)
+	if err != nil {
+		// TODO: error handling
+		return err
+	}
+
+	// Create response
+	response := structs.Webhook{
+		WebhookId: webhook.WebhookId,
+	}
+
+	gateway.RespondToGetRequestWithJSON(w, response)
+
+	return nil
 }
