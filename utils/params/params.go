@@ -3,7 +3,10 @@
 import (
 	"assignment2/utils/constants"
 	"assignment2/utils/db"
+	"assignment2/utils/structs"
+	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -173,4 +176,22 @@ func GetBoolParameterFromRequest(w http.ResponseWriter, r *http.Request, paramNa
 
 	// Return neighbours bool
 	return paramBool, nil
+}
+
+/*
+Get and decode webhook in json format into a webhook struct
+*/
+func GetWebhookFromRequest(w http.ResponseWriter, r *http.Request) (structs.Webhook, error) {
+	// Decode JSON
+	decoder := json.NewDecoder(r.Body)
+	var webhook structs.Webhook
+	if err := decoder.Decode(&webhook); err != nil {
+		// Error for error in decoding
+		log.Println(err.Error())
+		return webhook, err
+	}
+
+	log.Println(webhook)
+
+	return webhook, nil
 }
