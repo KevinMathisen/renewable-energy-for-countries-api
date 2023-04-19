@@ -119,6 +119,23 @@ func AppendDocumentToFirestore(id string, doc map[string]interface{}, collection
 }
 
 /*
+Appends a single map with specified webhookID to firestore in a collection under a document in a collection
+
+	doc				- Map of data, where each key will be one field in a document
+	collectionName	- Name of root collection to add data to
+	isoCode			- Document name of country the webhook is part of
+	webhookID		- ID of webhook and document we will add to firestore
+*/
+func AppendDocumentToWebhooksFirestore(doc map[string]interface{}, collectionName string, isoCode string, webhookID string) error {
+	_, err := firebaseClient.Collection(collectionName).Doc(isoCode).Collection(constants.WEBHOOK_COLLECTIONNAME).Doc(webhookID).Set(firestoreContext, doc)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+	return nil
+}
+
+/*
 Get a country from firestore
 
 	w		- Responsewriter for error handling
