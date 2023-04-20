@@ -1,7 +1,9 @@
-package gateway
+﻿package gateway
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/structs"
+	"bytes"
 	"encoding/json"
 	"net/http"
 )
@@ -12,7 +14,7 @@ Responds to GET request with JSON content and body specified
 	w			- Responsewriter
 	jsonBody	- Any struct which will be encoded into json and sent as response body
 */
-func RespondToGetRequestWithJSON(w http.ResponseWriter, jsonBody interface{}) {
+func RespondToGetRequestWithJSON(w http.ResponseWriter, jsonBody interface{}, status int) {
 	// Write to content type field in response header
 	w.Header().Add("content-type", constants.CONT_TYPE_JSON)
 
@@ -24,7 +26,7 @@ func RespondToGetRequestWithJSON(w http.ResponseWriter, jsonBody interface{}) {
 	}
 
 	// Manually set response http status code to ok
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(status)
 }
 
 /*
@@ -60,4 +62,47 @@ func HttpRequestFromUrl(url string, method string) (http.Response, error) {
 
 	// Return response
 	return *res, nil
+}
+
+/*
+Post content given to webhookURL
+
+	data		- Map of webhook data
+	webhookID	- ID of webhook
+*/
+func PostToWebhook(data map[string]interface{}, webhookID string) {
+	var countryName string
+	var err error
+
+	// Check if country isoCode is Any, if so return no country name
+	if data["country"].(string) == "ANY" {
+		countryName = ""
+	} else {
+		// Find name from isoCode
+		countryName, err = GetNameFromIsoCode(data["country"].(string))
+		if err != nil {
+			return
+		}
+	}
+
+	// Encode struct into json
+	webhookStruct := structs.Webhook{
+		WebhookId: webhookID,
+		Country:   countryName,
+		Calls:     int(data["invocations"].(int64)),
+	}
+
+	jsonData, err := json.Marshal(webhookStruct)
+	if err != nil {
+		return
+	}
+
+	// Issue post request to url
+	response, err := http.Post(data["url"].(string), "application/json", bytes.NewReader(jsonData))
+	if err != nil {
+		return
+	}
+
+	// Close reponse body at end of function
+	defer response.Body.Close()
 }
