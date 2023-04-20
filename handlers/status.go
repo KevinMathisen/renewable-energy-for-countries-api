@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/db"
 	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -46,14 +46,23 @@ func createStatusResponse(start time.Time) (structs.Status, error) {
 		return structs.Status{}, err
 	}
 
-	// TODO: Get request from Notification Database in Firebase
-	// TODO: Get amount of webhooks from Firebase
+	// Get request from notification db api
+	resDB, err := gateway.HttpRequestFromUrl(constants.FIRESTORE_NOTIFICATION_URL, http.MethodHead)
+	if err != nil {
+		return structs.Status{}, err
+	}
+
+	// Get amount of webhooks
+	amountOfWebhooks, err := db.CountWebhooks()
+	if err != nil {
+		return structs.Status{}, err
+	}
 
 	// Initialize the status response struct
 	statusResponse := structs.Status{
 		CountriesApi:   resCountry.Status,
-		NotificationDb: strconv.Itoa(http.StatusNotImplemented),
-		Webhooks:       0,
+		NotificationDb: resDB.Status,
+		Webhooks:       amountOfWebhooks,
 		Version:        constants.VERSION,
 		Uptime:         calculateUptimeInSeconds(),
 	}
