@@ -22,6 +22,7 @@ func Notification(w http.ResponseWriter, r *http.Request) error {
 	case http.MethodGet:
 		err = viewWebhook(w, r)
 	default:
+		return nil
 		/*
 			Status: Not impemented
 			Message: Invalid method, currently only [methods supported] is supported
@@ -31,6 +32,9 @@ func Notification(w http.ResponseWriter, r *http.Request) error {
 	return err
 }
 
+/*
+Gets webhook data from request, created ID, saves the webhook to the database, then repsponds with the id to the user
+*/
 func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
 	// Get request json body
 	webhook, err := params.GetWebhookFromRequest(w, r)
@@ -54,7 +58,7 @@ func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
 		WebhookId: webhook.WebhookId,
 	}
 
-	gateway.RespondToGetRequestWithJSON(w, response)
+	gateway.RespondToGetRequestWithJSON(w, response, http.StatusCreated)
 
 	return nil
 }
@@ -68,32 +72,30 @@ Saves a webhook to the correct database collection and document
 	return	- Type of error or nil if none
 */
 func saveWebhook(w http.ResponseWriter, webhook structs.Webhook) error {
+	var isoCode string
+
+	// Set isoCode to ANY if no country specified, else set code provided
+	if len(webhook.Country) == 0 {
+		isoCode = "ANY"
+	} else {
+		isoCode = webhook.Country
+	}
+
 	// Create map containing data to insert into database
 	webhookData := map[string]interface{}{
 		"url":         webhook.Url,
-		"country":     webhook.Country,
+		"country":     isoCode,
 		"calls":       webhook.Calls,
 		"invocations": 0,
 	}
 
 	// Save webhook to the database
-	err := db.AppendDocumentToWebhooksFirestore(webhookData, constants.WEBHOOK_COLLECTIONNAME, webhook.Country, webhook.WebhookId)
+	//err := db.AppendDocumentToWebhooksFirestore(webhookData, constants.WEBHOOK_COLLECTIONNAME, webhook.Country, webhook.WebhookId)
+	err := db.AppendDocumentToFirestore(webhook.WebhookId, webhookData, constants.WEBHOOKS_COLLECTION)
 	if err != nil {
 		// TODO: Error handling
 		return err
 	}
 
-	return nil
-}
-
-func deletionOfWebhook(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
-func viewWebhook(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
-func sendNotification(w http.ResponseWriter, webhookID string) error {
 	return nil
 }
