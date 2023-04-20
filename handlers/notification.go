@@ -126,3 +126,31 @@ func deletionOfWebhook(w http.ResponseWriter, r *http.Request) error {
 
 	return nil
 }
+
+/*
+Get webhook or multiple if none are specified, and then respond to user
+*/
+func viewWebhook(w http.ResponseWriter, r *http.Request) error {
+	// Get webhookID
+	webhookID, err := params.GetWebhookIDOrNothingFromRequest(w, r)
+	if err != nil {
+		return err
+	}
+
+	// Get webhooks from database
+	response, err := getWebhooks(w, webhookID)
+	if err != nil {
+		return err
+	}
+
+	// If one webhook returned, respond with only that one struct
+	if len(response) == 1 {
+		gateway.RespondToGetRequestWithJSON(w, response[0], http.StatusOK)
+		return nil
+	}
+
+	// Send list of webhoks as response to user
+	gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
+
+	return nil
+}
