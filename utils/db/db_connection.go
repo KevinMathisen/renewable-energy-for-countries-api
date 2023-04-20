@@ -4,6 +4,7 @@ import (
 	"assignment2/utils/constants"
 	"assignment2/utils/structs"
 	"context"
+	"errors"
 	"log"
 	"net/http"
 
@@ -191,4 +192,42 @@ func GetAllDocumentInCollectionFromFirestore(w http.ResponseWriter, collectionNa
 
 func CheckCacheDBForURL(w http.ResponseWriter, url string) ([]structs.CountryOutput, error) {
 	return nil, nil
+}
+
+/*
+Delete a document given ID if it exists
+
+	w				- HTTP responsewriter
+	documentID		- ID of document to delete
+	collectionName	- Name of collection document is in
+
+	return			- If deletion was succesful, if document existed, or any other errors
+*/
+func DeleteDocument(w http.ResponseWriter, documentID string, collectionName string) error {
+
+	// Get reference to document
+	documentRef := firebaseClient.Collection(collectionName).Doc(documentID)
+
+	// Get snapshot of document for testing if it exists
+	documentSnap, err := documentRef.Get(firestoreContext)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	// Test if any document with given ID exists
+	if !documentSnap.Exists() {
+		// Error, cant delete a document that does not exist
+		log.Println("Document in database not found")
+		return errors.New("Document in database not found")
+	}
+
+	// Delete document if it exists
+	documentRef.Delete(firestoreContext)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+
+	return nil
 }
