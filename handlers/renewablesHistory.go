@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/db"
 	"assignment2/utils/gateway"
 	"assignment2/utils/params"
 	"assignment2/utils/structs"
@@ -35,6 +36,9 @@ func RenewablesHistory(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	// Invoke webhooks
+	db.InvokeCountry(countries)
+
 	// Get the historical percentage of renewables for countires specified as a list of countryoutput structs
 	response, err = getHistoryRenewablesForCountries(w, countries, beginYear, endYear, sortByValue, getMean)
 	if err != nil {
@@ -42,7 +46,7 @@ func RenewablesHistory(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Respond with list of countryoutput struct encoded as json to user
-	gateway.RespondToGetRequestWithJSON(w, response)
+	gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
 
 	return nil
 }
