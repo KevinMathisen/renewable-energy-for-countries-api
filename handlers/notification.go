@@ -99,3 +99,30 @@ func saveWebhook(w http.ResponseWriter, webhook structs.Webhook) error {
 
 	return nil
 }
+
+/*
+Delete webhook and respond with ID of webhook deleted to user
+*/
+func deletionOfWebhook(w http.ResponseWriter, r *http.Request) error {
+	// Get webhookID
+	webhookID, err := params.GetWebhookIDFromRequest(w, r)
+	if err != nil {
+		return err
+	}
+
+	// Try to delete webhook from database
+	err = db.DeleteDocument(w, webhookID, constants.WEBHOOKS_COLLECTION)
+	if err != nil {
+		return err
+	}
+
+	// Create response
+	response := structs.Webhook{
+		WebhookId: webhookID,
+	}
+
+	// Send response to user
+	gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
+
+	return nil
+}
