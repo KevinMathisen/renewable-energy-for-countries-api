@@ -1,6 +1,7 @@
 ﻿package handlers
 
 import (
+	"assignment2/utils/constants"
 	"assignment2/utils/db"
 	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
@@ -28,7 +29,7 @@ func getRenewablesForCountriesByYears(w http.ResponseWriter, countries []string,
 	// For each country
 	for _, country := range countries {
 		// Get the renwables data from Firestore
-		renewablesCountry, err := db.GetRenewablesCountryFromFirestore(w, country)
+		renewablesCountry, err := db.GetDocumentFromFirestore(w, country, constants.RENEWABLES_COLLECTION)
 		if err != nil {
 			return renewablesOutput, err
 		}
@@ -69,7 +70,7 @@ func getRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, e
 	var outputNotSorted [][]structs.CountryOutput
 
 	// Get data from all countries from firestore
-	countriesData, err := db.GetRenewablesAllCountriesFromFirestore(w)
+	countriesData, err := db.GetAllDocumentInCollectionFromFirestore(w, constants.RENEWABLES_COLLECTION)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +119,7 @@ func checkCache(w http.ResponseWriter, r *http.Request) (bool, error) {
 
 	// Cache hit
 	if len(hit) != 0 {
-		gateway.RespondToGetRequestWithJSON(w, hit)
+		gateway.RespondToGetRequestWithJSON(w, hit, http.StatusOK)
 		return true, nil
 	}
 
