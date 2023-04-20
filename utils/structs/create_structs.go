@@ -118,6 +118,21 @@ func CreateMeanCountryOutputFromData(w http.ResponseWriter, data map[string]inte
 }
 
 /*
+Create a webhook struct given a map of data and webhook ID as string
+*/
+func CreateWebhookFromData(data map[string]interface{}, webhookID string) Webhook {
+	// Create webhook struct from data
+	webhook := Webhook{
+		WebhookId: webhookID,
+		Url:       data["url"].(string),
+		Country:   data["country"].(string),
+		Calls:     int(data["calls"].(int64)),
+	}
+
+	return webhook
+}
+
+/*
 Calculate mean value of list of numbers
 
 	input	- List of float values
