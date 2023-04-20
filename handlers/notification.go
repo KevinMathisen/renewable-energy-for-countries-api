@@ -154,3 +154,45 @@ func viewWebhook(w http.ResponseWriter, r *http.Request) error {
 
 	return nil
 }
+
+/*
+Get webhook from database, and create webhook structs from this data
+*/
+func getWebhooks(w http.ResponseWriter, webhookID string) ([]structs.Webhook, error) {
+	var webhooks []structs.Webhook
+	data := make(map[string]map[string]interface{})
+	var err error
+
+	if webhookID != "" {
+		// If webhookID is defined, get its data
+		webhookData, err := db.GetDocumentFromFirestore(w, webhookID, constants.WEBHOOKS_COLLECTION)
+		if err != nil {
+			// Error handling
+			return webhooks, err
+		}
+		// Save the webhooks data
+		data[webhookID] = webhookData
+
+	} else {
+		// If no webhookID is given, get all webhooks data
+		data, err = db.GetAllDocumentInCollectionFromFirestore(w, constants.WEBHOOKS_COLLECTION)
+		if err != nil {
+			// Error handling
+			return webhooks, err
+		}
+	}
+
+	for webhookID, webhookData := range data {
+		// For each webhook found in database, create struct from it
+		webhook := structs.CreateWebhookFromData(webhookData, webhookID)
+		if err != nil {
+			// Error handling
+			return webhooks, err
+		}
+
+		// Save the created struct
+		webhooks = append(webhooks, webhook)
+	}
+
+	return webhooks, nil
+}
