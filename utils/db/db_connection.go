@@ -2,6 +2,8 @@
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/div"
+	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
 	"context"
 	"errors"
@@ -230,4 +232,48 @@ func DeleteDocument(w http.ResponseWriter, documentID string, collectionName str
 	}
 
 	return nil
+}
+
+/*
+Go through all webhooks and check if they are to be invoked
+
+	isoCode	- Isocode of countries to be invoked, empty if all countries
+*/
+func InvokeCountry(isoCode []string) {
+	// Get reference to documents in collection
+	webhooksCollection := firebaseClient.Collection(constants.WEBHOOKS_COLLECTION)
+	iter := webhooksCollection.Documents(firestoreContext)
+
+	// Go through all webhooks
+	for {
+		// Try to get next document in collection
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return
+		}
+
+		// Get the webhook data
+		webhook := doc.Data()
+
+		// If the webhook country is not one of the invoked countries, and we did not invoke all countries, and the webhook is not invoked for all countries
+		if len(isoCode) != 0 && webhook["country"].(string) != "ANY" && !div.Contains(isoCode, webhook["country"].(string)) {
+			continue
+		}
+
+		// Increase invocation count by one
+		webhook["invocations"] = webhook["invocations"].(int64) + 1
+
+		// Check if we have met the required invokation amount
+		if webhook["invocations"].(int64)%webhook["calls"].(int64) == 0 {
+			// Send post to webhook
+			go gateway.PostToWebhook(webhook, doc.Ref.ID)
+		}
+
+		// Update webhook with new invocations
+		webhooksCollection.Doc(doc.Ref.ID).Set(firestoreContext, webhook)
+
+	}
 }
