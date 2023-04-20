@@ -28,7 +28,7 @@ func Status(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Handle get request
-	gateway.RespondToGetRequestWithJSON(w, statusRes)
+	gateway.RespondToGetRequestWithJSON(w, statusRes, http.StatusOK)
 
 	return nil
 }
