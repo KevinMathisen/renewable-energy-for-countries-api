@@ -277,3 +277,31 @@ func InvokeCountry(isoCode []string) {
 
 	}
 }
+
+/*
+Go through all webhooks and check if they are to be invoked
+
+	isoCode	- Isocode of countries to be invoked, empty if all countries
+*/
+func CountWebhooks() (int, error) {
+	var amountOfWebhooks int
+	// Get reference to documents in collection
+	iter := firebaseClient.Collection(constants.WEBHOOKS_COLLECTION).Documents(firestoreContext)
+
+	// Go through all webhooks, count each
+	for {
+		// Try to get next document in collection
+		_, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return -1, err
+		}
+
+		amountOfWebhooks += 1
+
+	}
+
+	return amountOfWebhooks, nil
+}
