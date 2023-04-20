@@ -26,3 +26,15 @@ func CreateWebhookId() string {
 
 	return string(b)
 }
+
+/*
+Returns if slice contains value
+*/
+func Contains(slice []string, value string) bool {
+	for _, valueInSlice := range slice {
+		if valueInSlice == value {
+			return true
+		}
+	}
+	return false
+}
