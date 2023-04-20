@@ -136,38 +136,40 @@ func AppendDocumentToWebhooksFirestore(doc map[string]interface{}, collectionNam
 }
 
 /*
-Get a country from firestore
+Get a document from firestore
 
-	w		- Responsewriter for error handling
-	isoCode	- isoCode of country used for finding document by ID
+	w				- Responsewriter for error handling
+	id				- document ID to get
+	collectionName	- Name of collection to get document from
 
-	return	- Map containing name and percentages for country
+	return	- Map containing data from document
 */
-func GetRenewablesCountryFromFirestore(w http.ResponseWriter, isoCode string) (map[string]interface{}, error) {
+func GetDocumentFromFirestore(w http.ResponseWriter, id string, collectionName string) (map[string]interface{}, error) {
 	// Get reference to document
-	countrySnapshot, err := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Doc(isoCode).Get(firestoreContext)
+	docSnapshot, err := firebaseClient.Collection(collectionName).Doc(id).Get(firestoreContext)
 	if err != nil {
-		http.Error(w, "Error extracting body of country "+isoCode, http.StatusInternalServerError)
+		http.Error(w, "Error extracting body of document "+id, http.StatusInternalServerError)
 		return nil, err
 	}
 
 	// Return the data
-	return countrySnapshot.Data(), nil
+	return docSnapshot.Data(), nil
 }
 
 /*
-Gets all data from all countries
+Gets all documents from a collection in firestore
 
-	w		- Responsewriter for error handling
+	w				- Responsewriter for error handling
+	collectionName	- Name of collection to get document from
 
-	return 	- Map containing key (isoCode) and elements containing maps with each countrys name and percentages
+	return 			- Map containing key (document id) and elements containing maps with data from each document
 */
-func GetRenewablesAllCountriesFromFirestore(w http.ResponseWriter) (map[string]map[string]interface{}, error) {
-	// Initialize map for saving countries
+func GetAllDocumentInCollectionFromFirestore(w http.ResponseWriter, collectionName string) (map[string]map[string]interface{}, error) {
+	// Initialize map for saving documents
 	data := make(map[string]map[string]interface{})
 
 	// Get reference to documents in collection
-	iter := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Documents(firestoreContext)
+	iter := firebaseClient.Collection(collectionName).Documents(firestoreContext)
 
 	for {
 		// Try to go to next document in collection
@@ -176,11 +178,11 @@ func GetRenewablesAllCountriesFromFirestore(w http.ResponseWriter) (map[string]m
 			break
 		}
 		if err != nil {
-			http.Error(w, "Failed to iterate through countires on firebase", http.StatusInternalServerError)
+			http.Error(w, "Failed to iterate through documents in collection "+collectionName+" on firebase", http.StatusInternalServerError)
 			return nil, err
 		}
 
-		// Save each country document with isoCode/document reference as the key
+		// Save each document with documentID as the key
 		data[doc.Ref.ID] = doc.Data()
 	}
 
