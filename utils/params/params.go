@@ -3,6 +3,7 @@
 import (
 	"assignment2/utils/constants"
 	"assignment2/utils/db"
+	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
 	"encoding/json"
 	"errors"
@@ -42,7 +43,13 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 
 	// If the user specified the name only
 	if len(countryCodeOrName) != 3 {
-		// TODO: Implement how to get the ISO code if name is given
+		// Get isoCode from name
+		isoCode, err := gateway.GetIsoCodeFromName(countryCodeOrName)
+		if err != nil {
+			return nil, err
+		}
+
+		countries = append(countries, isoCode)
 
 	} else if db.IsoCodeInDB(countryCodeOrName) {
 		// Else if the user specified ISO code and it exists in the database, add the code the list of countries
@@ -194,4 +201,55 @@ func GetWebhookFromRequest(w http.ResponseWriter, r *http.Request) (structs.Webh
 	log.Println(webhook)
 
 	return webhook, nil
+}
+
+/*
+Get webhookID from the requests url
+
+	w		- Responsewriter
+	r		- Request
+
+	return 	- webhookID, or empty
+*/
+func GetWebhookIDFromRequest(w http.ResponseWriter, r *http.Request) (string, error) {
+	// Split path into args
+	args := strings.Split(r.URL.Path, "/")
+
+	// Check if URL is correctly formatted
+	if len(args) != 5 && len(args) != 6 {
+		http.Error(w, "Malformed URL, Expecting format "+constants.NOTIFICATION_PATH+"{webhookID}", http.StatusBadRequest)
+		return "", errors.New("malformed URL")
+	}
+
+	// Return webhookID
+	return args[4], nil
+
+}
+
+/*
+Get webhookID from the requests url
+
+	w		- Responsewriter
+	r		- Request
+
+	return 	- webhookID, or empty
+*/
+func GetWebhookIDOrNothingFromRequest(w http.ResponseWriter, r *http.Request) (string, error) {
+	// Split path into args
+	args := strings.Split(r.URL.Path, "/")
+
+	// Check if URL is correctly formatted
+	if len(args) != 4 && len(args) != 5 && len(args) != 6 {
+		http.Error(w, "Malformed URL, Expecting format "+constants.NOTIFICATION_PATH+"{webhookID?}", http.StatusBadRequest)
+		return "", errors.New("malformed URL")
+	}
+
+	// If no webhookID was specified
+	if len(args) == 4 {
+		return "", nil
+	}
+
+	// Return webhookID
+	return args[4], nil
+
 }
