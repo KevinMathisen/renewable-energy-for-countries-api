@@ -19,7 +19,6 @@ const CONT_TYPE_JSON = "application/json"
 const COUNTRIES_API_URL = "http://129.241.150.113:8080"
 const COUNTRY_NAME_SEARCH_PATH = "/v3.1/name/"
 const COUNTRY_CODE_SEARCH_PATH = "/v3.1/alpha/"
-const ISO_SEARCH_PATH = "/v3.1/alpha/"
 const USED_COUNTRY_CODE = "cca3"
 
 // Years for renewables database
