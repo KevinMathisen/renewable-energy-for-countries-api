@@ -42,7 +42,7 @@ func Contains(slice []string, value string) bool {
 /*
 Removes duplicate string values from an array before returning them
 */
-func removeDuplicates(arr []string) []string {
+func RemoveDuplicates(arr []string) []string {
 	encountered := map[string]bool{}
 	result := []string{}
 
