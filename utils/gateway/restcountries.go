@@ -53,3 +53,21 @@ func getCountry(name string) (*structs.Country, error) {
 	// Return pointer to country
 	return country, nil
 }
+
+/*
+Get isocode from country name
+*/
+func GetIsoCodeFromName(countryName string) (string, error) {
+
+	// TODO: create function
+	return "NOR", nil
+}
+
+/*
+Get isocode from country name
+*/
+func GetNameFromIsoCode(isoCode string) (string, error) {
+
+	// TODO: create function
+	return "Norway", nil
+}
