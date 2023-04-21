@@ -106,21 +106,3 @@ func PostToWebhook(data map[string]interface{}, webhookID string) {
 	// Close reponse body at end of function
 	defer response.Body.Close()
 }
-
-/*
-Get isocode from country name
-*/
-func GetIsoCodeFromName(countryName string) (string, error) {
-
-	// TODO: create function
-	return "NOR", nil
-}
-
-/*
-Get isocode from country name
-*/
-func GetNameFromIsoCode(isoCode string) (string, error) {
-
-	// TODO: create function
-	return "Norway", nil
-}
