@@ -125,7 +125,10 @@ func deletionOfWebhook(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Send response to user
-	gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
+	err = gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -148,12 +151,18 @@ func viewWebhook(w http.ResponseWriter, r *http.Request) error {
 
 	// If one webhook returned, respond with only that one struct
 	if len(response) == 1 {
-		gateway.RespondToGetRequestWithJSON(w, response[0], http.StatusOK)
+		err = gateway.RespondToGetRequestWithJSON(w, response[0], http.StatusOK)
+		if err != nil {
+			return err
+		}
 		return nil
 	}
 
 	// Send list of webhoks as response to user
-	gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
+	err = gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

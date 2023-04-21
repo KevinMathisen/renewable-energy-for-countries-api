@@ -3,6 +3,7 @@
 import (
 	"assignment2/utils/constants"
 	"assignment2/utils/db"
+	"assignment2/utils/div"
 	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
 	"encoding/json"
@@ -56,20 +57,30 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 		countries = append(countries, countryCodeOrName)
 	}
 
-	// If the user specified the neighbour parameter
+	// If the user specified the neighbour parameter, get neighbour ISO code with Restcountries API
 	if neighbours {
-		// TODO: Get neighbour ISO code with Restcountries API
+		//Iterate through each country in the list
+
+		for _, iso := range countries {
+			country, err := gateway.GetCountryByIso(iso) //Get the country object
+			if err != nil {
+				return nil, err
+			}
+			borders := country.Borders       //Retrieve borders from country
+			for _, border := range borders { //Add borders to countries list, this will most likely include a lot of duplicates.
+				countries = append(countries, border)
+			}
+
+			temp := countries                      //Take backup of countries
+			countries = div.RemoveDuplicates(temp) //Remove duplicates from countries
+		}
 
 		// TODO: Check if each isoCode is in database, if so add to list of countires
-
-		// Temporary hardcoded for testing
-		countries = append(countries, []string{"SWE", "DNK", "FIN"}...)
 	}
 
 	// If no countries existed in the database
 	if len(countries) == 0 {
-		http.Error(w, "No country with given ISO code or name exists in our service", http.StatusNotFound)
-		return nil, errors.New("No country with given ISO code or name exists in our service")
+		return nil, structs.NewError(nil, http.StatusNotFound, "No country with given ISO code or name exists in our service", "")
 	}
 
 	return countries, nil
@@ -195,7 +206,7 @@ func GetWebhookFromRequest(w http.ResponseWriter, r *http.Request) (structs.Webh
 	if err := decoder.Decode(&webhook); err != nil {
 		// Error for error in decoding
 		log.Println(err.Error())
-		return webhook, err
+		return webhook, structs.NewError(err, 500, constants.DEFAULT500, "There was an error when decoding webhook from json.")
 	}
 
 	log.Println(webhook)

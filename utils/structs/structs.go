@@ -14,8 +14,9 @@ type CountryOutput struct {
 * Countries as stored in country cache and for interactions with restcountires API.
  */
 type Country struct {
-	Name    string `json:"name"`
-	IsoCode string `json:"isoCode"`
+	Name    string   `json:"name"`
+	IsoCode string   `json:"isoCode"`
+	Borders []string `json:"borders"`
 }
 
 /*

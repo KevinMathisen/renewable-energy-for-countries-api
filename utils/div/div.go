@@ -38,3 +38,20 @@ func Contains(slice []string, value string) bool {
 	}
 	return false
 }
+
+/*
+Removes duplicate string values from an array before returning them
+*/
+func removeDuplicates(arr []string) []string {
+	encountered := map[string]bool{}
+	result := []string{}
+
+	for _, value := range arr {
+		if !encountered[value] {
+			encountered[value] = true
+			result = append(result, value)
+		}
+	}
+
+	return result
+}
