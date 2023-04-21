@@ -5,7 +5,7 @@ go 1.20
 require (
 	cloud.google.com/go/firestore v1.9.0
 	firebase.google.com/go v3.13.0+incompatible
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	google.golang.org/api v0.116.0
 	google.golang.org/grpc v1.54.0
 )
