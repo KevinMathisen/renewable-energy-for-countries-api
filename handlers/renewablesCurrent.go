@@ -14,8 +14,7 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) error {
 
 	// Send error message if request method is not get
 	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid method, currently only GET is supported", http.StatusNotImplemented)
-		return nil // TODO: Return error
+		return structs.NewError(nil, http.StatusNotImplemented, "Invalid method, currently only GET is supported", "")
 	}
 
 	// If cache hit, send cached response
@@ -45,7 +44,10 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Respond with list of CountryOutPut struct encoded as json to user
-	gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
+	err = gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
