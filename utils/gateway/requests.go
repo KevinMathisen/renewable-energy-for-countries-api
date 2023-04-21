@@ -14,19 +14,19 @@ Responds to GET request with JSON content and body specified
 	w			- Responsewriter
 	jsonBody	- Any struct which will be encoded into json and sent as response body
 */
-func RespondToGetRequestWithJSON(w http.ResponseWriter, jsonBody interface{}, status int) {
+func RespondToGetRequestWithJSON(w http.ResponseWriter, jsonBody interface{}, status int) error {
 	// Write to content type field in response header
 	w.Header().Add("content-type", constants.CONT_TYPE_JSON)
 
 	// Encode content and write to response
 	err := json.NewEncoder(w).Encode(jsonBody)
 	if err != nil {
-		http.Error(w, "Error during encoding: "+err.Error(), http.StatusInternalServerError)
-		return
+		return structs.NewError(err, 500, constants.DEFAULT500, "There was an error when decoding JSON.")
 	}
 
 	// Manually set response http status code to ok
 	w.WriteHeader(status)
+	return nil
 }
 
 /*
@@ -44,7 +44,7 @@ func HttpRequestFromUrl(url string, method string) (http.Response, error) {
 	// Create request
 	request, err := http.NewRequest(method, url, nil)
 	if err != nil {
-		return response, err
+		return response, structs.NewError(err, 500, constants.DEFAULT500, "Could not create new GET request.")
 	}
 
 	// Set content type to empty
@@ -57,7 +57,7 @@ func HttpRequestFromUrl(url string, method string) (http.Response, error) {
 	// Issue http request
 	res, err := client.Do(request)
 	if err != nil {
-		return response, err
+		return response, structs.NewError(err, 502, constants.DEFAULT500, "GET request was sent, but failed.")
 	}
 
 	// Return response

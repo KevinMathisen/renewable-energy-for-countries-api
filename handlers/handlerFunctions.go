@@ -119,7 +119,10 @@ func checkCache(w http.ResponseWriter, r *http.Request) (bool, error) {
 
 	// Cache hit
 	if len(hit) != 0 {
-		gateway.RespondToGetRequestWithJSON(w, hit, http.StatusOK)
+		err := gateway.RespondToGetRequestWithJSON(w, hit, http.StatusOK)
+		if err != nil {
+			return false, err
+		}
 		return true, nil
 	}
 

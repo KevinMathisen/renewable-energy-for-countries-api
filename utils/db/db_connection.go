@@ -6,7 +6,6 @@ import (
 	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
 	"context"
-	"errors"
 	"log"
 	"net/http"
 
@@ -152,7 +151,8 @@ func GetDocumentFromFirestore(w http.ResponseWriter, id string, collectionName s
 	docSnapshot, err := firebaseClient.Collection(collectionName).Doc(id).Get(firestoreContext)
 	if err != nil {
 		http.Error(w, "Error extracting body of document "+id, http.StatusInternalServerError)
-		return nil, err
+
+		return nil, structs.NewError(err, 500, constants.DEFAULT500, "Could not reach firestone database.")
 	}
 
 	// Return the data
@@ -182,7 +182,7 @@ func GetAllDocumentInCollectionFromFirestore(w http.ResponseWriter, collectionNa
 		}
 		if err != nil {
 			http.Error(w, "Failed to iterate through documents in collection "+collectionName+" on firebase", http.StatusInternalServerError)
-			return nil, err
+			return nil, structs.NewError(err, 500, constants.DEFAULT500, "Failed to retrieve a document from firestone database.")
 		}
 
 		// Save each document with documentID as the key
@@ -213,22 +213,19 @@ func DeleteDocument(w http.ResponseWriter, documentID string, collectionName str
 	// Get snapshot of document for testing if it exists
 	documentSnap, err := documentRef.Get(firestoreContext)
 	if err != nil {
-		log.Println(err.Error())
-		return err
+		return structs.NewError(err, 500, constants.DEFAULT500, "Could not retrieve firestone document refrence.")
 	}
 
 	// Test if any document with given ID exists
 	if !documentSnap.Exists() {
 		// Error, cant delete a document that does not exist
-		log.Println("Document in database not found")
-		return errors.New("Document in database not found")
+		return structs.NewError(err, 500, constants.DEFAULT500, "Found reference to document, but it doesn't exist in database.")
 	}
 
 	// Delete document if it exists
 	documentRef.Delete(firestoreContext)
 	if err != nil {
-		log.Println(err.Error())
-		return err
+		return structs.NewError(err, 500, constants.DEFAULT500, "Could not delete document from firestone database.")
 	}
 
 	return nil
@@ -296,7 +293,7 @@ func CountWebhooks() (int, error) {
 			break
 		}
 		if err != nil {
-			return -1, err
+			return -1, structs.NewError(err, 500, constants.DEFAULT500, "Could not retrieve doc from database while counting webhooks.")
 		}
 
 		amountOfWebhooks += 1

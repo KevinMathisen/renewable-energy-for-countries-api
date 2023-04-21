@@ -5,6 +5,7 @@ go 1.20
 require (
 	cloud.google.com/go/firestore v1.9.0
 	firebase.google.com/go v3.13.0+incompatible
+	github.com/stretchr/testify v1.8.1
 	google.golang.org/api v0.116.0
 	google.golang.org/grpc v1.54.0
 )
@@ -28,7 +29,6 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
-	github.com/stretchr/testify v1.8.2
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/oauth2 v0.6.0 // indirect

@@ -58,7 +58,10 @@ func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
 		WebhookId: webhook.WebhookId,
 	}
 
-	gateway.RespondToGetRequestWithJSON(w, response, http.StatusCreated)
+	err = gateway.RespondToGetRequestWithJSON(w, response, http.StatusCreated)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
