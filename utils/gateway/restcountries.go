@@ -10,13 +10,13 @@ import (
 )
 
 // Map of countries that link country ISO codes to their respective structs containing all information.
-var RcCache = make(map[string]*structs.Country)
+var rcCache = make(map[string]*structs.Country)
 
 // Input a country name
 func GetCountryByIso(iso string) (*structs.Country, error) {
 
 	// Check if country name is in map
-	country, ok := RcCache[iso]
+	country, ok := rcCache[iso]
 	if ok { //Cache hit
 		return country, nil
 	} else { //Cache miss
@@ -50,7 +50,7 @@ func GetCountryByIso(iso string) (*structs.Country, error) {
 		country.IsoCode = resObject.([]interface{})[0].(map[string]interface{})["name"].(map[string]interface{})["common"].(string)
 		country.Borders = resObject.([]interface{})[0].(map[string]interface{})["borders"].([]string)
 
-		RcCache[country.IsoCode] = country
+		rcCache[country.IsoCode] = country
 	}
 	// Return pointer to country
 	return country, nil
