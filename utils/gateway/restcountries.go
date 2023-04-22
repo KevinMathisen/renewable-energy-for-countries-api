@@ -27,30 +27,10 @@ func GetCountryByIso(iso string) (*structs.Country, error) {
 	urlParts := []string{constants.COUNTRIES_API_URL, constants.COUNTRY_CODE_SEARCH_PATH, iso}
 	url := strings.Join(urlParts, "")
 
-	//Send get request to restcountries API
-	res, err := HttpRequestFromUrl(url, http.MethodGet)
+	country, err := getCountry(url)
 	if err != nil {
-		return nil, structs.NewError(err, http.StatusBadGateway, constants.DEFAULT500, "Restcountries API did not respond to request.")
+		return nil, err
 	}
-
-	//Extracts body of API response
-	resBody, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not extract body from restcountries HTTP response.")
-	}
-
-	//Decode response into an object
-	var resObject interface{}
-	err = json.Unmarshal(resBody, resObject)
-	if err != nil {
-		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not decode restcountries json response.")
-	}
-
-	//Define new country struct, and fill it with data from response
-	country = new(structs.Country)
-	country.Name = resObject.([]interface{})[0].(map[string]interface{})[constants.USED_COUNTRY_CODE].(string)
-	country.IsoCode = resObject.([]interface{})[0].(map[string]interface{})["name"].(map[string]interface{})["common"].(string)
-	country.Borders = resObject.([]interface{})[0].(map[string]interface{})["borders"].([]string)
 
 	rcCache[country.IsoCode] = country
 
@@ -74,30 +54,10 @@ func GetCountryByName(name string) (*structs.Country, error) {
 	urlParts := []string{constants.COUNTRIES_API_URL, constants.COUNTRY_NAME_SEARCH_PATH, name}
 	url := strings.Join(urlParts, "")
 
-	//Send get request to restcountries API
-	res, err := HttpRequestFromUrl(url, http.MethodGet)
+	country, err := getCountry(url)
 	if err != nil {
-		return nil, structs.NewError(err, http.StatusBadGateway, constants.DEFAULT500, "Restcountries API did not respond to request.")
+		return nil, err
 	}
-
-	//Extracts body of API response
-	resBody, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not extract body from restcountries HTTP response.")
-	}
-
-	//Decode response into an object
-	var resObject interface{}
-	err = json.Unmarshal(resBody, resObject)
-	if err != nil {
-		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not decode restcountries json response.")
-	}
-
-	//Define new country struct, and fill it with data from response
-	country := new(structs.Country)
-	country.Name = resObject.([]interface{})[0].(map[string]interface{})[constants.USED_COUNTRY_CODE].(string)
-	country.IsoCode = resObject.([]interface{})[0].(map[string]interface{})["name"].(map[string]interface{})["common"].(string)
-	country.Borders = resObject.([]interface{})[0].(map[string]interface{})["borders"].([]string)
 
 	rcCache[country.IsoCode] = country
 
@@ -141,4 +101,45 @@ func GetNeighbours(isoCode string) ([]string, error) {
 	}
 
 	return country.Borders, nil
+}
+
+func getInterface(url string) (interface{}, error) {
+
+	//Send get request to API
+	res, err := HttpRequestFromUrl(url, http.MethodGet)
+	if err != nil {
+		return nil, structs.NewError(err, http.StatusBadGateway, constants.DEFAULT500, "Restcountries API did not respond to request.")
+	}
+
+	//Extracts body of API response
+	resBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not extract body from restcountries HTTP response.")
+	}
+
+	//Decode response into an object
+	var resObject interface{}
+	err = json.Unmarshal(resBody, resObject)
+	if err != nil {
+		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not decode restcountries json response.")
+	}
+
+	return resObject, nil
+}
+
+func getCountry(url string) (*structs.Country, error) {
+
+	// Get response from API
+	resObject, err := getInterface(url)
+	if err != nil {
+		return nil, err
+	}
+
+	//Define new country struct, and fill it with data from response
+	country := new(structs.Country)
+	country.Name = resObject.([]interface{})[0].(map[string]interface{})[constants.USED_COUNTRY_CODE].(string)
+	country.IsoCode = resObject.([]interface{})[0].(map[string]interface{})["name"].(map[string]interface{})["common"].(string)
+	country.Borders = resObject.([]interface{})[0].(map[string]interface{})["borders"].([]string)
+
+	return country, nil
 }
