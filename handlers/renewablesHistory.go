@@ -36,7 +36,7 @@ func RenewablesHistory(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Invoke webhooks
-	db.InvokeCountry(countries)
+	go db.InvokeCountry(countries)
 
 	// Get the historical percentage of renewables for countires specified as a list of countryoutput structs
 	response, err = getHistoryRenewablesForCountries(w, countries, beginYear, endYear, sortByValue, getMean)
@@ -49,6 +49,9 @@ func RenewablesHistory(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
+
+	// Save reponse to cache
+	go saveToCache(response, countries, r)
 
 	return nil
 }
