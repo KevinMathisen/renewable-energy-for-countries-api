@@ -24,6 +24,7 @@ Get country code or name, and neighbours parameter from request, then returns ap
 */
 func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([]string, error) {
 	var countries []string
+	var countriesInDB []string
 
 	// Get country code or name from request
 	countryCodeOrName, err := getCountryCodeOrNameFromRequest(w, r, path)
@@ -52,8 +53,8 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 
 		countries = append(countries, isoCode)
 
-	} else if db.IsoCodeInDB(countryCodeOrName) {
-		// Else if the user specified ISO code and it exists in the database, add the code the list of countries
+	} else {
+		// Else if the user specified ISO code, add the code the list of countries
 		countries = append(countries, countryCodeOrName)
 	}
 
@@ -74,12 +75,17 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 			temp := countries                      //Take backup of countries
 			countries = div.RemoveDuplicates(temp) //Remove duplicates from countries
 		}
+	}
 
-		// TODO: Check if each isoCode is in database, if so add to list of countires
+	// Check if each country exists in the database
+	for _, isoCode := range countries {
+		if db.DocumentInCollection(isoCode, constants.RENEWABLES_COLLECTION) {
+			countriesInDB = append(countriesInDB, isoCode)
+		}
 	}
 
 	// If no countries existed in the database
-	if len(countries) == 0 {
+	if len(countriesInDB) == 0 {
 		return nil, structs.NewError(nil, http.StatusNotFound, "No country with given ISO code or name exists in our service", "")
 	}
 
