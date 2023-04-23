@@ -37,7 +37,9 @@ const CREDENTIALS_FILE = "./assignment2-prog2005-service-account.json"
 
 // Webhooks
 const WEBHOOK_ID_LENGTH = 16
-const WEBHOOK_COLLECTIONNAME = "webhooks"
+
+// Cache
+const MAX_CACHE_AGE_IN_HOURS = 4
 
 // Default error responses
 const DEFAULT500 = "There has been an internal server error. Please try again later."
