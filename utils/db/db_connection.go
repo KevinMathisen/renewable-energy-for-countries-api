@@ -57,21 +57,23 @@ func CloseFirebaseClient() {
 }
 
 /*
-Return if a country is in the renewables collection
+Return if a document with ID is in the collection given
 
-	isoCode	- Code of country to find
+	id			- ID of document to find
+	collection	- collection to search in
 
-	return 	- If country given exists in database
+	return 	- If document given exists in database
 */
-func IsoCodeInDB(isoCode string) bool {
-	// Check if country with ISO code exists in renewables collection
-	_, err := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Doc(isoCode).Get(firestoreContext)
+func DocumentInCollection(id string, collection string) bool {
+	// Check if document with id exists in collection
+	_, err := firebaseClient.Collection(collection).Doc(id).Get(firestoreContext)
 
 	// If we got error not found, return false
-	if status.Code(err) == codes.NotFound {
+	if status.Code(err) == codes.NotFound || err != nil {
+		log.Println(err.Error())
 		return false
 	}
-	// If the country was found
+	// If the document was found
 	return true
 }
 
@@ -113,23 +115,6 @@ Appends a single map with specified id to firestore
 */
 func AppendDocumentToFirestore(id string, doc map[string]interface{}, collectionName string) error {
 	_, err := firebaseClient.Collection(collectionName).Doc(id).Set(firestoreContext, doc)
-	if err != nil {
-		log.Println(err.Error())
-		return err
-	}
-	return nil
-}
-
-/*
-Appends a single map with specified webhookID to firestore in a collection under a document in a collection
-
-	doc				- Map of data, where each key will be one field in a document
-	collectionName	- Name of root collection to add data to
-	isoCode			- Document name of country the webhook is part of
-	webhookID		- ID of webhook and document we will add to firestore
-*/
-func AppendDocumentToWebhooksFirestore(doc map[string]interface{}, collectionName string, isoCode string, webhookID string) error {
-	_, err := firebaseClient.Collection(collectionName).Doc(isoCode).Collection(constants.WEBHOOK_COLLECTIONNAME).Doc(webhookID).Set(firestoreContext, doc)
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -192,10 +177,6 @@ func GetAllDocumentInCollectionFromFirestore(w http.ResponseWriter, collectionNa
 	return data, nil
 }
 
-func CheckCacheDBForURL(w http.ResponseWriter, url string) ([]structs.CountryOutput, error) {
-	return nil, nil
-}
-
 /*
 Delete a document given ID if it exists
 
@@ -255,7 +236,7 @@ func InvokeCountry(isoCode []string) {
 		// Get the webhook data
 		webhook := doc.Data()
 
-		// If the webhook country is not one of the invoked countries, and we did not invoke all countries, and the webhook is not invoked for all countries
+		// only want webhook if webhook country is one of the invoked countries, or we invoked all countries, or the webhook is invoked for all countries
 		if len(isoCode) != 0 && webhook["country"].(string) != "ANY" && !div.Contains(isoCode, webhook["country"].(string)) {
 			continue
 		}
@@ -276,9 +257,7 @@ func InvokeCountry(isoCode []string) {
 }
 
 /*
-Go through all webhooks and check if they are to be invoked
-
-	isoCode	- Isocode of countries to be invoked, empty if all countries
+Count amount of webhooks in firestore
 */
 func CountWebhooks() (int, error) {
 	var amountOfWebhooks int
