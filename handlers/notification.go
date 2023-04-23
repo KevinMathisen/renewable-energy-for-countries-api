@@ -93,7 +93,6 @@ func saveWebhook(w http.ResponseWriter, webhook structs.Webhook) error {
 	}
 
 	// Save webhook to the database
-	//err := db.AppendDocumentToWebhooksFirestore(webhookData, constants.WEBHOOK_COLLECTIONNAME, webhook.Country, webhook.WebhookId)
 	err := db.AppendDocumentToFirestore(webhook.WebhookId, webhookData, constants.WEBHOOKS_COLLECTION)
 	if err != nil {
 		// TODO: Error handling
