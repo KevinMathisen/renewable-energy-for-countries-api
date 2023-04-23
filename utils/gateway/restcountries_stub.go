@@ -49,3 +49,8 @@ func (rcs *RestCountriesStub) GetNameFromIsoCode(isoCode string) (string, error)
 	}
 	return country.Name, nil
 }
+
+// Sets the country cache to the input map.
+func (rcs *RestCountriesStub) SetCountryCache(countries map[string]*structs.Country) {
+	rcs.Countries = countries
+}
