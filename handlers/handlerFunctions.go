@@ -5,9 +5,14 @@ import (
 	"assignment2/utils/db"
 	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
+	"encoding/json"
+	"log"
 	"net/http"
 	"sort"
 	"strings"
+	"time"
+
+	"cloud.google.com/go/firestore"
 )
 
 /*
@@ -109,25 +114,90 @@ Should check if request is in the cache, then respond with cached response
 	return	- bool, true if there was a cache hit
 */
 func checkCache(w http.ResponseWriter, r *http.Request) (bool, error) {
-	var hit []structs.CountryOutput
+	var responseBody []structs.CountryOutput
+	var isoCodes []string
+
+	// Create request url path and parameters
+	requestURL := strings.Replace((r.URL.Path + r.URL.RawQuery), "/", "\\", -1)
 
 	// Check if request URL and response is in database
-	hit, err := db.CheckCacheDBForURL(w, r.URL.Path)
+	if !db.DocumentInCollection(requestURL, constants.CACHE_COLLECTION) {
+		return false, nil
+	}
+
+	// Get cached request
+	cachedRequest, err := db.GetDocumentFromFirestore(w, requestURL, constants.CACHE_COLLECTION)
 	if err != nil {
 		return false, err
 	}
 
-	// Cache hit
-	if len(hit) != 0 {
-		err := gateway.RespondToGetRequestWithJSON(w, hit, http.StatusOK)
-		if err != nil {
-			return false, err
-		}
-		return true, nil
+	// Delete and dont use cached response if it is older than max cache age
+	if time.Since(cachedRequest["time"].(time.Time)).Hours() > constants.MAX_CACHE_AGE_IN_HOURS {
+		go db.DeleteDocument(w, requestURL, constants.CACHE_COLLECTION)
+		return false, err
 	}
 
-	// No cache hit
-	return false, nil
+	// Try to decode reponse saved in cache
+	err = json.Unmarshal([]byte(cachedRequest["responseBody"].([]uint8)), &responseBody)
+	if err != nil {
+		return false, err
+	}
+
+	// Try to decode isoCodes saved in cache
+	err = json.Unmarshal([]byte(cachedRequest["isoCodes"].([]uint8)), &isoCodes)
+	if err != nil {
+		return false, err
+	}
+
+	// Invoke webhooks
+	go db.InvokeCountry(isoCodes)
+
+	// Answer request with cached response
+	err = gateway.RespondToGetRequestWithJSON(w, responseBody, http.StatusOK)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+/*
+Saves a request and its corresponding response to firestore, along with the response timestamp
+
+	responseBody	- reponse we will save
+	r				- http.request for getting the url of the request
+*/
+func saveToCache(responseBody []structs.CountryOutput, isoCodes []string, r *http.Request) {
+
+	// create request id by path and parameters
+	requestID := strings.Replace((r.URL.Path + r.URL.RawQuery), "/", "\\", -1)
+
+	// Encode country strycts into json
+	responseEncoded, err := json.Marshal(responseBody)
+	if err != nil {
+		log.Println("Error when encoding country response to json for caching")
+		return
+	}
+
+	// Encode isoCodes into json
+	isoCodesEncoded, err := json.Marshal(isoCodes)
+	if err != nil {
+		log.Println("Error when encoding isoCodes to json for caching")
+		return
+	}
+
+	// Create cache map
+	cachedResponse := map[string]interface{}{
+		"responseBody": responseEncoded,
+		"isoCodes":     isoCodesEncoded,
+		"time":         firestore.ServerTimestamp,
+	}
+
+	// Save reponse with url path and parameters to firestore
+	err = db.AppendDocumentToFirestore(requestID, cachedResponse, constants.CACHE_COLLECTION)
+	if err != nil {
+		return
+	}
 }
 
 /*
