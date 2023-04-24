@@ -79,10 +79,11 @@ func PostToWebhook(data map[string]interface{}, webhookID string) {
 		countryName = ""
 	} else {
 		// Find name from isoCode
-		countryName, err = GetNameFromIsoCode(data["country"].(string))
+		country, err := GetCountryByIso(data["country"].(string))
 		if err != nil {
 			return
 		}
+		countryName = country.Name
 	}
 
 	// Encode struct into json

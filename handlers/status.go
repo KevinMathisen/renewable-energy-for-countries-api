@@ -16,14 +16,12 @@ func Status(w http.ResponseWriter, r *http.Request) error {
 
 	// Send error if request is not GET:
 	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid method, currently only GET is supported", http.StatusNotImplemented)
-		return nil // TODO: Return error
+		return structs.NewError(nil, http.StatusNotImplemented, "Invalid method, currently only GET is supported", "User used invalid http method")
 	}
 
 	// Generate status response
 	statusRes, err := createStatusResponse(Start)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return err
 	}
 
@@ -46,19 +44,19 @@ func createStatusResponse(start time.Time) (structs.Status, error) {
 	// Get request from countries api
 	resCountry, err := gateway.HttpRequestFromUrl(constants.COUNTRIES_API_URL, http.MethodHead)
 	if err != nil {
-		return structs.Status{}, err
+		return structs.Status{}, structs.NewError(err, http.StatusGatewayTimeout, "Error when accessing restcountries api", "")
 	}
 
 	// Get request from notification db api
 	resDB, err := gateway.HttpRequestFromUrl(constants.FIRESTORE_NOTIFICATION_URL, http.MethodHead)
 	if err != nil {
-		return structs.Status{}, err
+		return structs.Status{}, structs.NewError(err, http.StatusGatewayTimeout, "Error when accesing the database", "")
 	}
 
 	// Get amount of webhooks
 	amountOfWebhooks, err := db.CountWebhooks()
 	if err != nil {
-		return structs.Status{}, err
+		return structs.Status{}, structs.NewError(err, http.StatusGatewayTimeout, "Error when accesing the database", "")
 	}
 
 	// Initialize the status response struct

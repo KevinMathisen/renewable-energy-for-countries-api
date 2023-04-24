@@ -78,19 +78,6 @@ func GetIsoCodeFromName(countryName string) (string, error) {
 }
 
 /*
-Get name from countries ISO code
-*/
-func GetNameFromIsoCode(isoCode string) (string, error) {
-
-	country, err := GetCountryByIso(isoCode)
-	if err != nil {
-		return "", err
-	}
-
-	return country.Name, nil
-}
-
-/*
 * Gets the neighbours of input country.
  */
 func GetNeighbours(isoCode string) ([]string, error) {
@@ -130,8 +117,8 @@ func getCountry(url string) (*structs.Country, error) {
 
 	//Define new country struct, and fill it with data from response
 	country := new(structs.Country)
-	country.Name = resObject[0][constants.USED_COUNTRY_CODE].(string)
-	country.IsoCode = resObject[0]["name"].(map[string]interface{})["common"].(string)
+	country.IsoCode = resObject[0][constants.USED_COUNTRY_CODE].(string)
+	country.Name = resObject[0]["name"].(map[string]interface{})["common"].(string)
 	country.Borders = getCountryBorder(resObject)
 
 	return country, nil

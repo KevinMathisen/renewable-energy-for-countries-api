@@ -60,21 +60,16 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 
 	// If the user specified the neighbour parameter, get neighbour ISO code with Restcountries API
 	if neighbours {
-		//Iterate through each country in the list
-
-		for _, iso := range countries {
-			country, err := gateway.GetCountryByIso(iso) //Get the country object
-			if err != nil {
-				return nil, err
-			}
-			borders := country.Borders       //Retrieve borders from country
-			for _, border := range borders { //Add borders to countries list, this will most likely include a lot of duplicates.
-				countries = append(countries, border)
-			}
-
-			temp := countries                      //Take backup of countries
-			countries = div.RemoveDuplicates(temp) //Remove duplicates from countries
+		country, err := gateway.GetCountryByIso(countries[0]) //Get the country object
+		if err != nil {
+			return nil, err
 		}
+
+		//Add borders to countries list, this will most likely include a lot of duplicates.
+		countries = append(countries, country.Borders...)
+
+		temp := countries                      //Take backup of countries
+		countries = div.RemoveDuplicates(temp) //Remove duplicates from countries
 	}
 
 	// Check if each country exists in the database
@@ -89,7 +84,7 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 		return nil, structs.NewError(nil, http.StatusNotFound, "No country with given ISO code or name exists in our service", "")
 	}
 
-	return countries, nil
+	return countriesInDB, nil
 
 }
 
@@ -212,10 +207,13 @@ func GetWebhookFromRequest(w http.ResponseWriter, r *http.Request) (structs.Webh
 	if err := decoder.Decode(&webhook); err != nil {
 		// Error for error in decoding
 		log.Println(err.Error())
-		return webhook, structs.NewError(err, 500, constants.DEFAULT500, "There was an error when decoding webhook from json.")
+		return webhook, structs.NewError(err, http.StatusBadRequest, "Invalid request body for registration of webhook", "There was an error when decoding webhook from json.")
 	}
 
-	log.Println(webhook)
+	// Dont allow registration of webhook for country which does not exist in database
+	if !db.DocumentInCollection(webhook.Country, constants.RENEWABLES_COLLECTION) {
+		return webhook, structs.NewError(nil, http.StatusBadRequest, "Invalid country code for registration of webhook", "User entered a country code not in the database")
+	}
 
 	return webhook, nil
 }

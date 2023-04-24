@@ -14,7 +14,7 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) error {
 
 	// Send error message if request method is not get
 	if r.Method != http.MethodGet {
-		return structs.NewError(nil, http.StatusNotImplemented, "Invalid method, currently only GET is supported", "")
+		return structs.NewError(nil, http.StatusNotImplemented, "Invalid method, currently only GET is supported", "User used invalid http method")
 	}
 
 	// If cache hit, send cached response
@@ -72,7 +72,7 @@ func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string,
 	currentYear := constants.LATEST_YEAR_DB
 
 	// If the users specified countries, get renewables data from them in the current year
-	if len(countries) != 0 && !sortByValue {
+	if len(countries) != 0 {
 		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err

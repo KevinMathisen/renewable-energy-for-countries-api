@@ -281,3 +281,25 @@ func CountWebhooks() (int, error) {
 
 	return amountOfWebhooks, nil
 }
+
+/*
+Delete all documents in cache collection
+*/
+func DeleteAllCachedRequestsFromFirestore() {
+	// Get reference to documents in collection
+	iter := firebaseClient.Collection(constants.CACHE_COLLECTION).DocumentRefs(firestoreContext)
+
+	for {
+		// Try to go to next document in collection
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return
+		}
+
+		// Save each document with documentID as the key
+		doc.Delete(firestoreContext)
+	}
+}

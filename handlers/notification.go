@@ -22,11 +22,7 @@ func Notification(w http.ResponseWriter, r *http.Request) error {
 	case http.MethodGet:
 		err = viewWebhook(w, r)
 	default:
-		return nil
-		/*
-			Status: Not impemented
-			Message: Invalid method, currently only [methods supported] is supported
-		*/
+		return structs.NewError(nil, http.StatusNotImplemented, "Invalid method, currently only Post, Delete, Get supported", "User used invalid http method")
 	}
 
 	return err
@@ -39,7 +35,6 @@ func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
 	// Get request json body
 	webhook, err := params.GetWebhookFromRequest(w, r)
 	if err != nil {
-		//error handling
 		return err
 	}
 
@@ -49,7 +44,6 @@ func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
 	// Save webhook to database
 	err = saveWebhook(w, webhook)
 	if err != nil {
-		// TODO: error handling
 		return err
 	}
 
