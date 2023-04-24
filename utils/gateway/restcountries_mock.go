@@ -9,12 +9,12 @@ import (
 )
 
 // Map of countries that link country ISO codes to their respective structs containing all information.
-type RestCountriesStub struct {
+type RestCountriesMock struct {
 	Countries map[string]*structs.Country
 }
 
 // Returns a country struct based on the ISO code of the country.
-func (rcs *RestCountriesStub) GetCountryByIso(iso string) (*structs.Country, error) {
+func (rcs *RestCountriesMock) GetCountryByIso(iso string) (*structs.Country, error) {
 	country, ok := rcs.Countries[iso]
 	if ok {
 		return country, nil
@@ -23,7 +23,7 @@ func (rcs *RestCountriesStub) GetCountryByIso(iso string) (*structs.Country, err
 }
 
 // Returns a country struct based on the name of the country.
-func (rcs *RestCountriesStub) GetCountryByName(name string) (*structs.Country, error) {
+func (rcs *RestCountriesMock) GetCountryByName(name string) (*structs.Country, error) {
 	for _, v := range rcs.Countries {
 		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(name)) {
 			return v, nil
@@ -33,7 +33,7 @@ func (rcs *RestCountriesStub) GetCountryByName(name string) (*structs.Country, e
 }
 
 // Returns ISO code based on country name.
-func (rcs *RestCountriesStub) GetIsoCodeFromName(countryName string) (string, error) {
+func (rcs *RestCountriesMock) GetIsoCodeFromName(countryName string) (string, error) {
 	country, err := rcs.GetCountryByName(countryName)
 	if err != nil {
 		return "", err
@@ -42,7 +42,7 @@ func (rcs *RestCountriesStub) GetIsoCodeFromName(countryName string) (string, er
 }
 
 // Returns country name based on ISO code.
-func (rcs *RestCountriesStub) GetNameFromIsoCode(isoCode string) (string, error) {
+func (rcs *RestCountriesMock) GetNameFromIsoCode(isoCode string) (string, error) {
 	country, err := rcs.GetCountryByIso(isoCode)
 	if err != nil {
 		return "", err
@@ -51,6 +51,6 @@ func (rcs *RestCountriesStub) GetNameFromIsoCode(isoCode string) (string, error)
 }
 
 // Sets the country cache to the input map.
-func (rcs *RestCountriesStub) SetCountryCache(countries map[string]*structs.Country) {
+func (rcs *RestCountriesMock) SetCountryCache(countries map[string]*structs.Country) {
 	rcs.Countries = countries
 }
