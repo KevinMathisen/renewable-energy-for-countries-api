@@ -207,7 +207,12 @@ func GetWebhookFromRequest(w http.ResponseWriter, r *http.Request) (structs.Webh
 	if err := decoder.Decode(&webhook); err != nil {
 		// Error for error in decoding
 		log.Println(err.Error())
-		return webhook, structs.NewError(err, 500, constants.DEFAULT500, "There was an error when decoding webhook from json.")
+		return webhook, structs.NewError(err, http.StatusBadRequest, "Invalid request body for registration of webhook", "There was an error when decoding webhook from json.")
+	}
+
+	// Dont allow registration of webhook for country which does not exist in database
+	if !db.DocumentInCollection(webhook.Country, constants.RENEWABLES_COLLECTION) {
+		return webhook, structs.NewError(nil, http.StatusBadRequest, "Invalid country code for registration of webhook", "User entered a country code not in the database")
 	}
 
 	return webhook, nil
