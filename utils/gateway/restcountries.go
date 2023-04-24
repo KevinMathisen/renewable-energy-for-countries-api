@@ -4,7 +4,6 @@ import (
 	"assignment2/utils/constants"
 	"assignment2/utils/structs"
 	"encoding/json"
-	"io"
 	"net/http"
 	"strings"
 )
@@ -111,15 +110,9 @@ func getInterface(url string) (interface{}, error) {
 		return nil, structs.NewError(err, http.StatusBadGateway, constants.DEFAULT500, "Restcountries API did not respond to request.")
 	}
 
-	//Extracts body of API response
-	resBody, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not extract body from restcountries HTTP response.")
-	}
-
 	//Decode response into an object
-	var resObject interface{}
-	err = json.Unmarshal(resBody, resObject)
+	var resObject []map[string]interface{}
+	err = json.NewDecoder(res.Body).Decode(&resObject)
 	if err != nil {
 		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not decode restcountries json response.")
 	}
