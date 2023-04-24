@@ -3,8 +3,11 @@ package gateway
 import (
 	"assignment2/utils/constants"
 	"assignment2/utils/structs"
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -53,4 +56,28 @@ func (rcs *RestCountriesMock) GetNameFromIsoCode(isoCode string) (string, error)
 // Sets the country cache to the input map.
 func (rcs *RestCountriesMock) SetCountryCache(countries map[string]*structs.Country) {
 	rcs.Countries = countries
+}
+
+// Sets the country cache to the input map, given a JSON file.
+func (rcs *RestCountriesMock) SetCountryCacheByJSON(filepath string) (map[string]*structs.Country, error) {
+	jsonFile, err := os.Open(filepath)
+	if err != nil {
+		return nil, err
+	}
+	defer jsonFile.Close()
+
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return nil, err
+	}
+
+	var countryMap map[string]*structs.Country
+	err = json.Unmarshal(byteValue, &countryMap)
+	if err != nil {
+		return nil, err
+	}
+
+	rcs.Countries = countryMap
+
+	return countryMap, nil
 }
