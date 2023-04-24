@@ -89,7 +89,7 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 		return nil, structs.NewError(nil, http.StatusNotFound, "No country with given ISO code or name exists in our service", "")
 	}
 
-	return countries, nil
+	return countriesInDB, nil
 
 }
 
