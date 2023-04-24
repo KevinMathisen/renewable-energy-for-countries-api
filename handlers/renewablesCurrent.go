@@ -72,7 +72,7 @@ func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string,
 	currentYear := constants.LATEST_YEAR_DB
 
 	// If the users specified countries, get renewables data from them in the current year
-	if len(countries) != 0 && !sortByValue {
+	if len(countries) != 0 {
 		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
