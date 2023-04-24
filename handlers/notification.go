@@ -22,11 +22,7 @@ func Notification(w http.ResponseWriter, r *http.Request) error {
 	case http.MethodGet:
 		err = viewWebhook(w, r)
 	default:
-		return nil
-		/*
-			Status: Not impemented
-			Message: Invalid method, currently only [methods supported] is supported
-		*/
+		return structs.NewError(nil, http.StatusNotImplemented, "Invalid method, currently only Post, Delete, Get supported", "User used invalid http method")
 	}
 
 	return err
