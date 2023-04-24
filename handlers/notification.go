@@ -106,6 +106,11 @@ func deletionOfWebhook(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	// Check if the webhookID is valid
+	if !checkIfValidWebhookId(webhookID) {
+		return structs.NewError(nil, http.StatusBadRequest, "Invalid webhookID given", "webhookID given was not found in database")
+	}
+
 	// Try to delete webhook from database
 	err = db.DeleteDocument(w, webhookID, constants.WEBHOOKS_COLLECTION)
 	if err != nil {
@@ -136,6 +141,11 @@ func viewWebhook(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	// Check if the webhookID is valid
+	if !checkIfValidWebhookId(webhookID) {
+		return structs.NewError(nil, http.StatusBadRequest, "Invalid webhookID given", "webhookID given was not found in database")
+	}
+
 	// Get webhooks from database
 	response, err := getWebhooks(w, webhookID)
 	if err != nil {
@@ -158,6 +168,10 @@ func viewWebhook(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	return nil
+}
+
+func checkIfValidWebhookId(id string) bool {
+	return id == "" || db.DocumentInCollection(id, constants.WEBHOOKS_COLLECTION)
 }
 
 /*

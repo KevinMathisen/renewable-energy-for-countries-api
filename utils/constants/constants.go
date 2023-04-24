@@ -32,8 +32,9 @@ const CACHE_COLLECTION = "cache"
 const FIRESTORE_NOTIFICATION_URL = "https://console.firebase.google.com/u/1/project/assignment2-prog2005/firestore/data/~2Fwebhooks"
 
 // Name of files
-const RENEWABLES_CSV_FILE = "./renewable-share-energy.csv"
+const RENEWABLES_CSV_FILE = "./res/renewable-share-energy.csv"
 const CREDENTIALS_FILE = "./assignment2-prog2005-service-account.json"
+const RESTCOUNTRIES_MOCK = "./res/restcountries-mock.json"
 
 // Webhooks
 const WEBHOOK_ID_LENGTH = 16
