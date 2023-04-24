@@ -39,7 +39,6 @@ func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
 	// Get request json body
 	webhook, err := params.GetWebhookFromRequest(w, r)
 	if err != nil {
-		//error handling
 		return err
 	}
 
@@ -49,7 +48,6 @@ func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
 	// Save webhook to database
 	err = saveWebhook(w, webhook)
 	if err != nil {
-		// TODO: error handling
 		return err
 	}
 
