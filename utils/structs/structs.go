@@ -67,7 +67,10 @@ func NewError(origErr error, statusCode int, userMsg, devMsg string) error {
 
 // Returns original error in string form
 func (err WrappedError) Error() string {
-	return err.OrigErr.Error()
+	if err.OrigErr != nil {
+		return err.OrigErr.Error()
+	}
+	return ""
 }
 
 // Unwraps error
