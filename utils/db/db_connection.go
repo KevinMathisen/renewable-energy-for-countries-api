@@ -8,6 +8,8 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"sync"
+	"time"
 
 	"cloud.google.com/go/firestore" // Firestore-specific support
 	firebase "firebase.google.com/go"
@@ -23,10 +25,19 @@ var firestoreContext context.Context
 // Firebase client used by Firestore functions
 var firebaseClient *firestore.Client
 
+// Boolean variable and accompanying lock to determine the state of the database. Toggle with ReportDbState()
+var (
+	DbState                 bool       = true
+	dbStateMutex            sync.Mutex // Mutual exclusion lock to safely toggle db error state
+	dbRestartTimerMutex     sync.Mutex // Mutual exclusion lock to wait for database reconnection attempt. It's purspose is to prevent multiple timers being started.
+	DbRestartTimerStartTime time.Time  // Moment of timer activation to display to user.
+)
+
 /*
 Sets up Firebase client connection with credentials
+Returns error
 */
-func InitializeFirestore() {
+func InitializeFirestore() error {
 	// Firebase initialisation
 	firestoreContext = context.Background()
 
@@ -35,15 +46,16 @@ func InitializeFirestore() {
 	// Create a firebase app with context and credentials
 	app, err := firebase.NewApp(firestoreContext, nil, serviceAccount)
 	if err != nil {
-		log.Fatalln(err)
+		return structs.NewError(err, 500, constants.DEFAULT500, "Could not establish firebase context")
 	}
 
 	// Instantiate client and connect to Firestore
 	firebaseClient, err = app.Firestore(firestoreContext)
 	if err != nil {
-		log.Fatalln(err)
+		return structs.NewError(err, 502, constants.DEFAULT500, "Could not contact firebase")
 	}
 
+	return nil
 }
 
 /*
@@ -301,5 +313,52 @@ func DeleteAllCachedRequestsFromFirestore() {
 
 		// Save each document with documentID as the key
 		doc.Delete(firestoreContext)
+	}
+}
+
+/*
+* A function used for reporting on the state of the database.
+* To signify a healthy database, send "true". This will disable the db-error handeling middleware.
+* To signify a broken database, send "false". This will trigger the db-error handeling middleware located in the root handler within "errorHandler".
+* Automaticly runs sleepAndRestartDb if action is false and goes through lock.
+ */
+func ReportDbState(action bool) {
+
+	//Check if dbstate is already equal to desired state
+	if DbState == action {
+		return
+	}
+
+	dbStateMutex.Lock()   //Lock variable
+	DbState = action      //Change dbstate
+	dbStateMutex.Unlock() //Unlock variable
+
+	//If the reported state is false, db is set to sleep and reattempt connection.
+	if !action {
+		sleepAndRestartDb()
+	}
+}
+
+/*
+* Function that sleeps for one minute before reattempting a database connection.
+ */
+func sleepAndRestartDb() {
+
+	//Check if timer is already active
+	if !dbRestartTimerMutex.TryLock() {
+		return
+	}
+
+	//Sleep for a minute
+	println("Sleeping for 1 minute")
+	DbRestartTimerStartTime = time.Now()
+	time.Sleep(1 * time.Minute)
+
+	err := InitializeFirestore() //Reattempt database connection
+	dbRestartTimerMutex.Unlock() //Give away lock regardless of output
+	if err != nil {
+		sleepAndRestartDb() //On database failure, restart function
+	} else {
+		ReportDbState(true) //On database success, set flag to true.
 	}
 }

@@ -12,8 +12,11 @@ import (
 
 func main() {
 
-	// Set up Firestore
-	db.InitializeFirestore()
+	// Set up Firestore, if a connection could not be established
+	err := db.InitializeFirestore()
+	if err != nil {
+		db.ReportDbState(false) //Close service on database failure, automaticly reattempt after 1 minute
+	}
 
 	// Close down client when service is done running
 	defer db.CloseFirebaseClient()
