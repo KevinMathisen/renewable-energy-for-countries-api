@@ -102,7 +102,7 @@ func GetNeighbours(isoCode string) ([]string, error) {
 	return country.Borders, nil
 }
 
-func getInterface(url string) (interface{}, error) {
+func getInterface(url string) ([]map[string]interface{}, error) {
 
 	//Send get request to API
 	res, err := HttpRequestFromUrl(url, http.MethodGet)
@@ -130,9 +130,21 @@ func getCountry(url string) (*structs.Country, error) {
 
 	//Define new country struct, and fill it with data from response
 	country := new(structs.Country)
-	country.Name = resObject.([]interface{})[0].(map[string]interface{})[constants.USED_COUNTRY_CODE].(string)
-	country.IsoCode = resObject.([]interface{})[0].(map[string]interface{})["name"].(map[string]interface{})["common"].(string)
-	country.Borders = resObject.([]interface{})[0].(map[string]interface{})["borders"].([]string)
+	country.Name = resObject[0][constants.USED_COUNTRY_CODE].(string)
+	country.IsoCode = resObject[0]["name"].(map[string]interface{})["common"].(string)
+	country.Borders = getCountryBorder(resObject)
 
 	return country, nil
+}
+
+/*
+Get a list of all the country ISO codes that border the country given
+*/
+func getCountryBorder(resObject []map[string]interface{}) []string {
+	var borders []string
+	// For each border, save border as a string to the list
+	for _, border := range resObject[0]["borders"].([]interface{}) {
+		borders = append(borders, border.(string))
+	}
+	return borders
 }
