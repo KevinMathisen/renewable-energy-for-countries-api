@@ -350,7 +350,7 @@ func sleepAndRestartDb() {
 	}
 
 	//Sleep for a minute
-	println("Retrying for 1 minute")
+	log.Println("Retrying for 1 minute")
 	DbRestartTimerStartTime = time.Now()
 	time.Sleep(1 * time.Minute)
 
