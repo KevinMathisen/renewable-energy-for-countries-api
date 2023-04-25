@@ -54,7 +54,7 @@ func TestGetCountryByIso(t *testing.T) {
 		Borders: []string{"FIN", "SWE", "RUS"},
 	}
 
-	assert.Equal(t, country, expected, "Response body does not match expected")
+	assert.Equal(t, expected, country, "Response body does not match expected")
 }
 
 /*
@@ -139,7 +139,7 @@ func TestGetCountryByName(t *testing.T) {
 		Borders: []string{"FIN", "SWE", "RUS"},
 	}
 
-	assert.Equal(t, country, expected, "Response body does not match expected")
+	assert.Equal(t, expected, country, "Response body does not match expected")
 }
 
 /*
@@ -236,14 +236,14 @@ func TestRcCacheIsoThenName(t *testing.T) {
 		t.Errorf("Expected no error, got %s", err)
 	}
 
-	assert.Equal(t, country, expected, "Response body does not match expected")
+	assert.Equal(t, expected, country, "Response body does not match expected")
 
 	country, err = GetCountryByName("Norway", ts.URL)
 	if err != nil {
 		t.Errorf("Expected no error, got %s", err)
 	}
 
-	assert.Equal(t, country, expected, "Response body does not match expected")
+	assert.Equal(t, expected, country, "Response body does not match expected")
 }
 
 /*
@@ -302,14 +302,14 @@ func TestRcCacheNameThenIso(t *testing.T) {
 		t.Errorf("Expected no error, got %s", err)
 	}
 
-	assert.Equal(t, country, expected, "Response body does not match expected")
+	assert.Equal(t, expected, country, "Response body does not match expected")
 
 	country, err = GetCountryByIso("NOR", ts.URL)
 	if err != nil {
 		t.Errorf("Expected no error, got %s", err)
 	}
 
-	assert.Equal(t, country, expected, "Response body does not match expected")
+	assert.Equal(t, expected, country, "Response body does not match expected")
 }
 
 /*
@@ -351,7 +351,7 @@ func TestGetIsoCodeFromName(t *testing.T) {
 		t.Errorf("Expected no error, got %s", err)
 	}
 
-	assert.Equal(t, isoCode, expected, "Response body does not match expected")
+	assert.Equal(t, expected, isoCode, "Response body does not match expected")
 }
 
 /*
@@ -420,7 +420,7 @@ func TestGetNeighbours(t *testing.T) {
 		t.Errorf("Expected no error, got %s", err)
 	}
 
-	assert.Equal(t, neighbours, expected, "Response body does not match expected")
+	assert.Equal(t, expected, neighbours, "Response body does not match expected")
 }
 
 /*
