@@ -8,7 +8,6 @@ COPY ./cmd /go/src/app/cmd
 COPY ./handlers /go/src/app/handlers
 COPY ./utils /go/src/app/utils
 COPY ./go.mod /go/src/app/go.mod
-COPY ./assignment2-prog2005-service-account.json /go/src/app/cmd/assignment2-prog2005-service-account.json
 
 # Starting in following working div
 WORKDIR /go/src/app/cmd
