@@ -18,7 +18,7 @@ RUN go get assignment2/handlers
 RUN go get github.com/stretchr/testify/assert
 
 # Compile executable
-RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags -static' -o initial_setup ./cmd/setup/initial_setup.go
+RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags -static' -o initial_setup ./setup/initial_setup.go
 
 # Application will run on port 8080
 EXPOSE 8080
