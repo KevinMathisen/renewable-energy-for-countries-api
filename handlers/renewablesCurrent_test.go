@@ -27,14 +27,15 @@ var CURRENT_NEIGHBOURS_CODES = [EXPECTED_NEIGHBOURS]string{"FIN", "NOR", "RUS", 
 CURRENT COVERAGE:
 
 /energy/v1/renewables/current/
-	Tests year of first country
 	Tests total amount of countries
 
 /energy/v1/renewables/current/NOR
+	Tests year of country
 	Tests number of recieved countries
 	Tests values of object
 
 /energy/v1/renewables/current/norway
+	Tests year of country
 	Tests number of recieved countries
 	Tests values of object
 
@@ -81,10 +82,10 @@ func TestHttpGetRenewablesCurrent(t *testing.T) {
 	defer db.CloseFirebaseClient()
 
 	handleCurrentLogistics(t, currentAll)
-	handleCurrentLogistics(t, currentCountryCode)
-	handleCurrentLogistics(t, currentCountryName)
+	handleCurrentLogistics(t, currentCountryByCode)
+	handleCurrentLogistics(t, currentCountryByName)
 	handleCurrentLogistics(t, currentNeighbours)
-	handleCurrentLogistics(t, currentSortBy)
+	handleCurrentLogistics(t, currentAllSortBy)
 }
 
 /*
@@ -106,43 +107,18 @@ func handleCurrentLogistics(t *testing.T, f func(*testing.T, string, http.Client
 	f(t, url, client)
 }
 
-// Runs tests for the .../renewables/current/ endpoint
-func currentAll(t *testing.T, url string, client http.Client) {
-
-	log.Println("Testing URL: \"" + url + "\"...")
-
-	//Gets data from the .../renewables/current/ endpoint
-	res, err := getCurrentData(client, url)
-	//If there was an error during gathering or decoding of data
-	if err != nil {
-		t.Fatal(err.Error())
-	}
-
-	//Checks that the year is right
-	if year := res[0].Year; year != strconv.Itoa(constants.LATEST_YEAR_DB) {
-		t.Fatal("Year of recieved objects is wrong." +
-			"\n\tExpected: " + strconv.Itoa(constants.LATEST_YEAR_DB) +
-			"\n\tRecieved: " + year)
-	}
-
-	//Checks amount of countries recieved
-	if length := len(res); length != EXPECTED_COUNTRIES {
-		t.Fatal("Total amount of objects recieved is wrong." +
-			"\n\tExpected: " + strconv.Itoa(EXPECTED_COUNTRIES) +
-			"\n\tRecieved: " + strconv.Itoa(length))
-	}
-}
+//------------------------------ SINGLE COUNTRY TESTS ------------------------------
 
 // Calls currentCountry(...) with a country code
-func currentCountryCode(t *testing.T, url string, client http.Client) {
-	fullUrl := url + CURRENT_COUNTRY_CODE
-	currentCountry(t, fullUrl, client)
+func currentCountryByCode(t *testing.T, url string, client http.Client) {
+	url = url + CURRENT_COUNTRY_CODE
+	currentCountry(t, url, client)
 }
 
 // Calls currentCountry(...) with a country name
-func currentCountryName(t *testing.T, url string, client http.Client) {
-	fullUrl := url + CURRENT_COUNTRY_NAME
-	currentCountry(t, fullUrl, client)
+func currentCountryByName(t *testing.T, url string, client http.Client) {
+	url = url + CURRENT_COUNTRY_NAME
+	currentCountry(t, url, client)
 }
 
 // Runs tests for the .../renewables/current/{countryName}/{countryCode} endpoint
@@ -156,6 +132,13 @@ func currentCountry(t *testing.T, url string, client http.Client) {
 		t.Fatal(err.Error())
 	}
 
+	//Checks that the year is right
+	if year := res[0].Year; year != strconv.Itoa(constants.LATEST_YEAR_DB) {
+		t.Fatal("Year of recieved objects is wrong." +
+			"\n\tExpected: " + strconv.Itoa(constants.LATEST_YEAR_DB) +
+			"\n\tRecieved: " + year)
+	}
+
 	//Checks that only one country was recieved
 	if n := len(res); n != 1 {
 		t.Fatal("Recieved more than one object." +
@@ -163,23 +146,24 @@ func currentCountry(t *testing.T, url string, client http.Client) {
 			"\n\tRecieved: " + strconv.Itoa(n))
 	}
 
-	//Checks that the data in retrieved object is correct. Is case-insensitive on the country name.
+	//Checks that the data in recieved object is correct. Is case-insensitive on the country name.
 	if res[0].IsoCode != CURRENT_COUNTRY_CODE || !strings.EqualFold(res[0].Name, CURRENT_COUNTRY_NAME) || res[0].Year != strconv.Itoa(constants.LATEST_YEAR_DB) || res[0].Percentage != CURRENT_COUNTRY_PERCENTAGE {
 		t.Fatal("Wrong object recieved." +
 			"\n\tExpected: " + CURRENT_COUNTRY_CODE + " - " + CURRENT_COUNTRY_NAME + " - " + strconv.Itoa(constants.LATEST_YEAR_DB) + " - " + strconv.FormatFloat(CURRENT_COUNTRY_PERCENTAGE, 'g', -1, 64) +
 			"\n\tRecieved: " + res[0].IsoCode + " - " + res[0].Name + " - " + res[0].Year + " - " + strconv.FormatFloat(res[0].Percentage, 'g', -1, 64))
 	}
-
 }
+
+//------------------------------ NEIGHBOUR COUNTRY TESTS ------------------------------
 
 // Runs tests for the .../renewables/current/{...}?neighbours=true endpoint
 func currentNeighbours(t *testing.T, url string, client http.Client) {
-	fullUrl := url + CURRENT_COUNTRY_CODE_NEIGHBOURS
+	url = url + CURRENT_COUNTRY_CODE_NEIGHBOURS
 
-	log.Println("Testing URL: \"" + fullUrl + "\"...")
+	log.Println("Testing URL: \"" + url + "\"...")
 
 	//Gets data from the endpoint
-	res, err := getCurrentData(client, fullUrl)
+	res, err := getCurrentData(client, url)
 	//If there was an error during gathering or decoding of data
 	if err != nil {
 		t.Fatal(err.Error())
@@ -208,8 +192,30 @@ func currentNeighbours(t *testing.T, url string, client http.Client) {
 	}
 }
 
+//------------------------------ ALL COUNTRIES TESTS ------------------------------
+
+// Runs tests for the .../renewables/current/ endpoint
+func currentAll(t *testing.T, url string, client http.Client) {
+
+	log.Println("Testing URL: \"" + url + "\"...")
+
+	//Gets data from the .../renewables/current/ endpoint
+	res, err := getCurrentData(client, url)
+	//If there was an error during gathering or decoding of data
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	//Checks amount of countries recieved
+	if length := len(res); length != EXPECTED_COUNTRIES {
+		t.Fatal("Total amount of objects recieved is wrong." +
+			"\n\tExpected: " + strconv.Itoa(EXPECTED_COUNTRIES) +
+			"\n\tRecieved: " + strconv.Itoa(length))
+	}
+}
+
 // Runs tests for the .../renewables/current/?sortByValue=true endpoint
-func currentSortBy(t *testing.T, url string, client http.Client) {
+func currentAllSortBy(t *testing.T, url string, client http.Client) {
 	fullUrl := url + CURRENT_SORT_BY
 
 	log.Println("Testing URL: \"" + url + "\"...")
