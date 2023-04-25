@@ -46,13 +46,13 @@ func InitializeFirestore() error {
 	// Create a firebase app with context and credentials
 	app, err := firebase.NewApp(firestoreContext, nil, serviceAccount)
 	if err != nil {
-		return structs.NewError(err, 500, constants.DEFAULT500, "Could not establish firebase context")
+		return structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not establish firebase context")
 	}
 
 	// Instantiate client and connect to Firestore
 	firebaseClient, err = app.Firestore(firestoreContext)
 	if err != nil {
-		return structs.NewError(err, 502, constants.DEFAULT500, "Could not contact firebase")
+		return structs.NewError(err, http.StatusServiceUnavailable, constants.DEFAULT500, "Could not contact firebase")
 	}
 
 	return nil
@@ -149,7 +149,7 @@ func GetDocumentFromFirestore(w http.ResponseWriter, id string, collectionName s
 	if err != nil {
 		http.Error(w, "Error extracting body of document "+id, http.StatusInternalServerError)
 
-		return nil, structs.NewError(err, 500, constants.DEFAULT500, "Could not reach firestone database.")
+		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not reach firestone database.")
 	}
 
 	// Return the data
@@ -179,7 +179,7 @@ func GetAllDocumentInCollectionFromFirestore(w http.ResponseWriter, collectionNa
 		}
 		if err != nil {
 			http.Error(w, "Failed to iterate through documents in collection "+collectionName+" on firebase", http.StatusInternalServerError)
-			return nil, structs.NewError(err, 500, constants.DEFAULT500, "Failed to retrieve a document from firestone database.")
+			return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Failed to retrieve a document from firestone database.")
 		}
 
 		// Save each document with documentID as the key
@@ -284,7 +284,7 @@ func CountWebhooks() (int, error) {
 			break
 		}
 		if err != nil {
-			return -1, structs.NewError(err, 500, constants.DEFAULT500, "Could not retrieve doc from database while counting webhooks.")
+			return -1, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not retrieve doc from database while counting webhooks.")
 		}
 
 		amountOfWebhooks += 1
