@@ -19,7 +19,7 @@ type datapoint struct {
 func main() {
 
 	// Set up Firestore
-	err := db.InitializeFirestore(constants.CREDENTIALS_FILE_TESTING)
+	err := db.InitializeFirestore(constants.CREDENTIALS_FILE)
 	if err != nil {
 		log.Fatal("Couldn't initialize firestore: " + err.Error())
 	}
