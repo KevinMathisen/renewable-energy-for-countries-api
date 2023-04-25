@@ -29,9 +29,6 @@ var CURRENT_SORTED_NEIGHBOURS_CODES = [EXPECTED_NEIGHBOURS]string{"NOR", "SWE", 
 /*
 CURRENT COVERAGE:
 
-/energy/v1/renewables/current/
-	Tests total amount of countries
-
 /energy/v1/renewables/current/NOR
 	Tests year of country
 	Tests number of recieved countries
@@ -45,6 +42,12 @@ CURRENT COVERAGE:
 /energy/v1/renewables/current/NOR?neighbours=true
 	Tests number of recieved countries
 	Tests if the countries recieved is the same as CURRENT_NEIGHBOURS_CODES
+
+/energy/v1/renewables/current/NOR?neighbours=true&sortByValue=true
+	Tests if the countries recieved is the same as CURRENT_SORTED_NEIGHBOURS_CODES
+
+/energy/v1/renewables/current/
+	Tests total amount of countries
 
 /energy/v1/renewables/current/?sortByValue=true
 	Tests the order of elements based on percentage relative to eachother
