@@ -21,21 +21,32 @@ The dataset reports on percentage of renewable energy in the country's energy mi
 
 ## Openstack instance
 
-The Openstack deployment is located at http://10.212.171.254:8080
+The easiest method of accessing the assignment is to use the official deployment.
 
-## Locally
-To run the project locally, you must first set up a database. Sign up to https://firebase.google.com/, and create a new firestone database. From the project settings tab, pull the service account credentials.
-
-
-If you downloaded the repository you can run it in one of two ways, as long as you have golang installed on your computer.
-- In the repository run the command `go run ./cmds/main.go`
-- In the repository, first run the command `go build ./cmds`, which will create a file calles *cmds.exe*. Running this file will start the application.
-
-When running the application locally it will be available on `localhost:8080`, or a different port if specified in environment. 
+1) Ensure you are on a NTNU network, either physically or through a VPN tunnel.
+2) Use address http://10.212.171.254:80 to access API.
 
 ## Docker
 
-The application may also be run locally as a docker container if docker is installed on the computer. To run the project locally, you must first set up a database. Sign up to https://firebase.google.com/, and create a new firestone database. Then, pull the service account json from the project settings tab on the firstone web-ui, and place it within the ".secrets" folder of the repository. If this folder doesn't exist, create one in the root of the repository. When this is complete, 
+The application may also be run locally as a docker container if docker is installed on the computer. To run the project locally, you must first set up a database. 
+
+1) Sign up to https://firebase.google.com/, and create a new firestone database. 
+2) Then, pull the service account json from the project settings tab on the firstone web-ui, and place it within the ".secrets" folder of the repository. If this folder doesn't exist, create one in the root of the repository. 
+3) Rename the file to "production_credentials.json"
+3) When this is complete, run the command ```docker compose up -d``` (on linux) while having the root of the repository as your working directory. 
+
+After a few minutes of loading, you will see that 6 containers have been created, whereas one of them is immediatly deleted. At this point the innstallation is complete. You'll notice that a new collection has been added to your firebase database containing some country information. Navigate to "localhost:80" to access the api.
+
+## Manual Compile
+The application may also be run locally using the "go run" command. This method is not reccomended, as it is required to navigate into the source code for it to be able to run.
+
+1) As with the docker method, you must first create a new firebase database before continuing.
+2) Create a new folder within the repository root named "credentials". Place the firebase service accound json within this folder.
+3) Rename the service account file to "production_credentials.json"
+5) Open the file ``/utils/constants/constants.go``. Change the CREDENTIALS_FILE constant variable to equal ``./credentials/production_credentials.json``
+6) In the command line interface, enter the following commands: ``go get assignment2/utils/db``, ``go get assignment2/handlers`` and ``go get github.com/stretchr/testify/assert``. This will install external liberaries necessary to run the application.
+7) Enter ``go run ./cmd/main.go`` in the command line interface to compile and run the application.
+8) The API is now avalibale at `localhost:8080`, or a different port if specified in environment. 
 
 
 # How to use the API
