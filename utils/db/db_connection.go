@@ -149,6 +149,10 @@ func GetDocumentFromFirestore(w http.ResponseWriter, id string, collectionName s
 	if err != nil {
 		http.Error(w, "Error extracting body of document "+id, http.StatusInternalServerError)
 
+		if !checkDbState() {
+			ReportDbState(false)
+		}
+
 		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not reach firestone database.")
 	}
 
@@ -179,6 +183,11 @@ func GetAllDocumentInCollectionFromFirestore(w http.ResponseWriter, collectionNa
 		}
 		if err != nil {
 			http.Error(w, "Failed to iterate through documents in collection "+collectionName+" on firebase", http.StatusInternalServerError)
+
+			if !checkDbState() {
+				ReportDbState(false)
+			}
+
 			return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Failed to retrieve a document from firestone database.")
 		}
 
@@ -211,8 +220,14 @@ func DeleteDocument(w http.ResponseWriter, documentID string, collectionName str
 
 	// Test if any document with given ID exists
 	if !documentSnap.Exists() {
+
+		if !checkDbState() {
+			ReportDbState(false)
+		}
+
 		// Error, cant delete a document that does not exist
 		return structs.NewError(err, http.StatusBadRequest, "Could not find given webhookID in database", "Found reference to document, but it doesn't exist in database.")
+
 	}
 
 	// Delete document if it exists
