@@ -1,4 +1,5 @@
-assignment2-prog2005-service-account.json
+production_credentials.json
+testing_credentials.json
 go.sum
 __debug_bin.exe
 .vscode/
