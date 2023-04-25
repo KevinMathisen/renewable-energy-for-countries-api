@@ -380,3 +380,110 @@ func TestGetIsoCodeFromNameError(t *testing.T) {
 		t.Errorf("Expected error, got nil")
 	}
 }
+
+/*
+Tests getting the neighbours of a country.
+*/
+func TestGetNeighbours(t *testing.T) {
+	clearRcCache()
+	// Create a test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET request, got %s", r.Method)
+		}
+
+		if path := constants.COUNTRY_CODE_SEARCH_PATH + "NOR"; r.URL.Path != path {
+			t.Errorf("Expected %s, got %s", path, r.URL.Path)
+		}
+
+		// Send response to be tested
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`[
+			{
+				"name": {
+					"common": "Norway"
+				},
+				"cca3": "NOR",
+				"borders": [
+					"FIN",
+					"SWE",
+					"RUS"
+				]
+			}
+		  ]`))
+	}))
+	defer ts.Close()
+
+	expected := []string{"FIN", "SWE", "RUS"}
+	neighbours, err := GetNeighbours("NOR", ts.URL)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	assert.Equal(t, neighbours, expected, "Response body does not match expected")
+}
+
+/*
+Tests getting the neighbours of a country, with no borders.
+*/
+func TestGetNeighboursNoBorders(t *testing.T) {
+	clearRcCache()
+	// Create a test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET request, got %s", r.Method)
+		}
+
+		if path := constants.COUNTRY_CODE_SEARCH_PATH + "NOR"; r.URL.Path != path {
+			t.Errorf("Expected %s, got %s", path, r.URL.Path)
+		}
+
+		// Send response to be tested
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`[
+			{
+				"name": {
+					"common": "Norway"
+				},
+				"cca3": "NOR",
+				"borders": []
+			}
+		  ]`))
+	}))
+	defer ts.Close()
+
+	var expected []string
+	neighbours, err := GetNeighbours("NOR", ts.URL)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	assert.Equal(t, expected, neighbours, "Response body does not match expected")
+}
+
+/*
+Tests getting the neighbours of a country, with no response.
+*/
+func TestGetNeighboursError(t *testing.T) {
+	clearRcCache()
+	// Create a test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET request, got %s", r.Method)
+		}
+
+		if path := constants.COUNTRY_CODE_SEARCH_PATH + "NOR"; r.URL.Path != path {
+			t.Errorf("Expected %s, got %s", path, r.URL.Path)
+		}
+
+		// Send response to be tested
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(``))
+	}))
+	defer ts.Close()
+
+	_, err := GetNeighbours("NOR", ts.URL)
+	if err == nil {
+		t.Errorf("Expected error, got nil")
+	}
+}
