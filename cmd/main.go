@@ -15,6 +15,7 @@ func main() {
 	// Set up Firestore, if a connection could not be established
 	err := db.InitializeFirestore()
 	if err != nil {
+		println("Could not connect to Firestore:", err.Error())
 		db.ReportDbState(false) //Close service on database failure, automaticly reattempt after 1 minute
 	}
 
