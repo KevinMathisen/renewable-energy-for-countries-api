@@ -75,3 +75,10 @@ func TestGetCountryByIsoError(t *testing.T) {
 		t.Errorf("Expected error, got nil")
 	}
 }
+
+func TestGetCountryByIsoError2(t *testing.T) {
+	_, err := GetCountryByIso("Norway", "http://localhost:1234")
+	if err == nil {
+		t.Errorf("Expected error, got nil")
+	}
+}
