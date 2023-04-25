@@ -16,8 +16,8 @@ func TestCreateWebhookId(t *testing.T) {
 
 	// Check if they are the same
 	assert.NotEqual(t, id1, id2, "WebhookIDs are the same")
-	assert.Equal(t, len(id1), 16, "WebhookID is not 16 characters long")
-	assert.Equal(t, len(id2), 16, "WebhookID is not 16 characters long")
+	assert.Equal(t, 16, len(id1), "WebhookID is not 16 characters long")
+	assert.Equal(t, 16, len(id2), "WebhookID is not 16 characters long")
 }
 
 /*
