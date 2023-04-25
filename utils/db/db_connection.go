@@ -6,8 +6,10 @@ import (
 	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -18,6 +20,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+var projectID string
 
 // Firebase context used by Firestore functions
 var firestoreContext context.Context
@@ -381,8 +385,41 @@ func sleepAndRestartDb() {
 	}
 }
 
+/*
+* Returns the status code of the database.
+ */
+func GetWebhookResponse() (http.Response, error) {
+	if projectID == "" {
+		// Read and parse the credentials file.
+		data, err := os.ReadFile(constants.CREDENTIALS_FILE)
+		if err != nil {
+			log.Fatalf("Failed to read credentials file: %v", err)
+		}
+	
+		var creds struct {
+			ProjectID string `json:"project_id"`
+		}
+		err = json.Unmarshal(data, &creds)
+		if err != nil {
+			log.Fatalf("Failed to parse credentials file: %v", err)
+		}
+	}
+
+	webhooksURL := "https://console.firebase.google.com/u/1/project/" + projectID + "/firestore/data/~2F" + constants.WEBHOOKS_COLLECTION
+	res, err := gateway.HttpRequestFromUrl(webhooksURL, http.MethodHead)
+	if err != nil {
+		return res, err
+	}
+
+	return res, nil
+}
+
+/*
+* Function that checks if the database is healthy.
+* Returns true if database is healthy, false if database is unhealthy.
+ */
 func checkDbState() bool {
-	res, _ := gateway.HttpRequestFromUrl(constants.FIRESTORE_NOTIFICATION_URL, http.MethodHead)
+	res, _ := GetWebhookResponse()
 	if res.StatusCode == 200 {
 		return true
 	} else {

@@ -29,7 +29,6 @@ const LATEST_YEAR_DB = 2021
 const RENEWABLES_COLLECTION = "renewables"
 const WEBHOOKS_COLLECTION = "webhooks"
 const CACHE_COLLECTION = "cache"
-const FIRESTORE_NOTIFICATION_URL = "https://console.firebase.google.com/u/1/project/assignment2-prog2005/firestore/data/~2Fwebhooks"
 
 // Name of files
 const RENEWABLES_CSV_FILE = "./res/renewable-share-energy.csv"
