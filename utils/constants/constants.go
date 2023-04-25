@@ -31,7 +31,7 @@ const WEBHOOKS_COLLECTION = "webhooks"
 const CACHE_COLLECTION = "cache"
 
 // Name of files
-const RENEWABLES_CSV_FILE = "./res/renewable-share-energy.csv"
+const RENEWABLES_CSV_FILE = "/data/renewable-share-energy.csv"
 const CREDENTIALS_FILE = "/credentials/production_credentials.json"
 const CREDENTIALS_FILE_TESTING = "../credentials/testing_credentials.json"
 const RESTCOUNTRIES_MOCK = "./res/restcountries-mock.json"
