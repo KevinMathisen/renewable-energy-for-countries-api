@@ -41,12 +41,12 @@ var (
 Sets up Firebase client connection with credentials
 Returns error
 */
-func InitializeFirestore() error {
+func InitializeFirestore(credentials string) error {
 	// Firebase initialisation
 	firestoreContext = context.Background()
 
 	// Load credentials from json file containing service account
-	serviceAccount := option.WithCredentialsFile(constants.CREDENTIALS_FILE)
+	serviceAccount := option.WithCredentialsFile(credentials)
 	// Create a firebase app with context and credentials
 	app, err := firebase.NewApp(firestoreContext, nil, serviceAccount)
 	if err != nil {
@@ -376,8 +376,8 @@ func sleepAndRestartDb() {
 	DbRestartTimerStartTime = time.Now()
 	time.Sleep(1 * time.Minute)
 
-	err := InitializeFirestore() //Reattempt database connection
-	dbRestartTimerMutex.Unlock() //Give away lock regardless of output
+	err := InitializeFirestore(constants.CREDENTIALS_FILE) //Reattempt database connection
+	dbRestartTimerMutex.Unlock()                           //Give away lock regardless of output
 	if err != nil {
 		sleepAndRestartDb() //On database failure, restart function
 	} else {
@@ -395,7 +395,7 @@ func GetWebhookResponse() (http.Response, error) {
 		if err != nil {
 			log.Fatalf("Failed to read credentials file: %v", err)
 		}
-	
+
 		var creds struct {
 			ProjectID string `json:"project_id"`
 		}

@@ -33,6 +33,7 @@ const CACHE_COLLECTION = "cache"
 // Name of files
 const RENEWABLES_CSV_FILE = "./res/renewable-share-energy.csv"
 const CREDENTIALS_FILE = "./assignment2-prog2005-service-account.json"
+const CREDENTIALS_FILE_TESTING = "." + CREDENTIALS_FILE
 const RESTCOUNTRIES_MOCK = "./res/restcountries-mock.json"
 
 // Webhooks
