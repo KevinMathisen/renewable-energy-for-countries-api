@@ -81,10 +81,10 @@ func TestHttpGetRenewablesCurrent(t *testing.T) {
 	// Close down client when service is done running
 	defer db.CloseFirebaseClient()
 
-	handleCurrentLogistics(t, currentAll)
 	handleCurrentLogistics(t, currentCountryByCode)
 	handleCurrentLogistics(t, currentCountryByName)
 	handleCurrentLogistics(t, currentNeighbours)
+	handleCurrentLogistics(t, currentAll)
 	handleCurrentLogistics(t, currentAllSortBy)
 }
 
