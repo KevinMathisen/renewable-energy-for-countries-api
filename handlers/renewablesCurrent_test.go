@@ -16,12 +16,15 @@ import (
 const CURRENT_COUNTRY_CODE = "NOR"                   // ISO code for current country
 const CURRENT_COUNTRY_NAME = "norway"                // Name for current country
 const CURRENT_COUNTRY_PERCENTAGE float64 = 71.558365 // Percentage for current country
-const CURRENT_COUNTRY_CODE_NEIGHBOURS = CURRENT_COUNTRY_CODE + "?neighbours=true"
-const CURRENT_SORT_BY = "?sortByValue=true"
+const CURRENT_NEIGHBOURS = "neighbours=true"
+const CURRENT_SORT_BY = "sortByValue=true"
+const CURRENT_AND = "&"
+const CURRENT_PARAM = "?"
+
 const EXPECTED_COUNTRIES = 72 //Amount of countries expected to get from the /country/ endpoint
 const EXPECTED_NEIGHBOURS = 4 //Amount of neighbours expected to get from the country with country code CURRENT_COUNTRY_CODE
-
 var CURRENT_NEIGHBOURS_CODES = [EXPECTED_NEIGHBOURS]string{"FIN", "NOR", "RUS", "SWE"}
+var CURRENT_SORTED_NEIGHBOURS_CODES = [EXPECTED_NEIGHBOURS]string{"NOR", "SWE", "FIN", "RUS"}
 
 /*
 CURRENT COVERAGE:
@@ -84,6 +87,7 @@ func TestHttpGetRenewablesCurrent(t *testing.T) {
 	handleCurrentLogistics(t, currentCountryByCode)
 	handleCurrentLogistics(t, currentCountryByName)
 	handleCurrentLogistics(t, currentNeighbours)
+	handleCurrentLogistics(t, currentNeighboursSortBy)
 	handleCurrentLogistics(t, currentAll)
 	handleCurrentLogistics(t, currentAllSortBy)
 }
@@ -121,7 +125,7 @@ func currentCountryByName(t *testing.T, url string, client http.Client) {
 	currentCountry(t, url, client)
 }
 
-// Runs tests for the .../renewables/current/{countryName}/{countryCode} endpoint
+// Runs tests for the .../renewables/current/{NOR}/{norway} endpoint
 func currentCountry(t *testing.T, url string, client http.Client) {
 	log.Println("Testing URL: \"" + url + "\"...")
 
@@ -156,9 +160,9 @@ func currentCountry(t *testing.T, url string, client http.Client) {
 
 //------------------------------ NEIGHBOUR COUNTRY TESTS ------------------------------
 
-// Runs tests for the .../renewables/current/{...}?neighbours=true endpoint
+// Runs tests for the .../renewables/current/NOR?neighbours=true endpoint
 func currentNeighbours(t *testing.T, url string, client http.Client) {
-	url = url + CURRENT_COUNTRY_CODE_NEIGHBOURS
+	url = url + CURRENT_COUNTRY_CODE + CURRENT_PARAM + CURRENT_NEIGHBOURS
 
 	log.Println("Testing URL: \"" + url + "\"...")
 
@@ -176,7 +180,7 @@ func currentNeighbours(t *testing.T, url string, client http.Client) {
 			"\n\tRecieved: " + strconv.Itoa(length))
 	}
 
-	//Checks if the countries recieved are the same as the neighbours of the tested country
+	//Checks if the countries recieved are the same as in CURRENT_NEIGHBOURS_CODES
 	//This check is dependent on the order that the countries are in
 	equal := true //Assume it is correct
 	for i, v := range CURRENT_NEIGHBOURS_CODES {
@@ -184,7 +188,35 @@ func currentNeighbours(t *testing.T, url string, client http.Client) {
 			equal = false
 		}
 	}
+	//Wrong countries or wrong order
+	if !equal {
+		t.Fatal("The list of neighbours is not correct." +
+			"\n\tExpected: " + CURRENT_NEIGHBOURS_CODES[0] + " - " + CURRENT_NEIGHBOURS_CODES[1] + " - " + CURRENT_NEIGHBOURS_CODES[2] + " - " + CURRENT_NEIGHBOURS_CODES[3] +
+			"\n\tRecieved: " + res[0].IsoCode + " - " + res[1].IsoCode + " - " + res[2].IsoCode + " - " + res[3].IsoCode)
+	}
+}
 
+// Runs tests for the .../renewables/current/NOR?neighbours=true&sortByValue=true endpoint
+func currentNeighboursSortBy(t *testing.T, url string, client http.Client) {
+	url = url + CURRENT_COUNTRY_CODE + CURRENT_PARAM + CURRENT_NEIGHBOURS + CURRENT_AND + CURRENT_SORT_BY
+
+	log.Println("Testing URL: \"" + url + "\"...")
+
+	//Gets data from the endpoint
+	res, err := getCurrentData(client, url)
+	//If there was an error during gathering or decoding of data
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	//Checks if the countries recieved are sorted by percentage
+	equal := true //Assume it is correct
+	for i, v := range CURRENT_SORTED_NEIGHBOURS_CODES {
+		if res[i].IsoCode != v {
+			equal = false
+		}
+	}
+	//Wrong order
 	if !equal {
 		t.Fatal("The list of neighbours is not correct." +
 			"\n\tExpected: " + CURRENT_NEIGHBOURS_CODES[0] + " - " + CURRENT_NEIGHBOURS_CODES[1] + " - " + CURRENT_NEIGHBOURS_CODES[2] + " - " + CURRENT_NEIGHBOURS_CODES[3] +
@@ -216,12 +248,12 @@ func currentAll(t *testing.T, url string, client http.Client) {
 
 // Runs tests for the .../renewables/current/?sortByValue=true endpoint
 func currentAllSortBy(t *testing.T, url string, client http.Client) {
-	fullUrl := url + CURRENT_SORT_BY
+	url = url + CURRENT_PARAM + CURRENT_SORT_BY
 
 	log.Println("Testing URL: \"" + url + "\"...")
 
 	//Gets data from the endpoint
-	res, err := getCurrentData(client, fullUrl)
+	res, err := getCurrentData(client, url)
 	//If there was an error during gathering or decoding of data
 	if err != nil {
 		t.Fatal(err.Error())
