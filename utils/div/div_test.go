@@ -33,3 +33,17 @@ func TestContains(t *testing.T) {
 	assert.True(t, Contains(slice, "c"), "Slice does not contain value c")
 	assert.False(t, Contains(slice, "d"), "Slice contains value d")
 }
+
+/*
+Tests the RemoveDuplicates function
+*/
+func TestRemoveDuplicates(t *testing.T) {
+	// Create slice
+	slice := []string{"a", "b", "c", "a", "b", "c", "b", "c", "a"}
+
+	// Create expected slice
+	expected := []string{"a", "b", "c"}
+
+	// Check if slice contains values
+	assert.Equal(t, expected, RemoveDuplicates(slice), "Slice does not contain value a")
+}
