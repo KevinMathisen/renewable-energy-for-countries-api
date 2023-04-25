@@ -94,7 +94,7 @@ Get parameters from request to renewables history endpoint if any are given
 	w	- Responsewriter for error messages
 	r	- Request for getting parameters
 
-	return	- Parameters from request. Ints are -1 if empty, bool values are false if empty
+	return	- Parameters from request. begin and endyear are set to default if empty, bool values are false if empty
 */
 func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beginYear int, endYear int, sortByValue bool, getMean bool, err error) {
 	// Get beginYear param
@@ -102,7 +102,7 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 
 	// If the parameter is not specified
 	if begin == "" {
-		beginYear = -1
+		beginYear = constants.OLDEST_YEAR_DB
 	} else {
 		// If the parameter is specified
 		// Try to convert string to int
@@ -118,7 +118,7 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 
 	// If the parameter is not specified
 	if end == "" {
-		endYear = -1
+		endYear = constants.LATEST_YEAR_DB
 	} else {
 		// If the parameter is specified
 		// Try to convert string to int

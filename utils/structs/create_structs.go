@@ -129,6 +129,11 @@ func CreateWebhookFromData(data map[string]interface{}, webhookID string) Webhoo
 		Calls:     int(data["calls"].(int64)),
 	}
 
+	// Include year if specified
+	if data["year"].(int64) != -1 {
+		webhook.Year = int(data["year"].(int64))
+	}
+
 	return webhook
 }
 

@@ -70,6 +70,7 @@ Saves a webhook to the correct database collection and document
 */
 func saveWebhook(w http.ResponseWriter, webhook structs.Webhook) error {
 	var isoCode string
+	var year int = -1
 
 	// Set isoCode to ANY if no country specified, else set code provided
 	if len(webhook.Country) == 0 {
@@ -78,12 +79,18 @@ func saveWebhook(w http.ResponseWriter, webhook structs.Webhook) error {
 		isoCode = webhook.Country
 	}
 
+	// Set year to selected year if it is specified
+	if webhook.Year > 0 {
+		year = webhook.Year
+	}
+
 	// Create map containing data to insert into database
 	webhookData := map[string]interface{}{
 		"url":         webhook.Url,
 		"country":     isoCode,
 		"calls":       webhook.Calls,
 		"invocations": 0,
+		"year":        year,
 	}
 
 	// Save webhook to the database

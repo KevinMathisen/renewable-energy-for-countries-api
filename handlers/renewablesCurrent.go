@@ -35,7 +35,7 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Invoke webhooks
-	go db.InvokeCountry(countries)
+	go db.InvokeCountry(countries, constants.LATEST_YEAR_DB, constants.LATEST_YEAR_DB)
 
 	// Get current percentage of renewables for countries specified as a list of countryoutput structs
 	response, err = getCurrentRenewablesForCountries(w, countries, sortByValue)
@@ -50,7 +50,7 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Save reponse to cache
-	go saveToCache(response, countries, r)
+	go saveToCache(response, countries, constants.LATEST_YEAR_DB, constants.LATEST_YEAR_DB, r)
 
 	return nil
 }

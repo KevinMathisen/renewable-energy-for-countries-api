@@ -116,6 +116,7 @@ Should check if request is in the cache, then respond with cached response
 func checkCache(w http.ResponseWriter, r *http.Request) (bool, error) {
 	var responseBody []structs.CountryOutput
 	var isoCodes []string
+	var years []int
 
 	// Create request url path and parameters
 	requestURL := strings.Replace((r.URL.Path + r.URL.RawQuery), "/", "\\", -1)
@@ -149,8 +150,14 @@ func checkCache(w http.ResponseWriter, r *http.Request) (bool, error) {
 		return false, err
 	}
 
+	// Try to decode years saved in cache
+	err = json.Unmarshal([]byte(cachedRequest["years"].([]uint8)), &years)
+	if err != nil {
+		return false, err
+	}
+
 	// Invoke webhooks
-	go db.InvokeCountry(isoCodes)
+	go db.InvokeCountry(isoCodes, years[0], years[1])
 
 	// Answer request with cached response
 	err = gateway.RespondToGetRequestWithJSON(w, responseBody, http.StatusOK)
@@ -167,7 +174,8 @@ Saves a request and its corresponding response to firestore, along with the resp
 	responseBody	- reponse we will save
 	r				- http.request for getting the url of the request
 */
-func saveToCache(responseBody []structs.CountryOutput, isoCodes []string, r *http.Request) {
+func saveToCache(responseBody []structs.CountryOutput, isoCodes []string, begin int, end int, r *http.Request) {
+	years := []int{begin, end}
 
 	// create request id by path and parameters
 	requestID := strings.Replace((r.URL.Path + r.URL.RawQuery), "/", "\\", -1)
@@ -186,10 +194,18 @@ func saveToCache(responseBody []structs.CountryOutput, isoCodes []string, r *htt
 		return
 	}
 
+	// Encode years into json
+	yearsEncoded, err := json.Marshal(years)
+	if err != nil {
+		log.Println("Error when encoding isoCodes to json for caching")
+		return
+	}
+
 	// Create cache map
 	cachedResponse := map[string]interface{}{
 		"responseBody": responseEncoded,
 		"isoCodes":     isoCodesEncoded,
+		"years":        yearsEncoded,
 		"time":         firestore.ServerTimestamp,
 	}
 

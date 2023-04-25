@@ -36,7 +36,7 @@ func RenewablesHistory(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Invoke webhooks
-	go db.InvokeCountry(countries)
+	go db.InvokeCountry(countries, beginYear, endYear)
 
 	// Get the historical percentage of renewables for countires specified as a list of countryoutput structs
 	response, err = getHistoryRenewablesForCountries(w, countries, beginYear, endYear, sortByValue, getMean)
@@ -51,7 +51,7 @@ func RenewablesHistory(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Save reponse to cache
-	go saveToCache(response, countries, r)
+	go saveToCache(response, countries, beginYear, endYear, r)
 
 	return nil
 }
@@ -72,18 +72,6 @@ If the user has no preference for type of data returned, the user will get histo
 func getHistoryRenewablesForCountries(w http.ResponseWriter, countries []string, beginYear int, endYear int, sortByValue bool, getMean bool) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
 	var err error
-
-	// If beginYear not specified set to default
-	if beginYear == -1 {
-		// TODO: Find beginyear
-		beginYear = constants.OLDEST_YEAR_DB
-	}
-
-	// If endYear not specified, set to default
-	if endYear == -1 {
-		// TODO: Get current year, as this will be default
-		endYear = constants.LATEST_YEAR_DB
-	}
 
 	// If countires specified and we don't want mean data, get renewables data from them in year range given
 	if len(countries) != 0 && !getMean {

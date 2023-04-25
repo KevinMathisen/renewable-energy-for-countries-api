@@ -86,13 +86,19 @@ func PostToWebhook(data map[string]interface{}, webhookID string) {
 		countryName = country.Name
 	}
 
-	// Encode struct into json
+	// Create base struct
 	webhookStruct := structs.Webhook{
 		WebhookId: webhookID,
 		Country:   countryName,
 		Calls:     int(data["invocations"].(int64)),
 	}
 
+	// Include year if specified
+	if data["year"].(int64) != -1 {
+		webhookStruct.Year = int(data["year"].(int64))
+	}
+
+	// Encode struct into json
 	jsonData, err := json.Marshal(webhookStruct)
 	if err != nil {
 		return

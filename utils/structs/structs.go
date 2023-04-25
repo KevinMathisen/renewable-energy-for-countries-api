@@ -27,6 +27,7 @@ type Webhook struct {
 	Url       string `json:"url,omitempty"`
 	Country   string `json:"country,omitempty"`
 	Calls     int    `json:"calls,omitempty"`
+	Year      int    `json:"year,omitempty"`
 }
 
 /*

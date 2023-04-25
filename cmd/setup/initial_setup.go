@@ -10,10 +10,10 @@ import (
 )
 
 type datapoint struct {
-	entity     string `json:"Entity"`
-	code       string `json:"code"`
-	year       string `json:"Year"`
-	renewables string `json:"renewables"`
+	Entity     string `json:"Entity"`
+	Code       string `json:"code"`
+	Year       string `json:"Year"`
+	Renewables string `json:"renewables"`
 }
 
 func main() {
@@ -60,10 +60,10 @@ func createRenewablesDataStructForAppending() map[string]map[string]interface{} 
 		}
 
 		row := datapoint{
-			entity:     line[0],
-			code:       line[1],
-			year:       line[2],
-			renewables: line[3],
+			Entity:     line[0],
+			Code:       line[1],
+			Year:       line[2],
+			Renewables: line[3],
 		}
 
 		datapoints = append(datapoints, row)
@@ -76,27 +76,27 @@ func createRenewablesDataStructForAppending() map[string]map[string]interface{} 
 	for _, datapoint := range datapoints {
 
 		// Ignore these codes, as they are not countires
-		if datapoint.code == "OWID_USS" || datapoint.code == "OWID_WRL" {
+		if datapoint.Code == "OWID_USS" || datapoint.Code == "OWID_WRL" {
 			continue
 		}
 
 		// Check if country is already in map
-		_, ok := countries[datapoint.code]
+		_, ok := countries[datapoint.Code]
 		if ok {
 			// If country is already in map, only add the year and percentage to the country
-			num, _ := strconv.ParseFloat(datapoint.renewables, 64)
-			countries[datapoint.code][datapoint.year] = num
+			num, _ := strconv.ParseFloat(datapoint.Renewables, 64)
+			countries[datapoint.Code][datapoint.Year] = num
 
-		} else if datapoint.code != "" {
+		} else if datapoint.Code != "" {
 
 			// If the country has not been added to the map, create a map containing name and one year percentage pair
-			num, _ := strconv.ParseFloat(datapoint.renewables, 64)
+			num, _ := strconv.ParseFloat(datapoint.Renewables, 64)
 			country := map[string]interface{}{
-				"name":         datapoint.entity,
-				datapoint.year: num,
+				"name":         datapoint.Entity,
+				datapoint.Year: num,
 			}
 			// Then add the country to the map using its isoCode as its key
-			countries[datapoint.code] = country
+			countries[datapoint.Code] = country
 		}
 	}
 

@@ -242,7 +242,7 @@ Go through all webhooks and check if they are to be invoked
 
 	isoCode	- Isocode of countries to be invoked, empty if all countries
 */
-func InvokeCountry(isoCode []string) {
+func InvokeCountry(isoCode []string, begin int, end int) {
 	// Get reference to documents in collection
 	webhooksCollection := firebaseClient.Collection(constants.WEBHOOKS_COLLECTION)
 	iter := webhooksCollection.Documents(firestoreContext)
@@ -263,6 +263,11 @@ func InvokeCountry(isoCode []string) {
 
 		// only want webhook if webhook country is one of the invoked countries, or we invoked all countries, or the webhook is invoked for all countries
 		if len(isoCode) != 0 && webhook["country"].(string) != "ANY" && !div.Contains(isoCode, webhook["country"].(string)) {
+			continue
+		}
+
+		// if year is specified, we only want to invoke if the year is between begin and end year
+		if webhook["year"].(int64) != -1 && (int(webhook["year"].(int64)) < begin || int(webhook["year"].(int64)) > end) {
 			continue
 		}
 
