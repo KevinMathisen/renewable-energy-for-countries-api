@@ -2,9 +2,11 @@ package gateway
 
 import (
 	"assignment2/utils/constants"
+	"assignment2/utils/structs"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetCountryByIso(t *testing.T) {
@@ -41,8 +43,12 @@ func TestGetCountryByIso(t *testing.T) {
 		t.Errorf("Expected no error, got %s", err)
 	}
 
-	// Test the response
-	if country.Name != "Norway" {
-		t.Errorf("Expected Norway, got %s", country.Name)
+	expected := &structs.Country{
+		Name: "Norway",
+		IsoCode: "NOR",
+		Borders: []string{"FIN", "SWE", "RUS"},
 	}
+
+	// Test the response
+	assert.Equal(t, country, expected, "Response body does not match expected")
 }
