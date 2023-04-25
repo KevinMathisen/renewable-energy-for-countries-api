@@ -19,7 +19,7 @@ services:
       replicas: 4
     restart: unless-stopped
     depends_on:
-      - initial_setup
+      - setup
   loadbalancer:
     image: nginx:stable
     ports:
