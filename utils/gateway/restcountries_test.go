@@ -487,3 +487,50 @@ func TestGetNeighboursError(t *testing.T) {
 		t.Errorf("Expected error, got nil")
 	}
 }
+
+/*
+Tests getting a country from a url.
+*/
+func TestGetCountry(t *testing.T) {
+	clearRcCache()
+	// Create a test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET request, got %s", r.Method)
+		}
+
+		if path := constants.COUNTRY_CODE_SEARCH_PATH + "NOR"; r.URL.Path != path {
+			t.Errorf("Expected %s, got %s", path, r.URL.Path)
+		}
+
+		// Send response to be tested
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`[
+			{
+				"name": {
+					"common": "Norway"
+				},
+				"cca3": "NOR",
+				"borders": [
+					"FIN",
+					"SWE",
+					"RUS"
+				],
+				"region": "Europe"
+			}
+		  ]`))
+	}))
+	defer ts.Close()
+
+	expected := &structs.Country{
+		Name:      "Norway",
+		IsoCode:   "NOR",
+		Borders: []string{"FIN", "SWE", "RUS"},
+	}
+	country, err := getCountry(ts.URL + constants.COUNTRY_CODE_SEARCH_PATH + "NOR")
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	assert.Equal(t, expected, country, "Response body does not match expected")
+}
