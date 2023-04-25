@@ -18,8 +18,8 @@ const CURRENT_COUNTRY_NAME = "norway"                // Name for current country
 const CURRENT_COUNTRY_PERCENTAGE float64 = 71.558365 // Percentage for current country
 const CURRENT_NEIGHBOURS = "neighbours=true"
 const CURRENT_SORT_BY = "sortByValue=true"
-const CURRENT_AND = "&"
 const CURRENT_PARAM = "?"
+const CURRENT_AND = "&"
 
 const EXPECTED_COUNTRIES = 72 //Amount of countries expected to get from the /country/ endpoint
 const EXPECTED_NEIGHBOURS = 4 //Amount of neighbours expected to get from the country with country code CURRENT_COUNTRY_CODE
@@ -27,7 +27,7 @@ var CURRENT_NEIGHBOURS_CODES = [EXPECTED_NEIGHBOURS]string{"FIN", "NOR", "RUS", 
 var CURRENT_SORTED_NEIGHBOURS_CODES = [EXPECTED_NEIGHBOURS]string{"NOR", "SWE", "FIN", "RUS"}
 
 /*
-CURRENT COVERAGE:
+TEST COVERAGE:
 
 /energy/v1/renewables/current/NOR
 	Tests year of country
@@ -128,7 +128,7 @@ func currentCountryByName(t *testing.T, url string, client http.Client) {
 	currentCountry(t, url, client)
 }
 
-// Runs tests for the .../renewables/current/{NOR}/{norway} endpoint
+// Runs tests for the .../renewables/current/{<NOR>/<norway>} endpoint
 func currentCountry(t *testing.T, url string, client http.Client) {
 	log.Println("Testing URL: \"" + url + "\"...")
 
