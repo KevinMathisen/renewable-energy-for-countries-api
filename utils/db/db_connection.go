@@ -86,7 +86,6 @@ func DocumentInCollection(id string, collection string) bool {
 
 	// If we got error not found, return false
 	if status.Code(err) == codes.NotFound || err != nil {
-		log.Println(err.Error())
 		return false
 	}
 	// If the document was found
