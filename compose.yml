@@ -1,6 +1,6 @@
 version: "1.0"
 services:
-  initial_setup:
+  setup:
     build:
       context: .
       dockerfile: Dockerfile.setup
