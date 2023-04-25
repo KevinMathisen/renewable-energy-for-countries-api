@@ -55,7 +55,7 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 
 	} else {
 		// Else if the user specified ISO code, add the code the list of countries
-		countries = append(countries, countryCodeOrName)
+		countries = append(countries, strings.ToUpper(countryCodeOrName))
 	}
 
 	// If the user specified the neighbour parameter, get neighbour ISO code with Restcountries API
