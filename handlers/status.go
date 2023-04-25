@@ -48,7 +48,7 @@ func createStatusResponse(start time.Time) (structs.Status, error) {
 	}
 
 	// Get request from notification db api
-	resDB, err := gateway.HttpRequestFromUrl(constants.FIRESTORE_NOTIFICATION_URL, http.MethodHead)
+	resDB, err := db.GetWebhookResponse()
 	if err != nil {
 		return structs.Status{}, structs.NewError(err, http.StatusGatewayTimeout, "Error when accesing the database", "")
 	}
