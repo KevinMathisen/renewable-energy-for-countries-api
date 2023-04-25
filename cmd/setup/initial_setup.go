@@ -19,7 +19,7 @@ type datapoint struct {
 func main() {
 
 	// Set up Firestore
-	db.InitializeFirestore(constants.CREDENTIALS_FILE)
+	db.InitializeFirestore(constants.CREDENTIALS_FILE_TESTING)
 
 	// Close down client when service is done running
 	defer db.CloseFirebaseClient()
