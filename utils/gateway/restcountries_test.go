@@ -10,6 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+/*
+Tests the query for countries by name
+*/
 func TestGetCountryByIso(t *testing.T) {
 	// Create a test server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -53,6 +56,9 @@ func TestGetCountryByIso(t *testing.T) {
 	assert.Equal(t, country, expected, "Response body does not match expected")
 }
 
+/*
+Tests the error handling of the query for countries by name
+*/
 func TestGetCountryByIsoError(t *testing.T) {
 	// Create a test server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -76,6 +82,9 @@ func TestGetCountryByIsoError(t *testing.T) {
 	}
 }
 
+/*
+Tests the error handling of the query for countries by name
+*/
 func TestGetCountryByIsoError2(t *testing.T) {
 	_, err := GetCountryByIso("Norway", "http://localhost:1234")
 	if err == nil {
