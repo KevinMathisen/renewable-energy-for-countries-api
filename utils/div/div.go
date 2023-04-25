@@ -13,7 +13,7 @@ Create random WebhookID with length 16
 */
 func CreateWebhookId() string {
 	// Set seed for rand
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// Define possible letters in webhookID
 	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
