@@ -16,6 +16,7 @@ WORKDIR /go/src/app/cmd
 # Install external dependencies (firestone)
 RUN go get assignment2/utils/db
 RUN go get assignment2/handlers
+RUN go get github.com/stretchr/testify/assert
 
 # Compile executable
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags -static' -o server
