@@ -8,6 +8,7 @@ COPY ./cmd /go/src/app/cmd
 COPY ./handlers /go/src/app/handlers
 COPY ./utils /go/src/app/utils
 COPY ./go.mod /go/src/app/go.mod
+COPY ./res /go/src/app/res
 
 # Starting in following working div
 WORKDIR /go/src/app/cmd
