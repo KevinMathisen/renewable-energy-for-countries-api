@@ -9,13 +9,14 @@ services:
     command: /bin/sh -c './initial_setup && exit 0'
   webserver:
     build: .
+          context: .
+          dockerfile: Dockerfile.main
     volumes:
       - ./.secrets:/credentials:ro
     ports:
       - '8080'
     deploy:
       replicas: 4
-    dockerfile: Dockerfile.main
     restart: unless-stopped
     depends_on:
       - initial_setup
