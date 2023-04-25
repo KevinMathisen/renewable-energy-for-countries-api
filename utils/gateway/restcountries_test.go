@@ -179,3 +179,135 @@ func TestGetCountryByNameError2(t *testing.T) {
 		t.Errorf("Expected error, got nil")
 	}
 }
+
+/*
+Tests if the cache is functioning as espected.
+First query for a country by name, with no response. Then, query by iso code with response, and check if the cache is populated.
+*/
+func TestRcCacheIsoThenName(t *testing.T) {
+	clearRcCache()
+	// Create a test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET request, got %s", r.Method)
+		}
+
+		if path := constants.COUNTRY_CODE_SEARCH_PATH + "NOR"; r.URL.Path == path {
+			// Send response to be tested
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`[
+				{
+					"name": {
+						"common": "Norway"
+					},
+					"cca3": "NOR",
+					"borders": [
+						"FIN",
+						"SWE",
+						"RUS"
+					]
+				}
+			  ]`))
+
+			} else if path := constants.COUNTRY_NAME_SEARCH_PATH + "Norway"; r.URL.Path == path {
+				// Send response to be tested
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte(``))
+
+		} else {
+			t.Errorf("Incorrect path: %s", r.URL.Path)
+		}
+	}))
+	defer ts.Close()
+
+	_, err := GetCountryByName("Norway", ts.URL)
+	if err == nil {
+		t.Errorf("Expected error, got nil")
+	}
+
+	expected := &structs.Country{
+		Name:    "Norway",
+		IsoCode: "NOR",
+		Borders: []string{"FIN", "SWE", "RUS"},
+	}
+
+	country, err := GetCountryByIso("NOR", ts.URL)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	assert.Equal(t, country, expected, "Response body does not match expected")
+
+	country, err = GetCountryByName("Norway", ts.URL)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	assert.Equal(t, country, expected, "Response body does not match expected")
+}
+
+/*
+Tests if the cache is functioning as espected.
+First query for a country by iso code, with no response. Then, query by name with response, and check if the cache is populated.
+*/
+func TestRcCacheNameThenIso(t *testing.T) {
+	clearRcCache()
+	// Create a test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET request, got %s", r.Method)
+		}
+
+		if path := constants.COUNTRY_CODE_SEARCH_PATH + "NOR"; r.URL.Path == path {
+			// Send response to be tested
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(``))
+
+			} else if path := constants.COUNTRY_NAME_SEARCH_PATH + "Norway"; r.URL.Path == path {
+				// Send response to be tested
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte(`[
+					{
+						"name": {
+							"common": "Norway"
+						},
+						"cca3": "NOR",
+						"borders": [
+							"FIN",
+							"SWE",
+							"RUS"
+						]
+					}
+				  ]`))
+
+		} else {
+			t.Errorf("Incorrect path: %s", r.URL.Path)
+		}
+	}))
+	defer ts.Close()
+
+	_, err := GetCountryByIso("NOR", ts.URL)
+	if err == nil {
+		t.Errorf("Expected error, got nil")
+	}
+
+	expected := &structs.Country{
+		Name:    "Norway",
+		IsoCode: "NOR",
+		Borders: []string{"FIN", "SWE", "RUS"},
+	}
+
+	country, err := GetCountryByName("Norway", ts.URL)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	assert.Equal(t, country, expected, "Response body does not match expected")
+
+	country, err = GetCountryByIso("NOR", ts.URL)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	assert.Equal(t, country, expected, "Response body does not match expected")
+}
