@@ -1,0 +1,17 @@
+version: "1.0"
+services:
+  webserver:
+    build: .
+    volumes:
+      - ./.secrets:/credentials:ro
+    ports:
+      - '8080'
+    restart: unless-stopped
+  loadbalancer:
+    image: nginx:stable
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - webserver
