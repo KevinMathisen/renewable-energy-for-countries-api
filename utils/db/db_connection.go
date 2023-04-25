@@ -362,3 +362,12 @@ func sleepAndRestartDb() {
 		ReportDbState(true) //On database success, set flag to true.
 	}
 }
+
+func checkDbState() bool {
+	res, _ := gateway.HttpRequestFromUrl(constants.FIRESTORE_NOTIFICATION_URL, http.MethodHead)
+	if res.StatusCode == 200 {
+		return true
+	} else {
+		return false
+	}
+}
