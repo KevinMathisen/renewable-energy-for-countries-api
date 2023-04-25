@@ -14,7 +14,7 @@ var rcCache = make(map[string]*structs.Country)
 /*
 * Returns a country struct based on the ISO code of the country.
  */
-func GetCountryByIso(iso string) (*structs.Country, error) {
+func GetCountryByIso(iso string, restCountriesUrl string) (*structs.Country, error) {
 
 	// Check if country ISO is in map
 	country, ok := rcCache[iso]
@@ -23,7 +23,7 @@ func GetCountryByIso(iso string) (*structs.Country, error) {
 	} //Cache miss
 
 	//Stitch together complete URL based on constants and input name
-	urlParts := []string{constants.COUNTRIES_API_URL, constants.COUNTRY_CODE_SEARCH_PATH, iso}
+	urlParts := []string{restCountriesUrl, constants.COUNTRY_CODE_SEARCH_PATH, iso}
 	url := strings.Join(urlParts, "")
 
 	country, err := getCountry(url)
@@ -40,7 +40,7 @@ func GetCountryByIso(iso string) (*structs.Country, error) {
 /*
 * Function takes a country name as input. It will convert it into an iso code, and then
  */
-func GetCountryByName(name string) (*structs.Country, error) {
+func GetCountryByName(name string, restCountriesUrl string) (*structs.Country, error) {
 
 	// Check if country name is in map
 	for _, v := range rcCache {
@@ -50,7 +50,7 @@ func GetCountryByName(name string) (*structs.Country, error) {
 	}
 
 	//Stitch together complete URL based on constants and input name
-	urlParts := []string{constants.COUNTRIES_API_URL, constants.COUNTRY_NAME_SEARCH_PATH, name}
+	urlParts := []string{restCountriesUrl, constants.COUNTRY_NAME_SEARCH_PATH, name}
 	url := strings.Join(urlParts, "")
 
 	country, err := getCountry(url)
@@ -67,9 +67,9 @@ func GetCountryByName(name string) (*structs.Country, error) {
 /*
 Get isocode from country name
 */
-func GetIsoCodeFromName(countryName string) (string, error) {
+func GetIsoCodeFromName(countryName string, restCountriesUrl string) (string, error) {
 
-	country, err := GetCountryByName(countryName)
+	country, err := GetCountryByName(countryName, restCountriesUrl)
 	if err != nil {
 		return "", err
 	}
@@ -80,8 +80,8 @@ func GetIsoCodeFromName(countryName string) (string, error) {
 /*
 * Gets the neighbours of input country.
  */
-func GetNeighbours(isoCode string) ([]string, error) {
-	country, err := GetCountryByIso(isoCode)
+func GetNeighbours(isoCode string, restCountriesUrl string) ([]string, error) {
+	country, err := GetCountryByIso(isoCode, restCountriesUrl)
 	if err != nil {
 		return nil, err
 	}

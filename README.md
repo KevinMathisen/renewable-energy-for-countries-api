@@ -1,4 +1,4 @@
-# Assignment2
+﻿# Assignment2
 
 # Overview
 
@@ -46,7 +46,7 @@ The responses will follow the specifications bellow for reponse body, as well as
 
 ## Endpoints
 
-Your web service has four resource root paths: 
+The web service has four resource root paths: 
 
 ```
 /energy/v1/renewables/current
@@ -64,13 +64,13 @@ The specification has the following conventions for placeholders:
 
 ## Current percentage of renewables
 
-The initial endpoint returns the latest percentages of renewables in the energy mix.
+This endpoint returns the latest percentages of renewables in the energy mix.
 
 ### - Request
 
 ```
 Method: GET
-Path: /energy/v1/renewables/current/{country?}
+Path: /energy/v1/renewables/current/{country?}{?neighbours=bool?}{?sortByValue=bool?}
 ```
 
 `{country?}` refers to an optional country identifier, either a 3-letter code or the name of the country.
@@ -161,22 +161,22 @@ Body (Exemplary message based on schema) - *without* country code *and* sortByVa
 ```
 [
     {
-        "name": "Algeria",
-        "isoCode": "DZA",
+        "name": "Iceland",
+        "isoCode": "ISL",
         "year": "2021",
-        "percentage": 0.26136735
+        "percentage": 86.874535
     },
     {
-        "name": "Argentina",
-        "isoCode": "ARG",
+        "name": "Norway",
+        "isoCode": "NOR",
         "year": "2021",
-        "percentage": 11.329249
+        "percentage": 71.558365
     },
     {
-        "name": "Australia",
-        "isoCode": "AUS",
+        "name": "Sweden",
+        "isoCode": "SWE",
         "year": "2021",
-        "percentage": 12.933532
+        "percentage": 50.924007
     },
     ...
 ]
@@ -184,16 +184,19 @@ Body (Exemplary message based on schema) - *without* country code *and* sortByVa
 
 ## Historical percentages of renewables
 
-The initial endpoint focuses on returning historical percentages of renewables in the energy mix, including individual levels, as well as mean values for individual or selections of countries.
+This endpoint focuses on returning historical percentages of renewables in the energy mix, including individual levels, as well as mean values for individual or selections of countries.
 
 ### - Request
 
 ```
 Method: GET
-Path: /energy/v1/renewables/history/{country?}{?begin=year&end=year?}
+Path: /energy/v1/renewables/history/{country?}{?begin=year}{?end=year?}{?sortByValue=bool?}{?mean=bool?}
 ```
 
 ```{country?}``` refers to an optional country 3-letter code.
+
+`{?neighbours=bool?}` refers to an optional parameter indicating whether neighbouring countries' values should be shown. 
+
 
 Example request: ```/energy/v1/renewables/history/nor```
 
