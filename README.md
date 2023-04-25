@@ -24,11 +24,19 @@ The dataset reports on percentage of renewable energy in the country's energy mi
 The Openstack deployment is located at http://10.212.171.254:8080
 
 ## Locally
+To run the project locally, you must first set up a database. Sign up to https://firebase.google.com/, and create a new firestone database. From the project settings tab, pull the service account credentials.
+
+
 If you downloaded the repository you can run it in one of two ways, as long as you have golang installed on your computer.
 - In the repository run the command `go run ./cmds/main.go`
 - In the repository, first run the command `go build ./cmds`, which will create a file calles *cmds.exe*. Running this file will start the application.
 
 When running the application locally it will be available on `localhost:8080`, or a different port if specified in environment. 
+
+## Docker
+
+The application may also be run locally as a docker container if docker is installed on the computer. To run the project locally, you must first set up a database. Sign up to https://firebase.google.com/, and create a new firestone database. Then, pull the service account json from the project settings tab on the firstone web-ui, and place it within the ".secrets" folder of the repository. If this folder doesn't exist, create one in the root of the repository. When this is complete, 
+
 
 # How to use the API
 
