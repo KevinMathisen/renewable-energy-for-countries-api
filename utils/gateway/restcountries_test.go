@@ -14,6 +14,7 @@ import (
 Tests the query for countries by iso code
 */
 func TestGetCountryByIso(t *testing.T) {
+	clearRcCache()
 	// Create a test server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -60,6 +61,7 @@ func TestGetCountryByIso(t *testing.T) {
 Tests the error handling of the query for countries by iso code
 */
 func TestGetCountryByIsoError(t *testing.T) {
+	clearRcCache()
 	// Create a test server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -86,6 +88,7 @@ func TestGetCountryByIsoError(t *testing.T) {
 Tests the error handling of the query for countries by iso code
 */
 func TestGetCountryByIsoError2(t *testing.T) {
+	clearRcCache()
 	_, err := GetCountryByIso("Norway", "http://localhost:1234")
 	if err == nil {
 		t.Errorf("Expected error, got nil")
@@ -96,6 +99,7 @@ func TestGetCountryByIsoError2(t *testing.T) {
 Tests the query for countries by name
 */
 func TestGetCountryByName(t *testing.T) {
+	clearRcCache()
 	// Create a test server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -142,6 +146,7 @@ func TestGetCountryByName(t *testing.T) {
 Tests the error handling of the query for countries by name
 */
 func TestGetCountryByNameError(t *testing.T) {
+	clearRcCache()
 	// Create a test server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -168,6 +173,7 @@ func TestGetCountryByNameError(t *testing.T) {
 Tests the error handling of the query for countries by name
 */
 func TestGetCountryByNameError2(t *testing.T) {
+	clearRcCache()
 	_, err := GetCountryByName("Norway", "http://localhost:1234")
 	if err == nil {
 		t.Errorf("Expected error, got nil")

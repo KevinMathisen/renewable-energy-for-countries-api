@@ -11,6 +11,10 @@ import (
 // Map of countries that link country ISO codes to their respective structs containing all information.
 var rcCache = make(map[string]*structs.Country)
 
+func clearRcCache() {
+	rcCache = make(map[string]*structs.Country)
+}
+
 /*
 * Returns a country struct based on the ISO code of the country.
  */
