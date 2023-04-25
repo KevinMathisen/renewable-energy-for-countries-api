@@ -209,10 +209,10 @@ func TestRcCacheIsoThenName(t *testing.T) {
 				}
 			  ]`))
 
-			} else if path := constants.COUNTRY_NAME_SEARCH_PATH + "Norway"; r.URL.Path == path {
-				// Send response to be tested
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte(``))
+		} else if path := constants.COUNTRY_NAME_SEARCH_PATH + "Norway"; r.URL.Path == path {
+			// Send response to be tested
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(``))
 
 		} else {
 			t.Errorf("Incorrect path: %s", r.URL.Path)
@@ -263,10 +263,10 @@ func TestRcCacheNameThenIso(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			w.Write([]byte(``))
 
-			} else if path := constants.COUNTRY_NAME_SEARCH_PATH + "Norway"; r.URL.Path == path {
-				// Send response to be tested
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte(`[
+		} else if path := constants.COUNTRY_NAME_SEARCH_PATH + "Norway"; r.URL.Path == path {
+			// Send response to be tested
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`[
 					{
 						"name": {
 							"common": "Norway"
@@ -310,4 +310,73 @@ func TestRcCacheNameThenIso(t *testing.T) {
 	}
 
 	assert.Equal(t, country, expected, "Response body does not match expected")
+}
+
+/*
+Tests converting a country name to an iso code.
+*/
+func TestGetIsoCodeFromName(t *testing.T) {
+	clearRcCache()
+	// Create a test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET request, got %s", r.Method)
+		}
+
+		if path := constants.COUNTRY_NAME_SEARCH_PATH + "Norway"; r.URL.Path != path {
+			t.Errorf("Expected %s, got %s", path, r.URL.Path)
+		}
+
+		// Send response to be tested
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`[
+			{
+				"name": {
+					"common": "Norway"
+				},
+				"cca3": "NOR",
+				"borders": [
+					"FIN",
+					"SWE",
+					"RUS"
+				]
+			}
+		  ]`))
+	}))
+	defer ts.Close()
+
+	expected := "NOR"
+	isoCode, err := GetIsoCodeFromName("Norway", ts.URL)
+	if err != nil {
+		t.Errorf("Expected no error, got %s", err)
+	}
+
+	assert.Equal(t, isoCode, expected, "Response body does not match expected")
+}
+
+/*
+Tests converting a country name to an iso code, with no response.
+*/
+func TestGetIsoCodeFromNameError(t *testing.T) {
+	clearRcCache()
+	// Create a test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("Expected GET request, got %s", r.Method)
+		}
+
+		if path := constants.COUNTRY_NAME_SEARCH_PATH + "Norway"; r.URL.Path != path {
+			t.Errorf("Expected %s, got %s", path, r.URL.Path)
+		}
+
+		// Send response to be tested
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(``))
+	}))
+	defer ts.Close()
+
+	_, err := GetIsoCodeFromName("Norway", ts.URL)
+	if err == nil {
+		t.Errorf("Expected error, got nil")
+	}
 }
