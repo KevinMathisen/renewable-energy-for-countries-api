@@ -7,9 +7,9 @@ import (
 	"assignment2/utils/structs"
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -386,7 +386,7 @@ func sleepAndRestartDb() {
 func GetWebhookResponse() (http.Response, error) {
 	if projectID == "" {
 		// Read and parse the credentials file.
-		data, err := ioutil.ReadFile(constants.CREDENTIALS_FILE)
+		data, err := os.ReadFile(constants.CREDENTIALS_FILE)
 		if err != nil {
 			log.Fatalf("Failed to read credentials file: %v", err)
 		}
