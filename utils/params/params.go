@@ -46,7 +46,7 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 	// If the user specified the name only
 	if len(countryCodeOrName) != 3 {
 		// Get isoCode from name
-		isoCode, err := gateway.GetIsoCodeFromName(countryCodeOrName)
+		isoCode, err := gateway.GetIsoCodeFromName(countryCodeOrName, constants.COUNTRIES_API_URL)
 		if err != nil {
 			return nil, err
 		}
@@ -60,7 +60,7 @@ func GetCountriesToQuery(w http.ResponseWriter, r *http.Request, path string) ([
 
 	// If the user specified the neighbour parameter, get neighbour ISO code with Restcountries API
 	if neighbours {
-		country, err := gateway.GetCountryByIso(countries[0]) //Get the country object
+		country, err := gateway.GetCountryByIso(countries[0], constants.COUNTRIES_API_URL) //Get the country object
 		if err != nil {
 			return nil, err
 		}
