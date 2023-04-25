@@ -22,8 +22,8 @@ func (fn RootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		usrMsg := fmt.Sprintf("The database is currently unavailable. Please try again later. Reattempting database connection in %v seconds.", time.Since(db.DbRestartTimerStartTime).Round(time.Second)) //Create message with time since timer was activated
-		err = structs.NewError(nil, http.StatusServiceUnavailable, usrMsg, "")                                                                                                                             //Return error to user
+		usrMsg := fmt.Sprintf("The database is currently unavailable. Please try again later. Reattempting database connection in %v seconds.", time.Until(db.DbRestartTimerStartTime.Add(1*time.Minute)).Round(time.Second)) //Create message with time since timer was activated
+		err = structs.NewError(nil, http.StatusServiceUnavailable, usrMsg, "")                                                                                                                                                //Return error to user
 	}
 
 	// If error is of type wrappederror, special logging actions will be taken.

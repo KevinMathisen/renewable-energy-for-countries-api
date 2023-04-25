@@ -43,3 +43,4 @@ const MAX_CACHE_AGE_IN_HOURS = 4
 
 // Default error responses
 const DEFAULT500 = "There has been an internal server error. Please try again later."
+const DEFAULT504 = "Service is currently down due to the failure of an external dependency. Please try again later."

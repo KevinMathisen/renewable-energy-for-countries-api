@@ -151,13 +151,12 @@ func GetDocumentFromFirestore(w http.ResponseWriter, id string, collectionName s
 	// Get reference to document
 	docSnapshot, err := firebaseClient.Collection(collectionName).Doc(id).Get(firestoreContext)
 	if err != nil {
-		http.Error(w, "Error extracting body of document "+id, http.StatusInternalServerError)
 
 		if !checkDbState() {
 			ReportDbState(false)
 		}
 
-		return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not reach firestone database.")
+		return nil, structs.NewError(err, http.StatusBadGateway, constants.DEFAULT504, "Could not reach firestone database. Error extracting body of document "+id)
 	}
 
 	// Return the data
@@ -186,13 +185,12 @@ func GetAllDocumentInCollectionFromFirestore(w http.ResponseWriter, collectionNa
 			break
 		}
 		if err != nil {
-			http.Error(w, "Failed to iterate through documents in collection "+collectionName+" on firebase", http.StatusInternalServerError)
 
 			if !checkDbState() {
 				ReportDbState(false)
 			}
 
-			return nil, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Failed to retrieve a document from firestone database.")
+			return nil, structs.NewError(err, http.StatusBadGateway, constants.DEFAULT504, "Failed to iterate through documents in collection "+collectionName+" on firebase")
 		}
 
 		// Save each document with documentID as the key
@@ -237,7 +235,7 @@ func DeleteDocument(w http.ResponseWriter, documentID string, collectionName str
 	// Delete document if it exists
 	documentRef.Delete(firestoreContext)
 	if err != nil {
-		return structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not delete document from firestone database.")
+		return structs.NewError(err, http.StatusBadGateway, constants.DEFAULT504, "Could not delete document from firestone database.")
 	}
 
 	return nil
@@ -303,7 +301,7 @@ func CountWebhooks() (int, error) {
 			break
 		}
 		if err != nil {
-			return -1, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not retrieve doc from database while counting webhooks.")
+			return -1, structs.NewError(err, http.StatusBadGateway, constants.DEFAULT504, "Could not retrieve doc from database while counting webhooks.")
 		}
 
 		amountOfWebhooks += 1
