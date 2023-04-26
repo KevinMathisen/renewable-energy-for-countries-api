@@ -43,6 +43,11 @@ func RenewablesCurrent(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	// Check if there was any data for the given request
+	if len(response) == 0 {
+		return structs.NewError(nil, http.StatusNotFound, "No data available for given request", "No data in database which satisfied the request")
+	}
+
 	// Respond with list of CountryOutPut struct encoded as json to user
 	err = gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
 	if err != nil {
@@ -73,13 +78,13 @@ func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string,
 
 	// If the users specified countries, get renewables data from them in the current year
 	if len(countries) != 0 {
-		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
+		renewablesOutput, err = getRenewablesForCountriesByYears(countries, currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}
 	} else {
 		// If the user did not specify countires, we get renewables data from all countires in the current year
-		renewablesOutput, err = getRenewablesForAllCountriesByYears(w, currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
+		renewablesOutput, err = getRenewablesForAllCountriesByYears(currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}

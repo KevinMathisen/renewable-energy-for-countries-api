@@ -19,7 +19,7 @@ Goes through each year for a country, filters out the ones we want, and create a
 
 	return		- List of countryOutput structs which can be encoded into Json and sent as reponse to requests
 */
-func CreateCountryOutputFromData(w http.ResponseWriter, data map[string]interface{}, isoCode string, startYear int, endYear int) ([]CountryOutput, error) {
+func CreateCountryOutputFromData(data map[string]interface{}, isoCode string, startYear int, endYear int) ([]CountryOutput, error) {
 	var output []CountryOutput
 
 	// Save country name as a string
@@ -78,7 +78,7 @@ Then returnes a struct with the mean value.
 
 	return		- CountryOutput struct with no year value and mean value as percentage, can be encoded into Json and sent as reponse to requests
 */
-func CreateMeanCountryOutputFromData(w http.ResponseWriter, data map[string]interface{}, isoCode string, startYear int, endYear int) ([]CountryOutput, error) {
+func CreateMeanCountryOutputFromData(data map[string]interface{}, isoCode string, startYear int, endYear int) ([]CountryOutput, error) {
 	var percentages []float64
 
 	// Save country name as a string
@@ -111,7 +111,7 @@ func CreateMeanCountryOutputFromData(w http.ResponseWriter, data map[string]inte
 	countryOutput := CountryOutput{
 		Name:       countryName,
 		IsoCode:    isoCode,
-		Percentage: mean(percentages),
+		Percentage: Mean(percentages),
 	}
 
 	return []CountryOutput{countryOutput}, nil
@@ -144,7 +144,7 @@ Calculate mean value of list of numbers
 
 	return	- Average of list
 */
-func mean(input []float64) float64 {
+func Mean(input []float64) float64 {
 	// If there is no input
 	if len(input) == 0 {
 		return 0

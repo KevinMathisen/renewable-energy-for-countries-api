@@ -103,7 +103,7 @@ func TestHttpGetRenewablesHistory(t *testing.T) {
 	// Set up Firestore
 	db.InitializeFirestore(constants.CREDENTIALS_FILE_TESTING)
 	// Clears cache
-	db.DeleteAllCachedRequestsFromFirestore()
+	db.DeleteAllDocumentsInCollectionFromFirestore(constants.CACHE_COLLECTION)
 	// Close down client when service is done running
 	defer db.CloseFirebaseClient()
 

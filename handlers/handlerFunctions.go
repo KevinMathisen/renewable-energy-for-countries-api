@@ -27,20 +27,20 @@ Get renewables data for all countries given between start and end year
 
 	return				- list of CountryOutPut structs which will be sent as json in the response, as well as error
 */
-func getRenewablesForCountriesByYears(w http.ResponseWriter, countries []string, startYear int, endYear int, createCountryOutput func(http.ResponseWriter, map[string]interface{}, string, int, int) ([]structs.CountryOutput, error), sortByPercentage bool) ([]structs.CountryOutput, error) {
+func getRenewablesForCountriesByYears(countries []string, startYear int, endYear int, createCountryOutput func(map[string]interface{}, string, int, int) ([]structs.CountryOutput, error), sortByPercentage bool) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
 	var outputNotSorted [][]structs.CountryOutput
 
 	// For each country
 	for _, country := range countries {
 		// Get the renwables data from Firestore
-		renewablesCountry, err := db.GetDocumentFromFirestore(w, country, constants.RENEWABLES_COLLECTION)
+		renewablesCountry, err := db.GetDocumentFromFirestore(country, constants.RENEWABLES_COLLECTION)
 		if err != nil {
 			return renewablesOutput, err
 		}
 
 		// Create structs with percentage renewable value for each year specified, and save in slice
-		outputCountry, err := createCountryOutput(w, renewablesCountry, country, startYear, endYear)
+		outputCountry, err := createCountryOutput(renewablesCountry, country, startYear, endYear)
 		if err != nil {
 			return renewablesOutput, err
 		}
@@ -70,19 +70,19 @@ Get renewables data for all counrties in the database between start and end year
 
 	return				- list of CountryOutPut structs which can will be sent as json in the response, as well as error
 */
-func getRenewablesForAllCountriesByYears(w http.ResponseWriter, startYear int, endYear int, createCountryOutput func(http.ResponseWriter, map[string]interface{}, string, int, int) ([]structs.CountryOutput, error), sortByPercentage bool) ([]structs.CountryOutput, error) {
+func getRenewablesForAllCountriesByYears(startYear int, endYear int, createCountryOutput func(map[string]interface{}, string, int, int) ([]structs.CountryOutput, error), sortByPercentage bool) ([]structs.CountryOutput, error) {
 	var renewablesOutput []structs.CountryOutput
 	var outputNotSorted [][]structs.CountryOutput
 
 	// Get data from all countries from firestore
-	countriesData, err := db.GetAllDocumentInCollectionFromFirestore(w, constants.RENEWABLES_COLLECTION)
+	countriesData, err := db.GetAllDocumentInCollectionFromFirestore(constants.RENEWABLES_COLLECTION)
 	if err != nil {
 		return nil, err
 	}
 
 	// For each country create structs with percentage renewable value for each year specified, and save in slice
 	for key, country := range countriesData {
-		outputCountry, err := createCountryOutput(w, country, key, startYear, endYear)
+		outputCountry, err := createCountryOutput(country, key, startYear, endYear)
 		if err != nil {
 			return renewablesOutput, err
 		}
@@ -127,14 +127,14 @@ func checkCache(w http.ResponseWriter, r *http.Request) (bool, error) {
 	}
 
 	// Get cached request
-	cachedRequest, err := db.GetDocumentFromFirestore(w, requestURL, constants.CACHE_COLLECTION)
+	cachedRequest, err := db.GetDocumentFromFirestore(requestURL, constants.CACHE_COLLECTION)
 	if err != nil {
 		return false, err
 	}
 
 	// Delete and dont use cached response if it is older than max cache age
 	if time.Since(cachedRequest["time"].(time.Time)).Hours() > constants.MAX_CACHE_AGE_IN_HOURS {
-		go db.DeleteDocument(w, requestURL, constants.CACHE_COLLECTION)
+		go db.DeleteDocument(requestURL, constants.CACHE_COLLECTION)
 		return false, err
 	}
 

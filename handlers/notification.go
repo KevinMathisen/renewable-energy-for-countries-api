@@ -42,7 +42,7 @@ func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
 	webhook.WebhookId = div.CreateWebhookId()
 
 	// Save webhook to database
-	err = saveWebhook(w, webhook)
+	err = saveWebhook(webhook)
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ Saves a webhook to the correct database collection and document
 
 	return	- Type of error or nil if none
 */
-func saveWebhook(w http.ResponseWriter, webhook structs.Webhook) error {
+func saveWebhook(webhook structs.Webhook) error {
 	var isoCode string
 	var year int = -1
 
@@ -119,7 +119,7 @@ func deletionOfWebhook(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Try to delete webhook from database
-	err = db.DeleteDocument(w, webhookID, constants.WEBHOOKS_COLLECTION)
+	err = db.DeleteDocument(webhookID, constants.WEBHOOKS_COLLECTION)
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func viewWebhook(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Get webhooks from database
-	response, err := getWebhooks(w, webhookID)
+	response, err := getWebhooks(webhookID)
 	if err != nil {
 		return err
 	}
@@ -176,14 +176,14 @@ func checkIfValidWebhookId(id string) bool {
 /*
 Get webhook from database, and create webhook structs from this data
 */
-func getWebhooks(w http.ResponseWriter, webhookID string) ([]structs.Webhook, error) {
+func getWebhooks(webhookID string) ([]structs.Webhook, error) {
 	var webhooks []structs.Webhook
 	data := make(map[string]map[string]interface{})
 	var err error
 
 	if webhookID != "" {
 		// If webhookID is defined, get its data
-		webhookData, err := db.GetDocumentFromFirestore(w, webhookID, constants.WEBHOOKS_COLLECTION)
+		webhookData, err := db.GetDocumentFromFirestore(webhookID, constants.WEBHOOKS_COLLECTION)
 		if err != nil {
 			// Error handling
 			return webhooks, err
@@ -193,7 +193,7 @@ func getWebhooks(w http.ResponseWriter, webhookID string) ([]structs.Webhook, er
 
 	} else {
 		// If no webhookID is given, get all webhooks data
-		data, err = db.GetAllDocumentInCollectionFromFirestore(w, constants.WEBHOOKS_COLLECTION)
+		data, err = db.GetAllDocumentInCollectionFromFirestore(constants.WEBHOOKS_COLLECTION)
 		if err != nil {
 			// Error handling
 			return webhooks, err

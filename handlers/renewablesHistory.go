@@ -44,6 +44,11 @@ func RenewablesHistory(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	// Check if there was any data for the given request
+	if len(response) == 0 {
+		return structs.NewError(nil, http.StatusNotFound, "No data available for given request", "No data in database which satisfied the request")
+	}
+
 	// Respond with list of countryoutput struct encoded as json to user
 	err = gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
 	if err != nil {
@@ -75,21 +80,21 @@ func getHistoryRenewablesForCountries(w http.ResponseWriter, countries []string,
 
 	// If countires specified and we don't want mean data, get renewables data from them in year range given
 	if len(countries) != 0 && !getMean {
-		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, beginYear, endYear, structs.CreateCountryOutputFromData, sortByValue)
+		renewablesOutput, err = getRenewablesForCountriesByYears(countries, beginYear, endYear, structs.CreateCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}
 
 	} else if len(countries) != 0 && getMean {
 		// If countires specified and we want mean data, get renewabled mean data from them in year range given
-		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, beginYear, endYear, structs.CreateMeanCountryOutputFromData, sortByValue)
+		renewablesOutput, err = getRenewablesForCountriesByYears(countries, beginYear, endYear, structs.CreateMeanCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}
 
 	} else if len(countries) == 0 {
 		// If no countries specified, get renewables mean data from all in year range given
-		renewablesOutput, err = getRenewablesForAllCountriesByYears(w, beginYear, endYear, structs.CreateMeanCountryOutputFromData, sortByValue)
+		renewablesOutput, err = getRenewablesForAllCountriesByYears(beginYear, endYear, structs.CreateMeanCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}

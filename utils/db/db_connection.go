@@ -29,6 +29,9 @@ var firestoreContext context.Context
 // Firebase client used by Firestore functions
 var firebaseClient *firestore.Client
 
+// Credentials file path
+var credentials string
+
 // Boolean variable and accompanying lock to determine the state of the database. Toggle with ReportDbState()
 var (
 	DbState                 bool       = true
@@ -41,7 +44,9 @@ var (
 Sets up Firebase client connection with credentials
 Returns error
 */
-func InitializeFirestore(credentials string) error {
+func InitializeFirestore(credPath string) error {
+	// Set credentials path
+	credentials = credPath
 	// Firebase initialisation
 	firestoreContext = context.Background()
 
@@ -146,7 +151,7 @@ Get a document from firestore
 
 	return	- Map containing data from document
 */
-func GetDocumentFromFirestore(w http.ResponseWriter, id string, collectionName string) (map[string]interface{}, error) {
+func GetDocumentFromFirestore(id string, collectionName string) (map[string]interface{}, error) {
 	// Get reference to document
 	docSnapshot, err := firebaseClient.Collection(collectionName).Doc(id).Get(firestoreContext)
 	if err != nil {
@@ -170,7 +175,7 @@ Gets all documents from a collection in firestore
 
 	return 			- Map containing key (document id) and elements containing maps with data from each document
 */
-func GetAllDocumentInCollectionFromFirestore(w http.ResponseWriter, collectionName string) (map[string]map[string]interface{}, error) {
+func GetAllDocumentInCollectionFromFirestore(collectionName string) (map[string]map[string]interface{}, error) {
 	// Initialize map for saving documents
 	data := make(map[string]map[string]interface{})
 
@@ -208,7 +213,7 @@ Delete a document given ID if it exists
 
 	return			- If deletion was succesful, if document existed, or any other errors
 */
-func DeleteDocument(w http.ResponseWriter, documentID string, collectionName string) error {
+func DeleteDocument(documentID string, collectionName string) error {
 
 	// Get reference to document
 	documentRef := firebaseClient.Collection(collectionName).Doc(documentID)
@@ -318,9 +323,9 @@ func CountWebhooks() (int, error) {
 /*
 Delete all documents in cache collection
 */
-func DeleteAllCachedRequestsFromFirestore() {
+func DeleteAllDocumentsInCollectionFromFirestore(collection string) {
 	// Get reference to documents in collection
-	iter := firebaseClient.Collection(constants.CACHE_COLLECTION).DocumentRefs(firestoreContext)
+	iter := firebaseClient.Collection(collection).DocumentRefs(firestoreContext)
 
 	for {
 		// Try to go to next document in collection
@@ -375,8 +380,8 @@ func sleepAndRestartDb() {
 	DbRestartTimerStartTime = time.Now()
 	time.Sleep(1 * time.Minute)
 
-	err := InitializeFirestore(constants.CREDENTIALS_FILE) //Reattempt database connection
-	dbRestartTimerMutex.Unlock()                           //Give away lock regardless of output
+	err := InitializeFirestore(credentials) //Reattempt database connection
+	dbRestartTimerMutex.Unlock()            //Give away lock regardless of output
 	if err != nil {
 		sleepAndRestartDb() //On database failure, restart function
 	} else {
@@ -390,7 +395,7 @@ func sleepAndRestartDb() {
 func GetWebhookResponse() (http.Response, error) {
 	if projectID == "" {
 		// Read and parse the credentials file.
-		data, err := os.ReadFile(constants.CREDENTIALS_FILE)
+		data, err := os.ReadFile(credentials)
 		if err != nil {
 			log.Fatalf("Failed to read credentials file: %v", err)
 		}
