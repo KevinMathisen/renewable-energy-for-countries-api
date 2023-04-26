@@ -11,75 +11,81 @@ import (
 	"assignment2/utils/structs"
 )
 
+/*
+Test data for CreateCountryOutPutFromData and CreateMeanCountryOutputFromData
+This data adheres is the expected format of input for all three functions.
+*/
+var countryData = map[string]interface{}{
+	"1965": 67.87996,
+	"1966": 65.3991,
+	"1967": 66.591644,
+	"1968": 67.13724,
+	"1969": 63.88058,
+	"1970": 61.510117,
+	"1971": 63.9665,
+	"1972": 64.29581,
+	"1973": 65.582184,
+	"1974": 68.31412,
+	"1975": 67.97407,
+	"1976": 67.33344,
+	"1977": 64.26859,
+	"1978": 64.17826,
+	"1979": 65.86465,
+	"1980": 65.252464,
+	"1981": 68.59788,
+	"1982": 69.16161,
+	"1983": 71.88228,
+	"1984": 71.13633,
+	"1985": 69.52919,
+	"1986": 66.977295,
+	"1987": 68.43144,
+	"1988": 69.97985,
+	"1989": 71.44203,
+	"1990": 72.44774,
+	"1991": 71.44005,
+	"1992": 71.865555,
+	"1993": 71.17737,
+	"1994": 69.031494,
+	"1995": 70.81212,
+	"1996": 66.01224,
+	"1997": 66.31446,
+	"1998": 67.218765,
+	"1999": 68.73755,
+	"2000": 72.39789,
+	"2001": 67.58246,
+	"2002": 69.30982,
+	"2003": 63.816036,
+	"2004": 64.23876,
+	"2005": 69.73603,
+	"2006": 66.73525,
+	"2007": 69.2405,
+	"2008": 69.89543,
+	"2009": 67.78923,
+	"2010": 65.47019,
+	"2011": 66.30012,
+	"2012": 70.095116,
+	"2013": 67.50864,
+	"2014": 68.88728,
+	"2015": 68.87519,
+	"2016": 69.86629,
+	"2017": 69.260994,
+	"2018": 68.85805,
+	"2019": 67.08509,
+	"2020": 70.96306,
+	"2021": 71.558365,
+	"name": "Norway",
+}
+
+// Unit test for CreateCountryOutputFromData() in create_structs file
 func TestCreateCountryOutputFromData(t *testing.T) {
 
+	//Example data
 	isoCode := "NOR"
 	startYear := 1965
 	endYear := 2021
-	//Declare test date. This was is the expected format.
-	data := map[string]interface{}{
-		"1965": 67.87996,
-		"1966": 65.3991,
-		"1967": 66.591644,
-		"1968": 67.13724,
-		"1969": 63.88058,
-		"1970": 61.510117,
-		"1971": 63.9665,
-		"1972": 64.29581,
-		"1973": 65.582184,
-		"1974": 68.31412,
-		"1975": 67.97407,
-		"1976": 67.33344,
-		"1977": 64.26859,
-		"1978": 64.17826,
-		"1979": 65.86465,
-		"1980": 65.252464,
-		"1981": 68.59788,
-		"1982": 69.16161,
-		"1983": 71.88228,
-		"1984": 71.13633,
-		"1985": 69.52919,
-		"1986": 66.977295,
-		"1987": 68.43144,
-		"1988": 69.97985,
-		"1989": 71.44203,
-		"1990": 72.44774,
-		"1991": 71.44005,
-		"1992": 71.865555,
-		"1993": 71.17737,
-		"1994": 69.031494,
-		"1995": 70.81212,
-		"1996": 66.01224,
-		"1997": 66.31446,
-		"1998": 67.218765,
-		"1999": 68.73755,
-		"2000": 72.39789,
-		"2001": 67.58246,
-		"2002": 69.30982,
-		"2003": 63.816036,
-		"2004": 64.23876,
-		"2005": 69.73603,
-		"2006": 66.73525,
-		"2007": 69.2405,
-		"2008": 69.89543,
-		"2009": 67.78923,
-		"2010": 65.47019,
-		"2011": 66.30012,
-		"2012": 70.095116,
-		"2013": 67.50864,
-		"2014": 68.88728,
-		"2015": 68.87519,
-		"2016": 69.86629,
-		"2017": 69.260994,
-		"2018": 68.85805,
-		"2019": 67.08509,
-		"2020": 70.96306,
-		"2021": 71.558365,
-		"name": "Norway",
-	}
 
 	// Call the function being tested
-	output, err := structs.CreateCountryOutputFromData(data, isoCode, startYear, endYear)
+	output, err := structs.CreateCountryOutputFromData(countryData, isoCode, startYear, endYear)
 	jsonOutput, _ := json.Marshal(output)
 
 	// Check for errors
@@ -93,33 +99,113 @@ func TestCreateCountryOutputFromData(t *testing.T) {
 		t.Errorf("CreateCountryOutputFromData() returned unexpected output.\nExpected: %s\nActual: %s", expectedOutput, jsonOutput)
 	}
 
-	//Check that output is in correct dataformat
+	//Check that output is in correct dataformat.  A list of structs is expected.
 	outputType := reflect.TypeOf(output)
 	expectedType := reflect.TypeOf([]structs.CountryOutput{})
 	if outputType != expectedType {
 		t.Errorf("CreateCountryOutputFromData() returned unexpected output. \nExpected datatype: %s\nActual datatype: %s ", expectedType, outputType)
 	}
 
-	//Check if data is outside of stard and end year bounderies
+	//Iterate through all indexes of output, and check if year data is outside the set start and end year bounderies
 	for _, val := range output {
 
-		intYear, err := strconv.Atoi(val.Year)
+		intYear, err := strconv.Atoi(val.Year) //Convert string form output to integer
 		if err != nil {
 			t.Errorf("CreateCountryOutputFromData() returned unexpected output. Non-number percentage in dataset.")
 		}
 
+		//Check if year value is outside specefied range
 		if intYear > endYear || intYear < startYear {
 			t.Errorf("CreateCountryOutputFromData() returned unexpected output. \nExpected Year Range: " + strconv.Itoa(endYear) + "-" + strconv.Itoa(startYear) + "\nActual year: " + strconv.Itoa(intYear))
 		}
 	}
 }
 
+// Unit test for CreateMeanCountryOutputFromData() in create_structs file
 func TestCreateMeanCountryOutputFromData(t *testing.T) {
 
+	//Example data
+	isoCode := "NOR"
+	startYear := 1965
+	endYear := 2021
+
+	// Call the function being tested
+	output, err := structs.CreateMeanCountryOutputFromData(countryData, isoCode, startYear, endYear)
+	jsonOutput, _ := json.Marshal(output)
+
+	// Check for errors
+	if err != nil {
+		t.Errorf("CreateMeanCountryOutputFromData() returned error: %v", err)
+	}
+
+	// Check that the response writer contains the expected output
+	expectedOutput := `[{"name":"Norway","isoCode":"NOR","percentage":68.01918892982458}]`
+	if string(jsonOutput) != expectedOutput {
+		t.Errorf("CreateMeanCountryOutputFromData() returned unexpected output.\nExpected: %s\nActual: %s", expectedOutput, jsonOutput)
+	}
+
+	//Check that output is in correct dataformat. A list of structs is expected.
+	outputType := reflect.TypeOf(output)
+	expectedType := reflect.TypeOf([]structs.CountryOutput{})
+	if outputType != expectedType {
+		t.Errorf("CreateMeanCountryOutputFromData() returned unexpected output. \nExpected datatype: %s\nActual datatype: %s ", expectedType, outputType)
+	}
 }
 
+// Unit test for CreateWebhookFromData() in create_structs file
+func TestCreateWebhookFromData(t *testing.T) {
+	// Define test data as a slice of maps, where each map represents a webhook
+	data := []map[string]interface{}{
+		{
+			"url":     "https://example.com/webhook0",
+			"country": "USA",
+			"calls":   int64(5),
+			"year":    int64(-1),
+		},
+		{
+			"url":     "https://example.com/webhook1",
+			"country": "Sweden",
+			"calls":   int64(15),
+			"year":    int64(1977),
+		},
+	}
+
+	// Set webhookID to be used in the test
+	webhookID := "abc123"
+
+	// Define the expected result as a slice of structs.Webhook
+	want := []structs.Webhook{
+		{
+			WebhookId: webhookID,
+			Url:       "https://example.com/webhook0",
+			Country:   "USA",
+			Calls:     5,
+		},
+		{
+			WebhookId: webhookID,
+			Url:       "https://example.com/webhook1",
+			Country:   "Sweden",
+			Calls:     15,
+			Year:      1977,
+		},
+	}
+
+	// Iterate over the test data
+	for i, val := range data {
+		// Call CreateWebhookFromData with the current webhook data and webhookID
+		got := structs.CreateWebhookFromData(val, webhookID)
+
+		// Compare the result with the expected value
+		if got != want[i] {
+			// If the result is not as expected, log an error with details about the inputs and outputs
+			t.Errorf("CreateWebhookFromData(%v, %s) = %v; want %v", data, webhookID, got, want)
+		}
+	}
+}
+
+// Unit test for Mean() in create_structs file
 func TestMean(t *testing.T) {
-	//Establish a number of tests consisting of a list of values, and the correct mean value of the list.
+	//Variable storing 4 sets of test data, as well as the expected response for each set
 	tests := []struct {
 		input []float64
 		want  float64
@@ -130,7 +216,7 @@ func TestMean(t *testing.T) {
 		{[]float64{}, 0},
 	}
 
-	//Feed the values into the mean function and report eventual anomalies.
+	//Feed the values into the Mean() function and report eventual anomalies.
 	for _, test := range tests {
 		got := structs.Mean(test.input)
 		if got != test.want {
@@ -139,19 +225,30 @@ func TestMean(t *testing.T) {
 	}
 }
 
+// Unit test for NewError() in error_struct file
 func TestNewError(t *testing.T) {
 	// Test case 1: Create a new error with a non-nil original error
+
+	//Establish example data
 	origErr := errors.New("original error")
 	statusCode := http.StatusBadRequest
 	userMsg := "Bad request"
 	devMsg := "Request was not well-formed"
+
+	//Use function to compile a wrapped error
 	err := structs.NewError(origErr, statusCode, userMsg, devMsg)
+
+	//Check for missing return value
 	if err == nil {
 		t.Errorf("NewError() returned nil, expected non-nil error")
 	}
+
+	//Check that .Error() function returns the original error.
 	if err.Error() != "original error" {
 		t.Errorf("NewError() returned error message '%s', expected 'original error'", err.Error())
 	}
+
+	//Check that expected parameter values are returned
 	if e, ok := err.(structs.WrappedError); ok {
 		if e.StatusCode != 400 {
 			t.Errorf("NewError() returned status code %d, expected %d", e.StatusCode, 400)
@@ -162,22 +259,32 @@ func TestNewError(t *testing.T) {
 		if e.DevMessage != "Request was not well-formed" {
 			t.Errorf("NewError() returned dev message '%s', expected 'Request was not well-formed'", e.DevMessage)
 		}
-	} else {
+	} else { //Check that correct datatype was returned
 		t.Errorf("NewError() did not return a WrappedError, expected WrappedError")
 	}
 
 	// Test case 2: Create a new error with a nil original error
+
+	//Establish example data for second test
 	origErr = nil
 	statusCode = http.StatusNotFound
 	userMsg = "Not found"
 	devMsg = "Requested resource could not be found"
+
+	//Use function to compile a wrapped error
 	err = structs.NewError(origErr, statusCode, userMsg, devMsg)
+
+	//Check for missing return value
 	if err == nil {
 		t.Errorf("NewError() returned nil, expected non-nil error")
 	}
+
+	//Check that .Error() function returns the original error.
 	if err.Error() != "" {
 		t.Errorf("NewError() returned error message '%s', expected empty string", err.Error())
 	}
+
+	//Check that expected parameter values are returned
 	if e, ok := err.(structs.WrappedError); ok {
 		if e.StatusCode != 404 {
 			t.Errorf("NewError() returned status code %d, expected %d", e.StatusCode, 404)
@@ -188,13 +295,14 @@ func TestNewError(t *testing.T) {
 		if e.DevMessage != "Requested resource could not be found" {
 			t.Errorf("NewError() returned dev message '%s', expected 'Requested resource could not be found'", e.DevMessage)
 		}
-	} else {
+	} else { //Check that correct datatype was returned
 		t.Errorf("NewError() did not return a WrappedError, expected WrappedError")
 	}
 }
 
-func TestMyError_Error(t *testing.T) {
-	// Create a new instance of MyError with a specific error message
+// Unit test for WrappedError_Error() in error_struct file
+func TestWrappedError_Error(t *testing.T) {
+	// Create a new instance of WrappedError with a specific error message
 	errMsg := "Original Error Message"
 	err := structs.NewError(errors.New(errMsg), http.StatusBadRequest, "Bad request.", "Request was not well formed")
 
