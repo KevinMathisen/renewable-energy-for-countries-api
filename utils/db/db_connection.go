@@ -29,6 +29,9 @@ var firestoreContext context.Context
 // Firebase client used by Firestore functions
 var firebaseClient *firestore.Client
 
+// Credentials file path
+var credentials string
+
 // Boolean variable and accompanying lock to determine the state of the database. Toggle with ReportDbState()
 var (
 	DbState                 bool       = true
@@ -41,7 +44,9 @@ var (
 Sets up Firebase client connection with credentials
 Returns error
 */
-func InitializeFirestore(credentials string) error {
+func InitializeFirestore(credPath string) error {
+	// Set credentials path
+	credentials = credPath
 	// Firebase initialisation
 	firestoreContext = context.Background()
 
@@ -375,7 +380,7 @@ func sleepAndRestartDb() {
 	DbRestartTimerStartTime = time.Now()
 	time.Sleep(1 * time.Minute)
 
-	err := InitializeFirestore(constants.CREDENTIALS_FILE) //Reattempt database connection
+	err := InitializeFirestore(credentials) //Reattempt database connection
 	dbRestartTimerMutex.Unlock()                           //Give away lock regardless of output
 	if err != nil {
 		sleepAndRestartDb() //On database failure, restart function
@@ -390,7 +395,7 @@ func sleepAndRestartDb() {
 func GetWebhookResponse() (http.Response, error) {
 	if projectID == "" {
 		// Read and parse the credentials file.
-		data, err := os.ReadFile(constants.CREDENTIALS_FILE)
+		data, err := os.ReadFile(credentials)
 		if err != nil {
 			log.Fatalf("Failed to read credentials file: %v", err)
 		}

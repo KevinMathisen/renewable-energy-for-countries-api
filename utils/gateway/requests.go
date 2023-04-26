@@ -44,7 +44,7 @@ func HttpRequestFromUrl(url string, method string) (http.Response, error) {
 	// Create request
 	request, err := http.NewRequest(method, url, nil)
 	if err != nil {
-		return response, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not create new GET request.")
+		return response, structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not create new request.")
 	}
 
 	// Set content type to empty
@@ -57,7 +57,7 @@ func HttpRequestFromUrl(url string, method string) (http.Response, error) {
 	// Issue http request
 	res, err := client.Do(request)
 	if err != nil {
-		return response, structs.NewError(err, http.StatusBadGateway, constants.DEFAULT500, "GET request was sent, but failed.")
+		return response, structs.NewError(err, http.StatusBadGateway, constants.DEFAULT504, method+" request to url: "+url+" was sent, but failed.")
 	}
 
 	// Return response
