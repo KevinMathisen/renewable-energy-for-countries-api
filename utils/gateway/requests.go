@@ -70,7 +70,7 @@ Post content given to webhookURL
 	data		- Map of webhook data
 	webhookID	- ID of webhook
 */
-func PostToWebhook(data map[string]interface{}, webhookID string) {
+func PostToWebhook(data map[string]interface{}, webhookID, countriesApiUrl string) {
 	var countryName string
 	var err error
 
@@ -79,7 +79,7 @@ func PostToWebhook(data map[string]interface{}, webhookID string) {
 		countryName = ""
 	} else {
 		// Find name from isoCode
-		country, err := GetCountryByIso(data["country"].(string), constants.COUNTRIES_API_URL)
+		country, err := GetCountryByIso(data["country"].(string), countriesApiUrl)
 		if err != nil {
 			return
 		}

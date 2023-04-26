@@ -280,7 +280,7 @@ func InvokeCountry(isoCode []string, begin int, end int) {
 		// Check if we have met the required invokation amount
 		if webhook["invocations"].(int64)%webhook["calls"].(int64) == 0 {
 			// Send post to webhook
-			go gateway.PostToWebhook(webhook, doc.Ref.ID)
+			go gateway.PostToWebhook(webhook, doc.Ref.ID, constants.COUNTRIES_API_URL)
 		}
 
 		// Update webhook with new invocations

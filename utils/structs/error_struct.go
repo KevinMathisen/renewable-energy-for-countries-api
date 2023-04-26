@@ -32,8 +32,3 @@ func (err WrappedError) Error() string {
 	}
 	return ""
 }
-
-// Unwraps error
-func (err WrappedError) Unwrap() error {
-	return err.OrigErr
-}

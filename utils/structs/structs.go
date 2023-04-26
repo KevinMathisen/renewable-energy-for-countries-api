@@ -23,7 +23,7 @@ type Country struct {
 * Struct for encoding JSON response for deleting and viewing a webhook/all webhooks in Notification endpoint.
  */
 type Webhook struct {
-	WebhookId string `json:"webook_id"`
+	WebhookId string `json:"webhook_id"`
 	Url       string `json:"url,omitempty"`
 	Country   string `json:"country,omitempty"`
 	Calls     int    `json:"calls,omitempty"`
