@@ -277,7 +277,6 @@ func TestHttpGetRenewablesHistory(t *testing.T) {
 	//All
 	handleHistoryLogistics(t, historyAll)
 	handleHistoryLogistics(t, historyAllSort)
-
 }
 
 //------------------------------ SINGLE COUNTRY TESTS ------------------------------
@@ -307,7 +306,6 @@ func historyCountry(t *testing.T, url string, client http.Client) {
 	if err2 := testLenLastFirst(res, HISTORY_COUNTRY_EXPECTED_ENTRIES, HISTORY_COUNTRY_CODE, HISTORY_COUNTRY_NAME, constants.OLDEST_YEAR_DB, HISTORY_COUNTRY_OLDEST_PERCENTAGE, HISTORY_COUNTRY_CODE, HISTORY_COUNTRY_NAME, constants.LATEST_YEAR_DB, HISTORY_COUNTRY_LATEST_PERCENTAGE); err2 != "" {
 		t.Fatal(err2)
 	}
-
 }
 
 // Runs tests for the .../renewables/history/NOR?begin={BEGIN_YEAR}&end={END_YEAR} endpoint
@@ -399,7 +397,6 @@ func historyCountryMean(t *testing.T, url string, client http.Client) {
 	if err2 := testPercentage(res[0].Percentage, HISTORY_COUNTRY_MEAN); err2 != "" {
 		t.Fatal(err2)
 	}
-
 }
 
 // Runs tests for the .../renewables/history/NOR?begin={BEGIN_YEAR}&end={END_YEAR}&mean=true endpoint
