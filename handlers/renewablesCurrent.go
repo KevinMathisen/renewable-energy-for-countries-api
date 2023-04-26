@@ -78,13 +78,13 @@ func getCurrentRenewablesForCountries(w http.ResponseWriter, countries []string,
 
 	// If the users specified countries, get renewables data from them in the current year
 	if len(countries) != 0 {
-		renewablesOutput, err = getRenewablesForCountriesByYears(w, countries, currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
+		renewablesOutput, err = getRenewablesForCountriesByYears(countries, currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}
 	} else {
 		// If the user did not specify countires, we get renewables data from all countires in the current year
-		renewablesOutput, err = getRenewablesForAllCountriesByYears(w, currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
+		renewablesOutput, err = getRenewablesForAllCountriesByYears(currentYear, currentYear, structs.CreateCountryOutputFromData, sortByValue)
 		if err != nil {
 			return renewablesOutput, err
 		}

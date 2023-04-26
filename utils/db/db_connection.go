@@ -146,7 +146,7 @@ Get a document from firestore
 
 	return	- Map containing data from document
 */
-func GetDocumentFromFirestore(w http.ResponseWriter, id string, collectionName string) (map[string]interface{}, error) {
+func GetDocumentFromFirestore(id string, collectionName string) (map[string]interface{}, error) {
 	// Get reference to document
 	docSnapshot, err := firebaseClient.Collection(collectionName).Doc(id).Get(firestoreContext)
 	if err != nil {
@@ -170,7 +170,7 @@ Gets all documents from a collection in firestore
 
 	return 			- Map containing key (document id) and elements containing maps with data from each document
 */
-func GetAllDocumentInCollectionFromFirestore(w http.ResponseWriter, collectionName string) (map[string]map[string]interface{}, error) {
+func GetAllDocumentInCollectionFromFirestore(collectionName string) (map[string]map[string]interface{}, error) {
 	// Initialize map for saving documents
 	data := make(map[string]map[string]interface{})
 
@@ -208,7 +208,7 @@ Delete a document given ID if it exists
 
 	return			- If deletion was succesful, if document existed, or any other errors
 */
-func DeleteDocument(w http.ResponseWriter, documentID string, collectionName string) error {
+func DeleteDocument(documentID string, collectionName string) error {
 
 	// Get reference to document
 	documentRef := firebaseClient.Collection(collectionName).Doc(documentID)
