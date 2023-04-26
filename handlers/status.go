@@ -12,6 +12,9 @@ import (
 // Create time of service start variable to calculate uptime
 var Start time.Time
 
+/*
+Handler for status endpoint
+*/
 func Status(w http.ResponseWriter, r *http.Request) error {
 
 	// Send error if request is not GET:

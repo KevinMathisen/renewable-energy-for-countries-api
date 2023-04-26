@@ -7,6 +7,9 @@ import (
 	"net/http"
 )
 
+/*
+Handler for default endpoint
+*/
 func Default(w http.ResponseWriter, r *http.Request) error {
 
 	// Send error message if request method is not get

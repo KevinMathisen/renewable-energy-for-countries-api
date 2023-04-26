@@ -11,7 +11,6 @@ import (
 Creates a slice of countryOutput structs sorted by year which can be sent as response to requests
 Goes through each year for a country, filters out the ones we want, and create a struct for each year
 
-	w			- Responsewriter for error handling
 	data		- Map which contain name of country and renewable percentages for all years of data
 	isoCode		- isoCode of country we are creating structs for
 	startYear	- The year in which we want to start returning data from
@@ -70,7 +69,6 @@ Creates a slice of countryOutput structs with Mean value hich can be sendt as re
 Goes through each year for a country, filters out the ones we want, and caulcates the mean value for all years.
 Then returnes a struct with the mean value.
 
-	w			- Responsewriter for error handling
 	data		- Map which contain name of country and renewable percentages for all years of data
 	isoCode		- isoCode of country we are creating struct for
 	startYear	- The year in which we want to start calculating mean from

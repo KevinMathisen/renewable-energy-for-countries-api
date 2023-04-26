@@ -145,7 +145,6 @@ func AppendDocumentToFirestore(id string, doc map[string]interface{}, collection
 /*
 Get a document from firestore
 
-	w				- Responsewriter for error handling
 	id				- document ID to get
 	collectionName	- Name of collection to get document from
 
@@ -170,7 +169,6 @@ func GetDocumentFromFirestore(id string, collectionName string) (map[string]inte
 /*
 Gets all documents from a collection in firestore
 
-	w				- Responsewriter for error handling
 	collectionName	- Name of collection to get document from
 
 	return 			- Map containing key (document id) and elements containing maps with data from each document
@@ -207,7 +205,6 @@ func GetAllDocumentInCollectionFromFirestore(collectionName string) (map[string]
 /*
 Delete a document given ID if it exists
 
-	w				- HTTP responsewriter
 	documentID		- ID of document to delete
 	collectionName	- Name of collection document is in
 
