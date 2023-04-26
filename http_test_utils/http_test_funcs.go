@@ -40,8 +40,8 @@ Tests to see if the float check is equal to float mark to 13 decimal places
 This is to avoid floating point errors that seem to appear around the 13th decimal place
 */
 func TestPercentage(check, mark float64) string {
-	checkInt := int(check * math.Pow(10, 12))
-	markInt := int(mark * math.Pow(10, 12))
+	checkInt := int(check * math.Pow(10, FLOAT_PRECISION))
+	markInt := int(mark * math.Pow(10, FLOAT_PRECISION))
 
 	if checkInt != markInt {
 		return ("Mean percentage for country is not correct." +
@@ -116,10 +116,10 @@ Tests if fPer1 is larger than lPer1, and that fPer2 is larger than lPer2
 Used to determine if a slice is sorted correctly for slices too large to list out manually
 */
 func TestSortedPercentage(fPer1, lPer1, fPer2, lPer2 float64) string {
-	fPer1Int := int(fPer1 * math.Pow(10, 12))
-	lPer1Int := int(lPer1 * math.Pow(10, 12))
-	fPer2Int := int(fPer2 * math.Pow(10, 12))
-	lPer2Int := int(lPer2 * math.Pow(10, 12))
+	fPer1Int := int(fPer1 * math.Pow(10, FLOAT_PRECISION))
+	lPer1Int := int(lPer1 * math.Pow(10, FLOAT_PRECISION))
+	fPer2Int := int(fPer2 * math.Pow(10, FLOAT_PRECISION))
+	lPer2Int := int(lPer2 * math.Pow(10, FLOAT_PRECISION))
 
 	if fPer1Int < lPer1Int || fPer2Int < lPer2Int {
 		return ("The order of the sorted values is wrong.")
@@ -127,6 +127,10 @@ func TestSortedPercentage(fPer1, lPer1, fPer2, lPer2 float64) string {
 	return ""
 }
 
+/*
+Tests if the values in check is in the same order as those in mark
+Used to determine if a slice is sorted correctly for slices small enough to be listed manually
+*/
 func TestSortedCodeList(check []structs.CountryOutput, mark []string) string {
 	equal := true //Assume it is correct
 	for i, v := range mark {
