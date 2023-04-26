@@ -1,6 +1,8 @@
 package gateway
 
 import (
+	"assignment2/utils/constants"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -106,4 +108,81 @@ func TestHttpRequestFromUrlNonExistingUrl(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error, but got nil.")
 	}
+}
+
+/*
+Tests the PostToWebhook function
+*/
+func TestPostToWebhook(t *testing.T) {
+	count := 0
+	webhookCount := 0
+	apiCount := 0
+	// Create a test server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		count++
+		if r.URL.Path == "/webhook" {
+			webhookCount++
+			if r.Method != "POST" {
+				t.Fatal("Expected POST request, but got ", r.Method)
+			}
+
+			// Unmarshal request body
+			var data map[string]interface{}
+			decoder := json.NewDecoder(r.Body)
+			err := decoder.Decode(&data)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// Define expected request body
+			expectedData := map[string]interface{}{
+				"webhook_id": "TEST",
+				"country":    "Norway",
+				"calls":      float64(5),
+			}
+
+			assert.Equal(t, expectedData, data, "Request body should be equal to expected request body.")
+
+			// Respond to request
+			w.WriteHeader(http.StatusOK)
+		}
+		if r.URL.Path == "/api"+constants.COUNTRY_CODE_SEARCH_PATH+"NOR" {
+			apiCount++
+			if r.Method != "GET" {
+				t.Fatal("Expected POST request, but got ", r.Method)
+			}
+
+			// Respond with JSON
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(`[
+			{
+				"name": {
+					"common": "Norway"
+				},
+				"cca3": "NOR",
+				"borders": [
+					"FIN",
+					"SWE",
+					"RUS"
+				]
+			}
+		  ]`))
+		}
+
+	}))
+
+	defer ts.Close()
+
+	data := make(map[string]interface{})
+
+	data["url"] = ts.URL + "/webhook"
+	data["country"] = "NOR"
+	data["year"] = int64(-1)
+	data["invocations"] = int64(5)
+
+	PostToWebhook(data, "TEST", ts.URL+"/api")
+
+	assert.Equal(t, 1, webhookCount, "Webhook should be called once.")
+	assert.Equal(t, 1, apiCount, "API should be called once.")
+	assert.Equal(t, 2, count, "Webhook and API should be called once each.")
 }
