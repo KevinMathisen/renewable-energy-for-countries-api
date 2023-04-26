@@ -32,7 +32,7 @@ func main() {
 		port = "8080"
 	}
 
-	// Set up handler endpoints throuh root error handler
+	// Set up handler endpoints through root error handler
 	http.Handle(constants.DEFAULT_PATH, h.RootHandler(h.Default))
 	http.Handle(constants.RENEWABLES_CURRENT_PATH, h.RootHandler(h.RenewablesCurrent))
 	http.Handle(constants.RENEWABLES_HISTORY_PATH, h.RootHandler(h.RenewablesHistory))
