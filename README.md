@@ -17,6 +17,9 @@ Dataset used for Renewables:
 
 The dataset reports on percentage of renewable energy in the country's energy mix over time. 
 
+## Completion of requirements
+All the advanced tasks are implemented. 
+
 # Running the assignment
 
 ## Openstack instance
@@ -67,7 +70,7 @@ Path: /energy/v1/renewables/current/{country?}{?neighbours=bool?}{?sortByValue=b
 
 `{country?}` refers to an optional country identifier, either a 3-letter code or the name of the country.
 
-`{?neighbours=bool?}` refers to an optional parameter indicating whether neighbouring countries' values should be shown. 
+`{?neighbours=bool?}` refers to an optional parameter indicating whether neighbouring countries' values should be shown. Will be ignored if no country is given. 
 
 `{?sortByValue=bool?}` refers to an optional parameter indicating whether the output will be sort by percentage value (e.g., `?sortByValue=true`).
 
@@ -182,20 +185,35 @@ This endpoint focuses on returning historical percentages of renewables in the e
 
 ```
 Method: GET
-Path: /energy/v1/renewables/history/{country?}{?begin=year}{?end=year?}{?sortByValue=bool?}{?mean=bool?}
+Path: /energy/v1/renewables/history/{country?}{?begin=year}{?end=year?}{?neighbours=bool?}{?sortByValue=bool?}{?mean=bool?}
 ```
 
-```{country?}``` refers to an optional country 3-letter code.
+`{country?}` refers to an optional country identifier, either a 3-letter code or the name of the country.
 
-`{?neighbours=bool?}` refers to an optional parameter indicating whether neighbouring countries' values should be shown. 
+`{?begin=year}` refers to an optional parameter indicating the earliest year of data the output will contain. No earlier years, and all laters years will be included (except if defined otherwise by the end parameter). If the output is mean percentage, the mean value will only be calculated from data later than this value.   
+
+`{?end=year}` refers to an optional parameter indicating the lastest year of data the output will contain. No later years, and all previous years will be included (except if defined otherwise by the begin parameter). If the output is mean percentage, the mean value will only be calculated from data earlier than this value.  
+
+`{?neighbours=bool?}` refers to an optional parameter indicating whether neighbouring countries' values should be shown. Will be ignored if no country is given. 
+
+`{?sortByValue=bool?}` refers to an optional parameter indicating whether the output will be sort by percentage value (e.g., `?sortByValue=true`).
+
+ `{?mean=bool?}` refers to an optional parameter indicating whether the output will be the mean value instead of data for each year. Will be ignore if no country is given.
 
 
-Example request: ```/energy/v1/renewables/history/nor```
+Example request: 
+* ```/energy/v1/renewables/history/nor```
+* ```/energy/v1/renewables/history/norway?begin=2000```
+* ```/energy/v1/renewables/history/NOR?begin=2010&end=2020&neighbours=true&sortByValue=true```
+* ```/energy/v1/renewables/history/NOR?begin=1990&mean=true```
+* ```/energy/v1/renewables/history/```
+* ```/energy/v1/renewables/history/end=1975```
+* ```/energy/v1/renewables/history/?sortByValue=true```
 
 ### - Response
 
 * Content type: `application/json`
-* Status code: 200 if everything is OK, appropriate error code otherwise. Ensure to deal with errors gracefully.
+* Status code: 200 if everything is OK, appropriate error code otherwise indicating wether the request is illegal or there has been a server error.
 
 Body (Exemplary message based on schema) - *with* country code:
 ```
@@ -215,7 +233,28 @@ Body (Exemplary message based on schema) - *with* country code:
     ...
 ]
 ```
-* Where `{?begin=year&end=year?}` is specified (e.g., `?begin=1960&end=1970`), only these years should be shown.
+
+Body (Exemplary message based on schema) - *with* country code, and mean, neighbours, and sortByValue set to true:
+```
+[
+    {
+        "name": "Norway",
+        "isoCode": "NOR",
+        "percentage": 68.01918892982457
+    },
+    {
+        "name": "Sweden",
+        "isoCode": "SWE",
+        "percentage": 33.97086068421053
+    },
+    {
+        "name": "Finland",
+        "isoCode": "FIN",
+        "percentage": 18.825984771929832
+    },
+    ...
+]
+```
 
 Body (Exemplary message based on schema) - *without* country code (returns mean percentages for all countries):
 ```
@@ -238,12 +277,6 @@ Body (Exemplary message based on schema) - *without* country code (returns mean 
     ...
 ]
 ```
-
-* **Advanced Tasks:** 
-  * Consider selective use of only `begin` or `end` as single parameter (e.g., `?begin=1980` should only consider data from 1980 onwards; `?end=1980` should consider values from the first time entry until 1980 only).
-  * Extend the history for all countries with a time constraint. That means, where `{?begin=year&end=year?}` is specified (e.g., `?begin=1960&end=1970`), only mean values for these years should be calculated (not for all years).
-  * Implement additional optional parameter `{?sortByValue=bool?}` to support sorting of output by percentage value (e.g., `?sortByValue=true`).
-  * be creative - can you think of other/alternative useful options? Whatever you implement in addition, remember to document this.
 
 ## Notification Endpoint
 
