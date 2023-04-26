@@ -9,6 +9,9 @@ import (
 	"net/http"
 )
 
+/*
+Handler for history endpoint
+*/
 func RenewablesHistory(w http.ResponseWriter, r *http.Request) error {
 	var response []structs.CountryOutput
 

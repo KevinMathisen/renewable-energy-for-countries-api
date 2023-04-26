@@ -145,7 +145,6 @@ func AppendDocumentToFirestore(id string, doc map[string]interface{}, collection
 /*
 Get a document from firestore
 
-	w				- Responsewriter for error handling
 	id				- document ID to get
 	collectionName	- Name of collection to get document from
 
@@ -170,7 +169,6 @@ func GetDocumentFromFirestore(id string, collectionName string) (map[string]inte
 /*
 Gets all documents from a collection in firestore
 
-	w				- Responsewriter for error handling
 	collectionName	- Name of collection to get document from
 
 	return 			- Map containing key (document id) and elements containing maps with data from each document
@@ -207,7 +205,6 @@ func GetAllDocumentInCollectionFromFirestore(collectionName string) (map[string]
 /*
 Delete a document given ID if it exists
 
-	w				- HTTP responsewriter
 	documentID		- ID of document to delete
 	collectionName	- Name of collection document is in
 
@@ -323,9 +320,9 @@ func CountWebhooks() (int, error) {
 /*
 Delete all documents in cache collection
 */
-func DeleteAllCachedRequestsFromFirestore() {
+func DeleteAllDocumentsInCollectionFromFirestore(collection string) {
 	// Get reference to documents in collection
-	iter := firebaseClient.Collection(constants.CACHE_COLLECTION).DocumentRefs(firestoreContext)
+	iter := firebaseClient.Collection(collection).DocumentRefs(firestoreContext)
 
 	for {
 		// Try to go to next document in collection
@@ -381,7 +378,7 @@ func sleepAndRestartDb() {
 	time.Sleep(1 * time.Minute)
 
 	err := InitializeFirestore(credentials) //Reattempt database connection
-	dbRestartTimerMutex.Unlock()                           //Give away lock regardless of output
+	dbRestartTimerMutex.Unlock()            //Give away lock regardless of output
 	if err != nil {
 		sleepAndRestartDb() //On database failure, restart function
 	} else {

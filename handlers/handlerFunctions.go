@@ -18,7 +18,6 @@ import (
 /*
 Get renewables data for all countries given between start and end year
 
-	w					- Responsewriter for sending error messages
 	countries			- A list of countries we want to get data from
 	startYear			- The first year we will get data from
 	endYear				- The last year we will get data from
@@ -62,7 +61,6 @@ func getRenewablesForCountriesByYears(countries []string, startYear int, endYear
 /*
 Get renewables data for all counrties in the database between start and end year
 
-	w					- Responsewriter for sending error messages
 	startYear			- The first year we will get data from
 	endYear				- The last year we will get data from
 	createCountryOutput	- Function for creating the countryOutputs. Alternatives are creating based on years or mean.

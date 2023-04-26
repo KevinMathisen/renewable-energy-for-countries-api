@@ -9,6 +9,9 @@ import (
 	"net/http"
 )
 
+/*
+Handler for current endpoint
+*/
 func RenewablesCurrent(w http.ResponseWriter, r *http.Request) error {
 	var response []structs.CountryOutput
 

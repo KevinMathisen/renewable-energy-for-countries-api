@@ -63,7 +63,6 @@ func registrationOfWebhook(w http.ResponseWriter, r *http.Request) error {
 /*
 Saves a webhook to the correct database collection and document
 
-	w		- Responsewriter for error handling
 	webhook	- Struct which contain all relevant information about webhook to save
 
 	return	- Type of error or nil if none
