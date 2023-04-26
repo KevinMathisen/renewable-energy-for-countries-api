@@ -8,23 +8,50 @@ The service allows for notification registration using webhooks, which are invok
 
 The application is dockerized and deployed using an IaaS system called Openstack on NTNUs instance called SkyHigh. See Running the assignment/Openstack instance 
 
-## Completion of requirements
-All the advanced tasks are implemented. 
-
 ## External dependencies 
 
 The application is dependent on the following external APIs. If any of these are down the application will inform the user.
 
-The REST web service:
 * *REST Countries API*. Endpoint: http://129.241.150.113:8080/v3.1 (Documentation: http://129.241.150.113:8080/)
-
-Firebase:
 * *Firebase*. Endpoint: https://console.firebase.google.com/ (Documentation: https://firebase.google.com/docs)
 
 Dataset used for Renewables which is hosted on firebase:
 * [*Renewable Energy Dataset*](https://drive.google.com/file/d/18G470pU2NRniDfAYJ27XgHyrWOThP__p/view?usp=sharing) (Authors: Hannah Ritchie, Max Roser and Pablo Rosado (2022) - "Energy". Published online at OurWorldInData.org. Retrieved from: https://ourworldindata.org/energy
 
 The dataset reports on percentage of renewable energy in the country's energy mix over time. 
+
+## Third-party libraries
+
+Used the following third-party libraries: 
+* Firestore, Firebase and all libraries these depend on, for interacting with the database. 
+* Testify assert, for writing tests
+
+
+# Completion of requirements
+All the requirements are implemented, including all advanced tasks. 
+
+* All endpoints are tested using automated testing facilities provided by Golang. 
+  * When testing the application uses stubbing of the third-party endpoints to ensure test reliability (removing dependency on external services).
+  * Testing includes testing of handlers using the httptest package, as well as unit tests. 
+  * Test coverage of TODO ----------------- !!!!!!!!!!! percent.
+* Repeated invocations for a given country and date are cached on firebase to minimise invocation on the third-party libraries. These are deleted if the cached requests are older than a constant that can be set by the user. The default value is 4 hours. 
+
+Allocation of tasks: 
+| Functionality | Name | 
+| ----- | ------ |
+|All endpoints | Kevin |
+|Error handling | Mostly Raphael, also Sondre and Kevin  |
+|Webhooks | Kevin |
+|Restcountries interaction | Raphael |
+|Cache | Kevin |
+|Firestore setup and connectivity | Kevin |
+|Http testing | Torje |
+|Unit testing | Sondre, Torje |
+|Stubbing of third-party services| Sondre |
+|Openstack deployment | Rapahael  |
+|Dockerfile and docker compose | Rapahael  |
+|Readme.md | Kevin, Raphael |
+|Debugging | Everyone |
 
 # Running the assignment
 
@@ -512,16 +539,3 @@ Body:
 }
 ```
 
-# Additional requirements
-
-* All endpoints are tested using automated testing facilities provided by Golang. 
-  * When testing the application uses stubbing of the third-party endpoints to ensure test reliability (removing dependency on external services).
-  * Testing includes testing of handlers using the httptest package, as well as unit tests. 
-  * Test coverage of TODO ----------------- !!!!!!!!!!! percent.
-* Repeated invocations for a given country and date are cached on firebase to minimise invocation on the third-party libraries. These are deleted if the cached requests are older than a constant that can be set by the user. The default value is 4 hours. 
-
-## Third-party libraries
-
-Used the following third-party libraries: 
-* Firestore, Firebase and all libraries these depend on, for interacting with the database. 
-* Testify assert, for writing tests
