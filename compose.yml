@@ -1,7 +1,15 @@
-version: "1.0"
 services:
+  setup:
+    build:
+      context: .
+      dockerfile: Dockerfile.setup
+    volumes:
+      - ./.secrets:/credentials:ro
+    command: /bin/sh -c './initial_setup && exit 0'
   webserver:
-    build: .
+    build:
+          context: .
+          dockerfile: Dockerfile.main
     volumes:
       - ./.secrets:/credentials:ro
     ports:
@@ -9,6 +17,8 @@ services:
     deploy:
       replicas: 4
     restart: unless-stopped
+    depends_on:
+      - setup
   loadbalancer:
     image: nginx:stable
     ports:
