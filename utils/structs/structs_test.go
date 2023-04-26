@@ -42,7 +42,6 @@ func (m *mockResponseWriter) Bytes() []byte {
 
 func TestCreateCountryOutputFromData(t *testing.T) {
 
-	w := newMockResponseWriter()
 	isoCode := "NOR"
 	startYear := 1965
 	endYear := 2021
@@ -109,7 +108,7 @@ func TestCreateCountryOutputFromData(t *testing.T) {
 	}
 
 	// Call the function being tested
-	output, err := structs.CreateCountryOutputFromData(w, data, isoCode, startYear, endYear)
+	output, err := structs.CreateCountryOutputFromData(data, isoCode, startYear, endYear)
 	jsonOutput, _ := json.Marshal(output)
 
 	// Check for errors
