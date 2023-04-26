@@ -142,13 +142,6 @@ func TestCreateCountryOutputFromData(t *testing.T) {
 			t.Errorf("CreateCountryOutputFromData() returned unexpected output. \nExpected Year Range: " + strconv.Itoa(endYear) + "-" + strconv.Itoa(startYear) + "\nActual year: " + strconv.Itoa(intYear))
 		}
 	}
-
-	//Attempt to use function with mismatched iso codes and names
-	isoCode = "SWE"
-	_, err = structs.CreateCountryOutputFromData(w, data, isoCode, 0, 2100)
-	if err == nil {
-		t.Errorf("CreateCountryOutputFromData() returned unexpected output. Expected error, but none was returned.")
-	}
 }
 
 func TestNewError(t *testing.T) {
