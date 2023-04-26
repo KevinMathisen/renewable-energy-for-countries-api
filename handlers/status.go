@@ -44,19 +44,19 @@ func createStatusResponse(start time.Time) (structs.Status, error) {
 	// Get request from countries api
 	resCountry, err := gateway.HttpRequestFromUrl(constants.COUNTRIES_API_URL, http.MethodHead)
 	if err != nil {
-		return structs.Status{}, structs.NewError(err, http.StatusGatewayTimeout, "Error when accessing restcountries api", "")
+		return structs.Status{}, err
 	}
 
 	// Get request from notification db api
 	resDB, err := db.GetWebhookResponse()
 	if err != nil {
-		return structs.Status{}, structs.NewError(err, http.StatusGatewayTimeout, "Error when accesing the database", "")
+		return structs.Status{}, structs.NewError(err, http.StatusGatewayTimeout, "Error when accesing the database", "Error when accesing the database")
 	}
 
 	// Get amount of webhooks
 	amountOfWebhooks, err := db.CountWebhooks()
 	if err != nil {
-		return structs.Status{}, structs.NewError(err, http.StatusGatewayTimeout, "Error when accesing the database", "")
+		return structs.Status{}, err
 	}
 
 	// Initialize the status response struct
