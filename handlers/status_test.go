@@ -3,6 +3,9 @@ package handlers
 import (
 	"assignment2/utils/constants"
 	"assignment2/utils/db"
+	"assignment2/utils/structs"
+	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -81,4 +84,42 @@ func TestCreateStatusResponseBadUrl(t *testing.T) {
 	assert.NotNil(t, res.Version, "Response cached requests should not be nil.")
 	assert.NotNil(t, res.Uptime, "Response should be nil.")
 	assert.IsType(t, float64(0), res.Uptime, "Response uptime should be of type float64.")
+}
+
+func TestHttpStatus(t *testing.T) {
+	// Set up Firestore
+	db.InitializeFirestore(constants.CREDENTIALS_FILE_TESTING)
+	// Clears cache
+	db.DeleteAllDocumentsInCollectionFromFirestore(constants.CACHE_COLLECTION)
+	// Close down client when service is done running
+	defer db.CloseFirebaseClient()
+
+	//Creates instance of Status handler
+	handler := RootHandler(Status)
+
+	//Runs handler instance as server
+	server := httptest.NewServer(http.HandlerFunc(handler.ServeHTTP))
+	defer server.Close()
+
+	//Creates client to speak with server
+	client := http.Client{}
+	defer client.CloseIdleConnections()
+
+	log.Println("URL: ", server.URL)
+
+	url := server.URL + constants.STATUS_PATH
+	log.Println("Testing URL: \"" + url + "\"...")
+
+	//Sends Get request
+	res, err := client.Get(url)
+	if err != nil {
+		t.Fatal("Get request to URL failed:" + err.Error())
+	}
+
+	var resObject structs.Status
+	//Recieves values, and decodes into slice
+	err = json.NewDecoder(res.Body).Decode(&resObject)
+	if err != nil {
+		t.Fatal("Error during decoding:" + err.Error())
+	}
 }

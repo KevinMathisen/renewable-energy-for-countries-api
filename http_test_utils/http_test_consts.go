@@ -4,6 +4,9 @@ import (
 	"strconv"
 )
 
+// Values for fucntions
+const FLOAT_PRECISION = 12
+
 // Values for building URLs
 const BEGIN_YEAR = "1990"
 const END_YEAR = "2010"
@@ -18,7 +21,6 @@ const PARAM = "?"
 const AND = "&"
 
 // Values for checking
-
 const ALL_COUNTRIES = 79      //All different countries in the dataset
 const CURRENT_COUNTRIES = 72  //Amount of countries with data for year 2021
 const EXPECTED_NEIGHBOURS = 4 //Amount of neighbours for Norway
