@@ -30,14 +30,12 @@ var CURRENT_SORTED_NEIGHBOURS_CODES = [EXPECTED_NEIGHBOURS]string{"NOR", "SWE", 
 TEST COVERAGE:
 
 /energy/v1/renewables/current/NOR
-	Tests year of country
 	Tests number of recieved countries
-	Tests values of object
+	Tests all values of country
 
 /energy/v1/renewables/current/norway
-	Tests year of country
 	Tests number of recieved countries
-	Tests values of object
+	Tests all values of country
 
 /energy/v1/renewables/current/NOR?neighbours=true
 	Tests number of recieved countries
@@ -58,6 +56,9 @@ Gets data from the test URL and decodes into a slice of type CountryOutput, then
 there are no errors
 */
 func getCurrentData(client http.Client, url string) ([]structs.CountryOutput, error) {
+
+	log.Println("Testing URL: \"" + url + "\"...")
+
 	//Sends Get request
 	res, err := client.Get(url)
 	if err != nil {
@@ -130,20 +131,12 @@ func currentCountryByName(t *testing.T, url string, client http.Client) {
 
 // Runs tests for the .../renewables/current/{<NOR>/<norway>} endpoint
 func currentCountry(t *testing.T, url string, client http.Client) {
-	log.Println("Testing URL: \"" + url + "\"...")
 
 	//Gets data from the endpoint
 	res, err := getCurrentData(client, url)
 	//If there was an error during gathering or decoding of data
 	if err != nil {
 		t.Fatal(err.Error())
-	}
-
-	//Checks that the year is right
-	if year := res[0].Year; year != strconv.Itoa(constants.LATEST_YEAR_DB) {
-		t.Fatal("Year of recieved objects is wrong." +
-			"\n\tExpected: " + strconv.Itoa(constants.LATEST_YEAR_DB) +
-			"\n\tRecieved: " + year)
 	}
 
 	//Checks that only one country was recieved
@@ -166,8 +159,6 @@ func currentCountry(t *testing.T, url string, client http.Client) {
 // Runs tests for the .../renewables/current/NOR?neighbours=true endpoint
 func currentNeighbours(t *testing.T, url string, client http.Client) {
 	url = url + CURRENT_COUNTRY_CODE + CURRENT_PARAM + CURRENT_NEIGHBOURS
-
-	log.Println("Testing URL: \"" + url + "\"...")
 
 	//Gets data from the endpoint
 	res, err := getCurrentData(client, url)
@@ -203,8 +194,6 @@ func currentNeighbours(t *testing.T, url string, client http.Client) {
 func currentNeighboursSortBy(t *testing.T, url string, client http.Client) {
 	url = url + CURRENT_COUNTRY_CODE + CURRENT_PARAM + CURRENT_NEIGHBOURS + CURRENT_AND + CURRENT_SORT_BY
 
-	log.Println("Testing URL: \"" + url + "\"...")
-
 	//Gets data from the endpoint
 	res, err := getCurrentData(client, url)
 	//If there was an error during gathering or decoding of data
@@ -232,8 +221,6 @@ func currentNeighboursSortBy(t *testing.T, url string, client http.Client) {
 // Runs tests for the .../renewables/current/ endpoint
 func currentAll(t *testing.T, url string, client http.Client) {
 
-	log.Println("Testing URL: \"" + url + "\"...")
-
 	//Gets data from the .../renewables/current/ endpoint
 	res, err := getCurrentData(client, url)
 	//If there was an error during gathering or decoding of data
@@ -252,8 +239,6 @@ func currentAll(t *testing.T, url string, client http.Client) {
 // Runs tests for the .../renewables/current/?sortByValue=true endpoint
 func currentAllSortBy(t *testing.T, url string, client http.Client) {
 	url = url + CURRENT_PARAM + CURRENT_SORT_BY
-
-	log.Println("Testing URL: \"" + url + "\"...")
 
 	//Gets data from the endpoint
 	res, err := getCurrentData(client, url)
