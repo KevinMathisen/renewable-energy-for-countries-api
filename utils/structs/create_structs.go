@@ -111,7 +111,7 @@ func CreateMeanCountryOutputFromData(w http.ResponseWriter, data map[string]inte
 	countryOutput := CountryOutput{
 		Name:       countryName,
 		IsoCode:    isoCode,
-		Percentage: mean(percentages),
+		Percentage: Mean(percentages),
 	}
 
 	return []CountryOutput{countryOutput}, nil
@@ -144,7 +144,7 @@ Calculate mean value of list of numbers
 
 	return	- Average of list
 */
-func mean(input []float64) float64 {
+func Mean(input []float64) float64 {
 	// If there is no input
 	if len(input) == 0 {
 		return 0
