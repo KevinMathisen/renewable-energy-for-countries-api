@@ -8,17 +8,23 @@ The service allows for notification registration using webhooks, which are invok
 
 The application is dockerized and deployed using an IaaS system called Openstack on NTNUs instance called SkyHigh. See Running the assignment/Openstack instance 
 
+## Completion of requirements
+All the advanced tasks are implemented. 
+
+## External dependencies 
+
+The application is dependent on the following external APIs. If any of these are down the application will inform the user.
 
 The REST web service:
 * *REST Countries API*. Endpoint: http://129.241.150.113:8080/v3.1 (Documentation: http://129.241.150.113:8080/)
 
-Dataset used for Renewables:
+Firebase:
+* *Firebase*. Endpoint: https://console.firebase.google.com/ (Documentation: https://firebase.google.com/docs)
+
+Dataset used for Renewables which is hosted on firebase:
 * [*Renewable Energy Dataset*](https://drive.google.com/file/d/18G470pU2NRniDfAYJ27XgHyrWOThP__p/view?usp=sharing) (Authors: Hannah Ritchie, Max Roser and Pablo Rosado (2022) - "Energy". Published online at OurWorldInData.org. Retrieved from: https://ourworldindata.org/energy
 
 The dataset reports on percentage of renewable energy in the country's energy mix over time. 
-
-## Completion of requirements
-All the advanced tasks are implemented. 
 
 # Running the assignment
 
@@ -87,7 +93,7 @@ Method: GET
 Path: /energy/v1/renewables/current/{country?}{?neighbours=bool?}{?sortByValue=bool?}
 ```
 
-`{country?}` refers to an optional country identifier, either a 3-letter code or the name of the country.
+`{country?}` refers to an optional country identifier, either a 3-letter code **or** the name of the country.
 
 `{?neighbours=bool?}` refers to an optional parameter indicating whether neighbouring countries' values should be shown. Will be ignored if no country is given. 
 
@@ -207,7 +213,7 @@ Method: GET
 Path: /energy/v1/renewables/history/{country?}{?begin=year}{?end=year?}{?neighbours=bool?}{?sortByValue=bool?}{?mean=bool?}
 ```
 
-`{country?}` refers to an optional country identifier, either a 3-letter code or the name of the country.
+`{country?}` refers to an optional country identifier, either a 3-letter code **or** the name of the country.
 
 `{?begin=year}` refers to an optional parameter indicating the earliest year of data the output will contain. No earlier years, and all laters years will be included (except if defined otherwise by the end parameter). If the output is mean percentage, the mean value will only be calculated from data later than this value.   
 
@@ -217,7 +223,7 @@ Path: /energy/v1/renewables/history/{country?}{?begin=year}{?end=year?}{?neighbo
 
 `{?sortByValue=bool?}` refers to an optional parameter indicating whether the output will be sort by percentage value (e.g., `?sortByValue=true`).
 
- `{?mean=bool?}` refers to an optional parameter indicating whether the output will be the mean value instead of data for each year. Will be ignore if no country is given.
+ `{?mean=bool?}` refers to an optional parameter indicating whether the output will be the mean value instead of data for each year. Will be ignored if no country is given, as this will always return mean value. 
 
 
 Example request: 
@@ -299,7 +305,7 @@ Body (Exemplary message based on schema) - *without* country code (returns mean 
 
 ## Notification Endpoint
 
-As an additional feature, users can register webhooks that are triggered by the service based on specified events, specifically if information about given countries (or any country) is invoked, where the minimum frequency can be specified. Users can register multiple webhooks. The registrations should survive a service restart (i.e., be persistent using a Firebase DB as backend).
+Users can register webhooks that are triggered by the service based on specified events, specifically if information about given countries (or any country) is invoked, where the minimum frequency can be specified. If specified, a webhook can only be triggered at the specified year. Users can register multiple webhooks. The registrations will be stored until explicitly deleted. 
 
 ### Registration of Webhook
 
@@ -316,6 +322,7 @@ The body contains
  * the URL to be triggered upon event (the service that should be invoked)
  * the country for which the trigger applies (if empty, it applies to any invocation)
  * the number of invocations after which a notification is triggered (it should re-occur every *number of invocations*, i.e., if 5 is specified, it should occur after 5, 10, 15 invocation, and so on, unless the webhook is deleted).
+ * an optional value "year" which specify for which year the trigger applies (if empty it applies to any year)
 
 Body (Exemplary message based on schema):
 ```
@@ -325,17 +332,27 @@ Body (Exemplary message based on schema):
    "calls": 5
 }
 ```
+
+Body (Exemplary message based on schema) with year:
+```
+{
+   "url": "https://localhost:8080/client/",
+   "country": "NOR",
+   "calls": 5,
+   "year": 2000
+}
+```
 ### - Response
 
-The response contains the ID for the registration that can be used to see detail information or to delete the webhook registration. The format of the ID is not prescribed, as long it is unique. Consider best practices for determining IDs.
+The response contains the ID for the registration that can be used to see detail information or to delete the webhook registration. The format of the ID is a unique randomly generated 16 character string.
 
 * Content type: `application/json`
-* Status code: Choose an appropriate status code
+* Status code: 201 Status created if everything is OK, appropriate error code otherwise indicating wether the request is illegal or there has been a server error.
 
 Body (Exemplary message based on schema):
 ```
 {
-    "webhook_id": "OIdksUDwveiwe"
+    "webhook_id": "BOlOomFOeiKvZhVD"
 }
 ```
 
@@ -352,7 +369,8 @@ Path: /energy/v1/notifications/{id}
 
 ### - Response
 
-Implement the response according to best practices.
+* Status code: 204 No content if everything is OK, appropriate error code otherwise indicating wether the request is illegal or there has been a server error.
+
 
 ### View registered webhook
 
@@ -369,14 +387,26 @@ Path: /energy/v1/notifications/{id}
 The response is similar to the POST request body, but further includes the ID assigned by the server upon adding the webhook.
 
 * Content type: `application/json`
+* Status code: 200 if everything is OK, appropriate error code otherwise indicating wether the request is illegal or there has been a server error.
 
 Body (Exemplary message based on schema):
 ```
 {
-   "webhook_id": "OIdksUDwveiwe",
+   "webhook_id": "BOlOomFOeiKvZhVD",
    "url": "https://localhost:8080/client/",
    "country": "NOR",
    "calls": 5
+}
+
+```
+Body (Exemplary message based on schema) with no country specified and year:
+```
+{
+   "webhook_id": "QDzPVIWGuZkfueZx",
+   "url": "https://localhost:8081/client/",
+   "country": "ANY",
+   "calls": 2,
+   "year": 2020
 }
 
 ```
@@ -400,24 +430,25 @@ Body (Exemplary message based on schema):
 ```
 [
    {
-      "webhook_id": "OIdksUDwveiwe",
+      "webhook_id": "BOlOomFOeiKvZhVD",
       "url": "https://localhost:8080/client/",
       "country": "NOR",
       "calls": 5
    },
    {
-      "webhook_id": "DiSoisivucios",
-      "url": "https://localhost:8081/anotherClient/",
-      "country": "SWE",
-      "calls": 2
-   },
+      "webhook_id": "QDzPVIWGuZkfueZx",
+      "url": "https://localhost:8081/client/",
+      "country": "ANY",
+      "calls": 2,
+      "year": 2020
+    },
    ...
 ]
 ```
 
 ### Webhook Invocation (upon trigger)
 
-When a webhook is triggered, it should send information as follows. Where multiple webhooks are triggered, the information should be sent separately (i.e., one notification per triggered webhook). Note that for testing purposes, this will require you to set up another service that is able to receive the invocation. During the development, consider using https://webhook.site/ initially.
+When a webhook is triggered, it sends information as follows. Where multiple webhooks are triggered, the information is sent separately. 
 
 ```
 Method: POST
@@ -429,18 +460,34 @@ Path: <url specified in the corresponding webhook registration>
 Body (Exemplary message based on schema):
 ```
 {
-   "webhook_id": "OIdksUDwveiwe",
+   "webhook_id": "BOlOomFOeiKvZhVD",
    "country": "Norway",
    "calls": 10
 }
 ```
-* Note: `calls` should show the number of invocations, not the number specified as part of the webhook registration (i.e., not 5, but the actual invocation upon which the webhook is triggered).
 
-* **Advanced Task:** Consider supporting other event types you can think of.
+Body (Exemplary message based on schema) where no country is specified:
+```
+{
+   "webhook_id": "QfwLosaJKVANmUJk",
+   "calls": 4
+}
+```
+
+Body (Exemplary message based on schema) when year is specified:
+```
+{
+   "webhook_id": "ScFdJSpMVIMsXznf",
+   "country": "Sweden",
+   "calls": 8,
+   "year": 2020
+}
+```
+* Note: `calls` show the number of invocations, not the number specified as part of the webhook registration (i.e. the actual invocation upon which the webhook is triggered).
 
 ## Status Endpoint
 
-The status interface indicates the availability of all individual services this service depends on. These can be more services than the ones specified above (if you considered the advanced tasks). If you include more, you can specify additional keys with the suffix `api`. The reporting occurs based on status codes returned by the dependent services. The status interface further provides information about the number of registered webhooks (more details is provided in the next section), and the uptime of the service.
+The status interface indicates the availability of all individual services this service depends on. The reporting occurs based on status codes returned by the dependent services. The status interface further provides information about the number of registered webhooks and the uptime of the service.
 
 ### - Request
 
@@ -459,68 +506,22 @@ Body:
 {
    "countries_api": "<http status code for *REST Countries API*>",
    "notification_db": "<http status code for *Notification DB* in Firebase>",
-   ...
    "webhooks": <number of registered webhooks>,
    "version": "v1",
    "uptime": <time in seconds from the last service restart>
 }
 ```
 
-Note: `<some value>` indicates placeholders for values to be populated by the service as described for the corresponding values. Feel free to extend the output with information you deem useful to assess the status of your service.
-
 # Additional requirements
 
-* All endpoints should be *tested using automated testing facilities provided by Golang*. 
-  * This includes the stubbing of the third-party endpoints to ensure test reliability (removing dependency on external services).
-  * Include the testing of handlers using the httptest package. Your code should be structured to support this. 
-  * Try to maximize test coverage as reported by Golang.
-* Repeated invocations for a given country and date should be cached to minimise invocation on the third-party libraries. Use Firebase for this purpose.
-  * **Advanced Task**: Implement purging of cached information for requests older than a given number of hours/days.
-
-# Deployment
-
-The service is to be deployed on an IaaS solution OpenStack using Docker (to be discussed in class). You will need to provide the URL to the deployed service as part of the submission, in addition the source repository.
-
-# Notes
-
-* Feel free to introduce additional endpoints to support the development and debugging.
-* Where specification details are missing (but you can infer those), operate based on best practices and document it accordingly.
-* Where information is unclear, get in touch with teaching staff for clarification. Where needed, the assignment information will be updated accordingly (and the updated information will be highlighted as **UPDATE**).
-
-# General Aspects
-
-## Professionalism
-
-As indicated during the initial sessions, ensure you work with professionalism in mind (see Course Rules). In addition to professionalism, you are at liberty to introduce further features into your service, as long it does not break the specification given above. 
-
-## Workspace environment
-
-Please work in the provided workspace environment (see [here](Rules-&-Conventions/Workspace-Conventions) - lodge an issue if you have trouble accessing it) for your user and create a project `assignment-2` in this workspace. All group members share *one* repository; it does not matter in whose workspace folder it lies.
-
-## Rate limits reminder
-
-As mentioned above, be sensitive to rate limits of external services. This has proven very important, given the large number of projects (and hence invocations) on the third-party services.
-
-## Resources
-
-The course repository provides a range of example projects for various features discussed throughout the lecture sessions. Feel free to borrow from those projects, or use them to understand a concept you are struggling with (e.g., learning the use of Firestore). 
+* All endpoints are tested using automated testing facilities provided by Golang. 
+  * When testing the application uses stubbing of the third-party endpoints to ensure test reliability (removing dependency on external services).
+  * Testing includes testing of handlers using the httptest package, as well as unit tests. 
+  * Test coverage of TODO ----------------- !!!!!!!!!!! percent.
+* Repeated invocations for a given country and date are cached on firebase to minimise invocation on the third-party libraries. These are deleted if the cached requests are older than a constant that can be set by the user. The default value is 4 hours. 
 
 ## Third-party libraries
 
-Be deliberative about using third-party libraries (Don't just do it because someone did it on StackOverflow). While those libraries often allow for convenience and functionality you would otherwise need to reimplement, they can also mean the "import" of technological debt, especially if you were to think about maintainability. So, be very clear *why* you want to use the library (lack of functionality in standard packages, convenience, etc.). Note that it may be challenging for us to provide the necessary support, especially if the library is rather specialised (we will rely on the same resources available to you). As the assignment is designed, you will only need Golang standard API functionality, alongside Firebase/store functionality as a third-party dependency.
-
-# Submission
-
-The **assignment is a group assignment**. Ensure that the group allocations specified in the submission system are correct at the deadline. The **submission deadline** is provided on the [course wiki page](Home#deadlines). Extensions to the deadline are handled according to the [Course Rules](Rules-&-Conventions/Course%20Rules). 
-
-As part of the submission you will need to provide:
-* a link to your code repository (ensure it is `internal` at that stage)
-* a link to the deployed service
-
-In addition, we will provide you with an option to clarify aspects of your submission (e.g., checklist of features, elaboration on aspects that don't quite work, or additional features).
-
-The submission occurs via our [Submission System](Guides/Submission System). Early submission is explicitly encouraged - you can change it (or even withdraw) any time before the deadline.
-
-# Peer Review
-
-After the submission deadline, there will be a separate deadline during which you will review other groups' submissions. To do this the system provides you with a checklist of aspects to assess. You will need to review *at least two submissions* to meet the mandatory requirements of peer review, but you can review as many submissions as you like, which counts towards your participation mark for the course. The peer-review deadline is indicated on the [course wiki page](Home#deadlines).
+Used the following third-party libraries: 
+* Firestore, Firebase and all libraries these depend on, for interacting with the database. 
+* Testify assert, for writing tests
