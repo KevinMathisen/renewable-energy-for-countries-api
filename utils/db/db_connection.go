@@ -97,17 +97,6 @@ func DocumentInCollection(id string, collection string) bool {
 	return true
 }
 
-func Firestore_test() error {
-	res := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Doc("NOR")
-
-	doc, _ := res.Get(firestoreContext)
-
-	message := doc.Data()
-	log.Println(message)
-
-	return nil
-}
-
 /*
 Appends data from a map to firestore
 
