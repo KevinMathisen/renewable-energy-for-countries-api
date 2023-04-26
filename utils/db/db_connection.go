@@ -55,13 +55,13 @@ func InitializeFirestore(credPath string) error {
 	// Create a firebase app with context and credentials
 	app, err := firebase.NewApp(firestoreContext, nil, serviceAccount)
 	if err != nil {
-		return structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "Could not establish firebase context")
+		return structs.NewError(err, http.StatusGatewayTimeout, constants.DEFAULT504, "Could not establish firebase context")
 	}
 
 	// Instantiate client and connect to Firestore
 	firebaseClient, err = app.Firestore(firestoreContext)
 	if err != nil {
-		return structs.NewError(err, http.StatusServiceUnavailable, constants.DEFAULT500, "Could not contact firebase")
+		return structs.NewError(err, http.StatusGatewayTimeout, constants.DEFAULT504, "Could not contact firebase")
 	}
 
 	return nil
