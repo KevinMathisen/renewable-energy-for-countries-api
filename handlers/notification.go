@@ -115,7 +115,7 @@ func deletionOfWebhook(w http.ResponseWriter, r *http.Request) error {
 
 	// Check if the webhookID is valid
 	if !checkIfValidWebhookId(webhookID) {
-		return structs.NewError(nil, http.StatusBadRequest, "Invalid webhookID given", "webhookID given was not found in database")
+		return structs.NewError(nil, http.StatusNotFound, "Invalid webhookID given", "webhookID given was not found in database")
 	}
 
 	// Try to delete webhook from database
@@ -124,16 +124,8 @@ func deletionOfWebhook(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	// Create response
-	response := structs.Webhook{
-		WebhookId: webhookID,
-	}
-
-	// Send response to user
-	err = gateway.RespondToGetRequestWithJSON(w, response, http.StatusOK)
-	if err != nil {
-		return err
-	}
+	// Respond with status no content
+	w.WriteHeader(http.StatusNoContent)
 
 	return nil
 }
@@ -150,7 +142,7 @@ func viewWebhook(w http.ResponseWriter, r *http.Request) error {
 
 	// Check if the webhookID is valid
 	if !checkIfValidWebhookId(webhookID) {
-		return structs.NewError(nil, http.StatusBadRequest, "Invalid webhookID given", "webhookID given was not found in database")
+		return structs.NewError(nil, http.StatusNotFound, "Invalid webhookID given", "webhookID given was not found in database")
 	}
 
 	// Get webhooks from database

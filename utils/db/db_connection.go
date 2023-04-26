@@ -216,7 +216,7 @@ func DeleteDocument(w http.ResponseWriter, documentID string, collectionName str
 	// Get snapshot of document for testing if it exists
 	documentSnap, err := documentRef.Get(firestoreContext)
 	if err != nil {
-		return structs.NewError(err, http.StatusBadRequest, "Could not find given webhookID in database", "Could not retrieve firestone document refrence.")
+		return structs.NewError(err, http.StatusNotFound, "Could not find given webhookID in database", "Could not retrieve firestone document refrence.")
 	}
 
 	// Test if any document with given ID exists
@@ -227,7 +227,7 @@ func DeleteDocument(w http.ResponseWriter, documentID string, collectionName str
 		}
 
 		// Error, cant delete a document that does not exist
-		return structs.NewError(err, http.StatusBadRequest, "Could not find given webhookID in database", "Found reference to document, but it doesn't exist in database.")
+		return structs.NewError(err, http.StatusNotFound, "Could not find given webhookID in database", "Found reference to document, but it doesn't exist in database.")
 
 	}
 
