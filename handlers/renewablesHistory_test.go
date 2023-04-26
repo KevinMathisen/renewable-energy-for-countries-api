@@ -119,7 +119,8 @@ TEST COVERAGE:
 
 /energy/v1/renewables/history/NOR?neighbours=true&sortByValue=true
 	Cheacks amount of returned objects
-	Tests percentage value of second recieved object (Norway)
+	Tests all values of the first instance
+	Tests all values of the last instance
 
 /energy/v1/renewables/history/NOR?neighbours=true&mean=true&sortByValue=true
 	Checks whether recieved object has year value or not
