@@ -1,4 +1,4 @@
-﻿package gateway
+package gateway
 
 import (
 	"assignment2/utils/constants"

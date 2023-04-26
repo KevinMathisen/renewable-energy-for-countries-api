@@ -1,4 +1,4 @@
-﻿package handlers
+package handlers
 
 import (
 	"assignment2/utils/constants"

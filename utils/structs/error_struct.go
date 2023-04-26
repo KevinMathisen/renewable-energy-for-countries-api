@@ -1,4 +1,4 @@
-﻿package structs
+package structs
 
 /*
 * Struct for wrapping errors for standardized error handling.

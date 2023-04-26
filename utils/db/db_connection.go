@@ -1,4 +1,4 @@
-﻿package db
+package db
 
 import (
 	"assignment2/utils/constants"
