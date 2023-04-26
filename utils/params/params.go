@@ -7,7 +7,6 @@ import (
 	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -108,8 +107,7 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 		// Try to convert string to int
 		beginYear, err = strconv.Atoi(begin)
 		if err != nil && begin != "" {
-			http.Error(w, "Malformed URL, invalid begin parameter set", http.StatusForbidden)
-			return -1, -1, false, false, err
+			return -1, -1, false, false, structs.NewError(nil, http.StatusForbidden, "Malformed URL, invalid begin parameter set", "")
 		}
 	}
 
@@ -124,15 +122,13 @@ func GetRenewablesHistoryParameters(w http.ResponseWriter, r *http.Request) (beg
 		// Try to convert string to int
 		endYear, err = strconv.Atoi(end)
 		if err != nil && end != "" {
-			http.Error(w, "Malformed URL, invalid end parameter set", http.StatusForbidden)
-			return -1, -1, false, false, err
+			return -1, -1, false, false, structs.NewError(nil, http.StatusForbidden, "Malformed URL, invalid begin parameter set", "")
 		}
 	}
 
 	// If years set are outside of database scope
 	if (beginYear < constants.OLDEST_YEAR_DB && beginYear != -1) || (endYear > constants.LATEST_YEAR_DB && endYear != -1) {
-		http.Error(w, "Malformed URL, begin and end years have to be between "+strconv.Itoa(constants.OLDEST_YEAR_DB)+" and "+strconv.Itoa(constants.LATEST_YEAR_DB), http.StatusUnprocessableEntity)
-		return -1, -1, false, false, err
+		return -1, -1, false, false, structs.NewError(nil, http.StatusUnprocessableEntity, "Malformed URL, begin and end years have to be between "+strconv.Itoa(constants.OLDEST_YEAR_DB)+" and "+strconv.Itoa(constants.LATEST_YEAR_DB), "")
 	}
 
 	// Get sortByValue param
@@ -166,8 +162,7 @@ func getCountryCodeOrNameFromRequest(w http.ResponseWriter, r *http.Request, pat
 
 	// Check if URL is correctly formatted
 	if len(args) != 6 && len(args) != 7 {
-		http.Error(w, "Malformed URL, Expecting format "+path+"{country?}", http.StatusForbidden)
-		return "", errors.New("malformed URL")
+		return "", structs.NewError(nil, http.StatusForbidden, "Malformed URL, Expecting format "+path+"{country?}", "")
 	}
 
 	// Return name of country / isoCode
@@ -189,8 +184,7 @@ func GetBoolParameterFromRequest(w http.ResponseWriter, r *http.Request, paramNa
 	// Try to convert string to int
 	paramBool, err := strconv.ParseBool(paramString)
 	if err != nil && paramString != "" {
-		http.Error(w, "Malformed URL, invalid "+paramName+" parameter set", http.StatusForbidden)
-		return false, err
+		return false, structs.NewError(nil, http.StatusForbidden, "Malformed URL, invalid "+paramName+" parameter set", "")
 	}
 
 	// Return neighbours bool
@@ -236,8 +230,7 @@ func GetWebhookIDFromRequest(w http.ResponseWriter, r *http.Request) (string, er
 
 	// Check if URL is correctly formatted
 	if len(args) != 5 && len(args) != 6 {
-		http.Error(w, "Malformed URL, Expecting format "+constants.NOTIFICATION_PATH+"{webhookID}", http.StatusForbidden)
-		return "", errors.New("malformed URL")
+		return "", structs.NewError(nil, http.StatusForbidden, "Malformed URL, Expecting format "+constants.NOTIFICATION_PATH+"{webhookID}", "")
 	}
 
 	// Return webhookID
@@ -259,8 +252,7 @@ func GetWebhookIDOrNothingFromRequest(w http.ResponseWriter, r *http.Request) (s
 
 	// Check if URL is correctly formatted
 	if len(args) != 4 && len(args) != 5 && len(args) != 6 {
-		http.Error(w, "Malformed URL, Expecting format "+constants.NOTIFICATION_PATH+"{webhookID?}", http.StatusForbidden)
-		return "", errors.New("malformed URL")
+		return "", structs.NewError(nil, http.StatusForbidden, "Malformed URL, Expecting format "+constants.NOTIFICATION_PATH+"{webhookID?}", "")
 	}
 
 	// If no webhookID was specified

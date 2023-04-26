@@ -1,6 +1,7 @@
 ﻿package structs
 
 import (
+	"assignment2/utils/constants"
 	"net/http"
 	"sort"
 	"strconv"
@@ -35,8 +36,8 @@ func CreateCountryOutputFromData(w http.ResponseWriter, data map[string]interfac
 		// Try to convert year to an int
 		yearInt, err := strconv.Atoi(year)
 		if err != nil {
-			http.Error(w, "Error when creating data, could not convert year to int", http.StatusInternalServerError)
-			return output, err
+			return output, NewError(nil, http.StatusInternalServerError, constants.DEFAULT500, "Error when creating data, could not convert year to int")
+
 		}
 
 		// Ignore years outside of scope defined by user
@@ -94,8 +95,7 @@ func CreateMeanCountryOutputFromData(w http.ResponseWriter, data map[string]inte
 		// Try to convert year to an int
 		yearInt, err := strconv.Atoi(year)
 		if err != nil {
-			http.Error(w, "Error when creating data, could not convert year to int", http.StatusInternalServerError)
-			return nil, err
+			return nil, NewError(nil, http.StatusInternalServerError, constants.DEFAULT500, "Error when creating data, could not convert year to int")
 		}
 
 		// Ignore years outside of scope defined by user
