@@ -20,7 +20,7 @@ func Status(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	// Generate status response
-	statusRes, err := createStatusResponse(Start)
+	statusRes, err := createStatusResponse(constants.COUNTRIES_API_URL, Start)
 	if err != nil {
 		return err
 	}
@@ -40,9 +40,9 @@ Creates the status json response.
 	start - Start time of service
 	return - Returns json of status response
 */
-func createStatusResponse(start time.Time) (structs.Status, error) {
+func createStatusResponse(countriesApiURL string, start time.Time) (structs.Status, error) {
 	// Get request from countries api
-	resCountry, err := gateway.HttpRequestFromUrl(constants.COUNTRIES_API_URL, http.MethodHead)
+	resCountry, err := gateway.HttpRequestFromUrl(countriesApiURL, http.MethodHead)
 	if err != nil {
 		return structs.Status{}, structs.NewError(err, http.StatusGatewayTimeout, "Error when accessing restcountries api", "")
 	}
