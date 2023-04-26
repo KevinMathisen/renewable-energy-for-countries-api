@@ -34,7 +34,6 @@ func TestDBConnection(t *testing.T) {
 		},
 	}
 
-	
 	DeleteAllDocumentsInCollectionFromFirestore(constants.WEBHOOKS_COLLECTION)
 
 	err := AppendDataToFirestore(data, constants.WEBHOOKS_COLLECTION)
@@ -68,4 +67,10 @@ func TestDBConnection(t *testing.T) {
 
 	DeleteDocument("FpLSjFbcXoEFfRsW", constants.WEBHOOKS_COLLECTION)
 	assert.False(t, DocumentInCollection("FpLSjFbcXoEFfRsW", constants.WEBHOOKS_COLLECTION), "Webhook 1 still in collection")
+
+	amountOfWebhooks, err := CountWebhooks()
+	if err != nil {
+		t.Errorf("Couldn't get webhooks from firestore: " + err.Error())
+	}
+	assert.Equal(t, 1, amountOfWebhooks)
 }
