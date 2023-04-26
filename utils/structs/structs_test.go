@@ -1,7 +1,6 @@
 package structs_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -12,37 +11,8 @@ import (
 	"assignment2/utils/structs"
 )
 
-type mockResponseWriter struct {
-	headers http.Header
-	buffer  *bytes.Buffer
-}
-
-func newMockResponseWriter() *mockResponseWriter {
-	return &mockResponseWriter{
-		headers: make(http.Header),
-		buffer:  bytes.NewBuffer(nil),
-	}
-}
-
-func (m *mockResponseWriter) Header() http.Header {
-	return m.headers
-}
-
-func (m *mockResponseWriter) Write(data []byte) (int, error) {
-	return m.buffer.Write(data)
-}
-
-func (m *mockResponseWriter) WriteHeader(statusCode int) {
-	// do nothing
-}
-
-func (m *mockResponseWriter) Bytes() []byte {
-	return m.buffer.Bytes()
-}
-
 func TestCreateCountryOutputFromData(t *testing.T) {
 
-	w := newMockResponseWriter()
 	isoCode := "NOR"
 	startYear := 1965
 	endYear := 2021
@@ -109,7 +79,7 @@ func TestCreateCountryOutputFromData(t *testing.T) {
 	}
 
 	// Call the function being tested
-	output, err := structs.CreateCountryOutputFromData(w, data, isoCode, startYear, endYear)
+	output, err := structs.CreateCountryOutputFromData(data, isoCode, startYear, endYear)
 	jsonOutput, _ := json.Marshal(output)
 
 	// Check for errors
@@ -140,6 +110,31 @@ func TestCreateCountryOutputFromData(t *testing.T) {
 
 		if intYear > endYear || intYear < startYear {
 			t.Errorf("CreateCountryOutputFromData() returned unexpected output. \nExpected Year Range: " + strconv.Itoa(endYear) + "-" + strconv.Itoa(startYear) + "\nActual year: " + strconv.Itoa(intYear))
+		}
+	}
+}
+
+func TestCreateMeanCountryOutputFromData(t *testing.T) {
+
+}
+
+func TestMean(t *testing.T) {
+	//Establish a number of tests consisting of a list of values, and the correct mean value of the list.
+	tests := []struct {
+		input []float64
+		want  float64
+	}{
+		{[]float64{1, 2, 3}, 2},
+		{[]float64{0, 0, 0}, 0},
+		{[]float64{-1, 1}, 0},
+		{[]float64{}, 0},
+	}
+
+	//Feed the values into the mean function and report eventual anomalies.
+	for _, test := range tests {
+		got := structs.Mean(test.input)
+		if got != test.want {
+			t.Errorf("mean(%v) = %v; want %v", test.input, got, test.want)
 		}
 	}
 }
