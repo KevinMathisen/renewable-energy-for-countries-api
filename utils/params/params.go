@@ -210,8 +210,8 @@ func GetWebhookFromRequest(w http.ResponseWriter, r *http.Request) (structs.Webh
 		return webhook, structs.NewError(err, http.StatusBadRequest, "Invalid request body for registration of webhook", "There was an error when decoding webhook from json.")
 	}
 
-	if webhook.Url == "" || webhook.Country == "" || webhook.Calls <= 0 {
-		return webhook, structs.NewError(nil, http.StatusBadRequest, "Invalid request body for registration of webhook, all fields must have a value", "There was an error when decoding webhook from json.")
+	if webhook.Url == "" || webhook.Calls <= 0 {
+		return webhook, structs.NewError(nil, http.StatusBadRequest, "Invalid request body for registration of webhook, webhook URL and Calls must have a value", "There was an error when decoding webhook from json.")
 	}
 
 	// Dont allow registration of webhook for country which does not exist in database
