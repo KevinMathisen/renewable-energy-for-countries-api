@@ -144,6 +144,31 @@ func TestCreateCountryOutputFromData(t *testing.T) {
 	}
 }
 
+func TestCreateMeanCountryOutputFromData(t *testing.T) {
+
+}
+
+func TestMean(t *testing.T) {
+	//Establish a number of tests consisting of a list of values, and the correct mean value of the list.
+	tests := []struct {
+		input []float64
+		want  float64
+	}{
+		{[]float64{1, 2, 3}, 2},
+		{[]float64{0, 0, 0}, 0},
+		{[]float64{-1, 1}, 0},
+		{[]float64{}, 0},
+	}
+
+	//Feed the values into the mean function and report eventual anomalies.
+	for _, test := range tests {
+		got := structs.Mean(test.input)
+		if got != test.want {
+			t.Errorf("mean(%v) = %v; want %v", test.input, got, test.want)
+		}
+	}
+}
+
 func TestNewError(t *testing.T) {
 	// Test case 1: Create a new error with a non-nil original error
 	origErr := errors.New("original error")
