@@ -67,9 +67,9 @@ const HISTORY_NEIGHBOURS_SORT_MEAN_LAST = 6.004957597297297 //Percentage of the 
 
 const HISTORY_ALL_COUNTRIES = 79 //All different countries in the dataset
 
-const HISTORY_ALL_SORT_LAST_CODE = "SAU"
-const HISTORY_ALL_SORT_LAST_NAME = "Saudi Arabia"
-const HISTORY_ALL_SORT_LAST_PERCENTAGE = 0.0013665377020357142
+const HISTORY_ALL_SORT_LAST_CODE = "SAU"                       //The ISO code of the last country in the list when sorting all countries by percentage
+const HISTORY_ALL_SORT_LAST_NAME = "Saudi Arabia"              //The name of the last country in the list when sorting all countries by percentage
+const HISTORY_ALL_SORT_LAST_PERCENTAGE = 0.0013665377020357142 //The percentage of the last country in the list when sorting all countries by percentage
 
 /*
 TEST COVERAGE:
@@ -121,6 +121,12 @@ TEST COVERAGE:
 	Cheacks amount of returned objects
 	Tests percentage value of second recieved object (Norway)
 
+/energy/v1/renewables/history/NOR?neighbours=true&mean=true&sortByValue=true
+	Checks whether recieved object has year value or not
+	Cheacks amount of returned objects
+	Tests all values of the first instance
+	Tests all values of the last instance
+
 /energy/v1/renewables/history/
 	Cheacks amount of returned objects
 
@@ -129,7 +135,6 @@ TEST COVERAGE:
 	Cheacks amount of returned objects
 	Tests all values of the first instance
 	Tests all values of the last instance
-
 */
 
 /*
@@ -187,6 +192,19 @@ func testLen(s []structs.CountryOutput, expected int) string {
 
 /*
 Tests the length of given slice, then tests the values of the first object, then the values of the last
+
+	s:			the slice of objects to be operated on
+	objects:	the amount of objects to be expected in s
+	fISO:		the expected code of the fist object in s
+	fName:		the expected name of the fist object in s
+	fYear:		the expected year of the fist object in s
+	fPer:		the expected percentage of the fist object in s
+	lISO:		the expected code of the last object in s
+	lName:		the expected name of the last object in s
+	lYear:		the expected year of the last object in s
+	lPer:		the expected percentage of the last object in s
+
+	return:		a message explaining whats wrong if the test failed, empty string if test succeeded
 */
 func testLenLastFirst(s []structs.CountryOutput, objects int, fISO string, fName string, fYear int, fPer float64, lISO string, lName string, lYear int, lPer float64) string {
 	//Checks that all instances of the country is recieved
@@ -210,6 +228,26 @@ func testLenLastFirst(s []structs.CountryOutput, objects int, fISO string, fName
 	}
 
 	return ""
+}
+
+/*
+Handles opening and closing of server, alongside creating and closing client
+Then calls given function for testing individual endpoints
+*/
+func handleHistoryLogistics(t *testing.T, f func(*testing.T, string, http.Client)) {
+	handler := RootHandler(RenewablesHistory)
+
+	server := httptest.NewServer(http.HandlerFunc(handler.ServeHTTP))
+	defer server.Close()
+
+	client := http.Client{}
+	defer client.CloseIdleConnections()
+
+	log.Println("URL: ", server.URL)
+
+	url := server.URL + constants.RENEWABLES_HISTORY_PATH
+
+	f(t, url, client)
 }
 
 func TestHttpGetRenewablesHistory(t *testing.T) {
@@ -239,26 +277,6 @@ func TestHttpGetRenewablesHistory(t *testing.T) {
 	handleHistoryLogistics(t, historyAll)
 	handleHistoryLogistics(t, historyAllSort)
 
-}
-
-/*
-Handles opening and closing of server, alongside creating and closing client
-Then calls given function for testing individual endpoints
-*/
-func handleHistoryLogistics(t *testing.T, f func(*testing.T, string, http.Client)) {
-	handler := RootHandler(RenewablesHistory)
-
-	server := httptest.NewServer(http.HandlerFunc(handler.ServeHTTP))
-	defer server.Close()
-
-	client := http.Client{}
-	defer client.CloseIdleConnections()
-
-	log.Println("URL: ", server.URL)
-
-	url := server.URL + constants.RENEWABLES_HISTORY_PATH
-
-	f(t, url, client)
 }
 
 //------------------------------ SINGLE COUNTRY TESTS ------------------------------
@@ -504,6 +522,7 @@ func historyNeighboursMeanSort(t *testing.T, url string, client http.Client) {
 		t.Fatal("Mean of an object is not supposed to have year value.")
 	}
 
+	//The code in testLenFirstLast but refactored to not include country year:
 	//Tests the amount of recieved objects, then tests the values of the first and then the last object
 	if err2 := testLen(res, HISTORY_NEIGHBOURS_AMOUNT); err2 != "" {
 		t.Fatal(err2)
@@ -559,6 +578,7 @@ func historyAllSort(t *testing.T, url string, client http.Client) {
 		t.Fatal("Mean of an object is not supposed to have year value.")
 	}
 
+	//The code in testLenFirstLast but refactored to not include country year:
 	//Tests the amount of recieved objects, then tests the values of the first and then the last object
 	if err2 := testLen(res, HISTORY_ALL_COUNTRIES); err2 != "" {
 		t.Fatal(err2)
