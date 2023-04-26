@@ -1,7 +1,6 @@
 package structs_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -11,34 +10,6 @@ import (
 
 	"assignment2/utils/structs"
 )
-
-type mockResponseWriter struct {
-	headers http.Header
-	buffer  *bytes.Buffer
-}
-
-func newMockResponseWriter() *mockResponseWriter {
-	return &mockResponseWriter{
-		headers: make(http.Header),
-		buffer:  bytes.NewBuffer(nil),
-	}
-}
-
-func (m *mockResponseWriter) Header() http.Header {
-	return m.headers
-}
-
-func (m *mockResponseWriter) Write(data []byte) (int, error) {
-	return m.buffer.Write(data)
-}
-
-func (m *mockResponseWriter) WriteHeader(statusCode int) {
-	// do nothing
-}
-
-func (m *mockResponseWriter) Bytes() []byte {
-	return m.buffer.Bytes()
-}
 
 func TestCreateCountryOutputFromData(t *testing.T) {
 
