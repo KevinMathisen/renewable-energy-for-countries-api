@@ -323,9 +323,9 @@ func CountWebhooks() (int, error) {
 /*
 Delete all documents in cache collection
 */
-func DeleteAllCachedRequestsFromFirestore() {
+func DeleteAllDocumentsInCollectionFromFirestore(collection string) {
 	// Get reference to documents in collection
-	iter := firebaseClient.Collection(constants.CACHE_COLLECTION).DocumentRefs(firestoreContext)
+	iter := firebaseClient.Collection(collection).DocumentRefs(firestoreContext)
 
 	for {
 		// Try to go to next document in collection
@@ -381,7 +381,7 @@ func sleepAndRestartDb() {
 	time.Sleep(1 * time.Minute)
 
 	err := InitializeFirestore(credentials) //Reattempt database connection
-	dbRestartTimerMutex.Unlock()                           //Give away lock regardless of output
+	dbRestartTimerMutex.Unlock()            //Give away lock regardless of output
 	if err != nil {
 		sleepAndRestartDb() //On database failure, restart function
 	} else {
