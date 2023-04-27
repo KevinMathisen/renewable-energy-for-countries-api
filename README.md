@@ -88,10 +88,10 @@ The application can also be run locally using the "go run" command. This method 
 2. Create a new folder within the repository root named "credentials". Place the Firebase service account JSON within this folder.
 3. Rename the service account file to "production_credentials.json".
 4. Open the file `/utils/constants/constants.go`. Change the `CREDENTIALS_FILE` constant variable to equal `./credentials/production_credentials.json`.
-5. In the command line interface, enter the following commands: `go get assignment2/utils/db`, `go get assignment2/handlers`, and `go get github.com/stretchr/testify/assert`. This will install external libraries necessary to run the application.
-6. Enter `go run ./cmd/main.go` in the command line interface to compile and run the application.
-7. The API is now available at "localhost:8080", or a different port if specified in the environment.
-
+5. (OPTIONAL) To enable testing, the value for `CREDENTIALS_FILE_TESTING` must be set to `../credentials/testing_credentials.json`.
+6. In the command line interface, enter the following commands: `go get assignment2/utils/db`, `go get assignment2/handlers`, and `go get github.com/stretchr/testify/assert`. This will install external libraries necessary to run the application.
+7. Enter `go run ./cmd/main.go` in the command line interface to compile and run the application.
+8. The API is now available at "localhost:8080", or a different port if specified in the environment.
 
 # How to use the API
 
