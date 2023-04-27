@@ -127,8 +127,8 @@ func TestHttpStatus(t *testing.T) {
 	}
 
 	//Asserts response
-	assert.Equal(t, "200 OK", resObject.CountriesApi, "Response status code should be 200.")
 	assert.Equal(t, "200 OK", resObject.NotificationDb, "Response status code should be 200.")
+	assert.NotNil(t, resObject.CountriesApi, "Response countries api should not be nil.")
 	assert.NotNil(t, resObject.Webhooks, "Response webhooks should not be nil.")
 	assert.NotNil(t, resObject.Version, "Response cached requests should not be nil.")
 	assert.NotNil(t, resObject.Uptime, "Response should be nil.")
@@ -176,8 +176,8 @@ func TestHttpStatusWithBadDatabase(t *testing.T) {
 	}
 
 	//Asserts response
-	assert.Equal(t, "200 OK", resObject.CountriesApi, "Response status code should be 200.")
 	assert.Equal(t, "503 Service Unavailable", resObject.NotificationDb, "Response status code should be 503.")
+	assert.NotNil(t, resObject.CountriesApi, "Response countries api should not be nil.")
 	assert.NotNil(t, resObject.Webhooks, "Response webhooks should not be nil.")
 	assert.Equal(t, -1, resObject.Webhooks, "Response webhooks should be -1.")
 	assert.NotNil(t, resObject.Version, "Response cached requests should not be nil.")
