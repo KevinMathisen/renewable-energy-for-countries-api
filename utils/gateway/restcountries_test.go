@@ -345,6 +345,7 @@ func TestGetIsoCodeFromName(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	// Expected response
 	expected := "NOR"
 	isoCode, err := GetIsoCodeFromName("Norway", ts.URL)
 	if err != nil {
@@ -375,6 +376,7 @@ func TestGetIsoCodeFromNameError(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	// Test if error is returned
 	_, err := GetIsoCodeFromName("Norway", ts.URL)
 	if err == nil {
 		t.Errorf("Expected error, got nil")
@@ -414,6 +416,7 @@ func TestGetNeighbours(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	// Expected response
 	expected := []string{"FIN", "SWE", "RUS"}
 	neighbours, err := GetNeighbours("NOR", ts.URL)
 	if err != nil {
@@ -452,6 +455,7 @@ func TestGetNeighboursNoBorders(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	// Expected response
 	var expected []string
 	neighbours, err := GetNeighbours("NOR", ts.URL)
 	if err != nil {
@@ -482,6 +486,7 @@ func TestGetNeighboursError(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	// Test if error is returned
 	_, err := GetNeighbours("NOR", ts.URL)
 	if err == nil {
 		t.Errorf("Expected error, got nil")
@@ -522,11 +527,14 @@ func TestGetCountry(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	// Expected response
 	expected := &structs.Country{
 		Name:    "Norway",
 		IsoCode: "NOR",
 		Borders: []string{"FIN", "SWE", "RUS"},
 	}
+
+	// Test if response body matches expected
 	country, err := getCountry(ts.URL + constants.COUNTRY_CODE_SEARCH_PATH + "NOR")
 	if err != nil {
 		t.Errorf("Expected no error, got %s", err)

@@ -1,7 +1,7 @@
 package structs
 
 /*
-* Struct for encoding json response for RENEWABLES_CURRENT and RENEWABLES_HISTORY endpoints.
+Struct for encoding json response for RENEWABLES_CURRENT and RENEWABLES_HISTORY endpoints.
  */
 type CountryOutput struct {
 	Name       string  `json:"name"`
@@ -11,7 +11,7 @@ type CountryOutput struct {
 }
 
 /*
-* Countries as stored in country cache and for interactions with restcountires API.
+Countries as stored in country cache and for interactions with restcountires API.
  */
 type Country struct {
 	Name    string   `json:"name"`
@@ -20,7 +20,7 @@ type Country struct {
 }
 
 /*
-* Struct for encoding JSON response for deleting and viewing a webhook/all webhooks in Notification endpoint.
+Struct for encoding JSON response for deleting and viewing a webhook/all webhooks in Notification endpoint.
  */
 type Webhook struct {
 	WebhookId string `json:"webhook_id"`

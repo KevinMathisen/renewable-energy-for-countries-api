@@ -43,13 +43,15 @@ func Contains(slice []string, value string) bool {
 Removes duplicate string values from an array before returning them
 */
 func RemoveDuplicates(arr []string) []string {
+	// Create map to keep track of encountered strings
 	encountered := map[string]bool{}
 	result := []string{}
 
+	// Add all strings from array to encountered map
 	for _, value := range arr {
-		if !encountered[value] {
-			encountered[value] = true
-			result = append(result, value)
+		if !encountered[value] { // If string has not been encountered yet
+			encountered[value] = true      // Add string to encountered map
+			result = append(result, value) // Add string to result
 		}
 	}
 

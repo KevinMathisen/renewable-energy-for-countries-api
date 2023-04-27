@@ -11,13 +11,21 @@ import (
 // Map of countries that link country ISO codes to their respective structs containing all information.
 var rcCache = make(map[string]*structs.Country)
 
+/*
+Clears the country cache.
+*/
 func clearRcCache() {
 	rcCache = make(map[string]*structs.Country)
 }
 
 /*
-* Returns a country struct based on the ISO code of the country.
- */
+Returns a country struct based on the ISO code of the country.
+
+	iso			- The ISO code of the country to get
+	apiURL		- The URL to the restcountries API
+
+	returns		- A pointer to a country struct containing country information
+*/
 func GetCountryByIso(iso, apiURL string) (*structs.Country, error) {
 
 	// Check if country ISO is in map
@@ -42,8 +50,13 @@ func GetCountryByIso(iso, apiURL string) (*structs.Country, error) {
 }
 
 /*
-* Function takes a country name as input. It will convert it into an iso code, and then
- */
+Get country from restcountries API, based on the name.
+
+	name		- The name of the country to get
+	apiURL		- The URL to the restcountries API
+
+	returns		- A pointer to a country struct containing country information
+*/
 func GetCountryByName(name string, apiURL string) (*structs.Country, error) {
 
 	// Check if country name is in map
@@ -69,7 +82,12 @@ func GetCountryByName(name string, apiURL string) (*structs.Country, error) {
 }
 
 /*
-Get isocode from country name
+Get isocode from country name.
+
+	countryName	- The name of the country to get the iso code of
+	apiURL		- The URL to the restcountries API
+
+	returns		- The iso code of the country
 */
 func GetIsoCodeFromName(countryName string, apiURL string) (string, error) {
 
@@ -93,6 +111,13 @@ func GetNeighbours(isoCode string, apiURL string) ([]string, error) {
 	return country.Borders, nil
 }
 
+/*
+Gets a country from restcountries API, based on the URL.
+
+	url		 - The URL to the restcountries API, with the search path and country name appended
+
+	returns	 - A slice of country maps containing all information about the countries
+*/
 func getInterface(url string) ([]map[string]interface{}, error) {
 
 	//Send get request to API
@@ -111,6 +136,13 @@ func getInterface(url string) ([]map[string]interface{}, error) {
 	return resObject, nil
 }
 
+/*
+Gets a country struct from the restcountries API, based on the URL.
+
+	url		 - The URL to the restcountries API
+
+	returns	 - A pointer to a country struct containing all information about the country
+*/
 func getCountry(url string) (*structs.Country, error) {
 
 	// Get response from API
@@ -130,6 +162,10 @@ func getCountry(url string) (*structs.Country, error) {
 
 /*
 Get a list of all the country ISO codes that border the country given
+
+	resObject	 - The response object from the restcountries API
+
+	returns		 - A list of strings containing the ISO codes of the countries that border the country given
 */
 func getCountryBorder(resObject []map[string]interface{}) []string {
 	var borders []string

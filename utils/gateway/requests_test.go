@@ -26,6 +26,7 @@ func TestRespondToGetRequestWithJSON(t *testing.T) {
 			Msg:   "Hello World!",
 		}
 
+		// Respond to request with JSON
 		RespondToGetRequestWithJSON(w, body, 200)
 	}))
 
@@ -38,6 +39,7 @@ func TestRespondToGetRequestWithJSON(t *testing.T) {
 	}
 	defer res.Body.Close()
 
+	// Read response body
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		t.Fatal(err)
@@ -70,6 +72,7 @@ func TestHttpRequestFromUrl(t *testing.T) {
 			Msg:   "Hello World!",
 		}
 
+		// Respond to request with JSON
 		RespondToGetRequestWithJSON(w, body, 200)
 	}))
 
@@ -82,6 +85,7 @@ func TestHttpRequestFromUrl(t *testing.T) {
 	}
 	defer res.Body.Close()
 
+	// Read response body
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		t.Fatal(err)
@@ -103,7 +107,7 @@ func TestHttpRequestFromUrl(t *testing.T) {
 Tests the HttpRequestFromUrl function with a non-existing URL
 */
 func TestHttpRequestFromUrlNonExistingUrl(t *testing.T) {
-	// Make a request to the test server
+	// Make a request to a non-existing URL
 	_, err := HttpRequestFromUrl("http://localhost:1234", "GET")
 	if err == nil {
 		t.Fatal("Expected error, but got nil.")
@@ -114,9 +118,9 @@ func TestHttpRequestFromUrlNonExistingUrl(t *testing.T) {
 Tests the PostToWebhook function
 */
 func TestPostToWebhook(t *testing.T) {
-	count := 0
-	webhookCount := 0
-	apiCount := 0
+	count := 0        // Count number of requests
+	webhookCount := 0 // Count number of webhook requests
+	apiCount := 0     // Count number of API requests
 	// Create a test server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		count++
@@ -173,6 +177,7 @@ func TestPostToWebhook(t *testing.T) {
 
 	defer ts.Close()
 
+	// Define data to be sent to webhook
 	data := make(map[string]interface{})
 
 	data["url"] = ts.URL + "/webhook"
@@ -180,6 +185,7 @@ func TestPostToWebhook(t *testing.T) {
 	data["year"] = int64(-1)
 	data["invocations"] = int64(5)
 
+	// Post data to webhook
 	PostToWebhook(data, "TEST", ts.URL+"/api")
 
 	assert.Equal(t, 1, webhookCount, "Webhook should be called once.")

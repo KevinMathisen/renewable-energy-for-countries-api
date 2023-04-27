@@ -17,6 +17,8 @@ func TestDBConnection(t *testing.T) {
 	defer CloseFirebaseClient()
 
 	// Test connection
+
+	// Create data to append
 	data := map[string]map[string]interface{}{
 		"FpLSjFbcXoEFfRsW": {
 			"calls":       int64(5),
@@ -34,13 +36,16 @@ func TestDBConnection(t *testing.T) {
 		},
 	}
 
+	// Delete all documents in collection
 	DeleteAllDocumentsInCollectionFromFirestore(constants.WEBHOOKS_COLLECTION)
 
+	// Test append
 	err := AppendDataToFirestore(data, constants.WEBHOOKS_COLLECTION)
 	if err != nil {
 		t.Errorf("Couldn't append data to firestore: " + err.Error())
 	}
 
+	// Test read
 	webhook1, err := GetDocumentFromFirestore("FpLSjFbcXoEFfRsW", constants.WEBHOOKS_COLLECTION)
 	if err != nil {
 		t.Errorf("Couldn't get document from firestore: " + err.Error())
@@ -53,6 +58,7 @@ func TestDBConnection(t *testing.T) {
 	assert.Equal(t, data["FpLSjFbcXoEFfRsW"], webhook1, "Webhook 1 not equal")
 	assert.Equal(t, data["QfwLosaJKVANmUJk"], webhook2, "Webhook 2 not equal")
 
+	// Test get all
 	collection, err := GetAllDocumentInCollectionFromFirestore(constants.WEBHOOKS_COLLECTION)
 	if err != nil {
 		t.Errorf("Couldn't get collection from firestore: " + err.Error())
@@ -65,9 +71,11 @@ func TestDBConnection(t *testing.T) {
 	assert.True(t, DocumentInCollection("FpLSjFbcXoEFfRsW", constants.WEBHOOKS_COLLECTION), "Webhook 1 not in collection")
 	assert.True(t, DocumentInCollection("QfwLosaJKVANmUJk", constants.WEBHOOKS_COLLECTION), "Webhook 2 not in collection")
 
+	// Test delete
 	DeleteDocument("FpLSjFbcXoEFfRsW", constants.WEBHOOKS_COLLECTION)
 	assert.False(t, DocumentInCollection("FpLSjFbcXoEFfRsW", constants.WEBHOOKS_COLLECTION), "Webhook 1 still in collection")
 
+	// Test count webhooks
 	amountOfWebhooks, err := CountWebhooks()
 	if err != nil {
 		t.Errorf("Couldn't get webhooks from firestore: " + err.Error())

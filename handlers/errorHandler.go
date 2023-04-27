@@ -6,6 +6,10 @@ import (
 	"net/http"
 )
 
+/*
+RootHandler is a wrapper for all handlers in the service.
+It handles all errors in the same place, and logs them.
+*/
 type RootHandler func(http.ResponseWriter, *http.Request) error
 
 // Handles all errors in the same place.

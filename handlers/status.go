@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// Create time of service start variable to calculate uptime
+// Variable for time of service start, used to calculate uptime
 var Start time.Time
 
 /*

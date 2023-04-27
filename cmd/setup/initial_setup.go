@@ -9,6 +9,7 @@ import (
 	"strconv"
 )
 
+// Datapoint structure for renewables data. Used for importing data from csv file
 type datapoint struct {
 	Entity     string `json:"Entity"`
 	Code       string `json:"code"`

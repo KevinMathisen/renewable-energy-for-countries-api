@@ -76,7 +76,9 @@ var countryData = map[string]interface{}{
 	"name": "Norway",
 }
 
-// Unit test for CreateCountryOutputFromData() in create_structs file
+/*
+Unit test for CreateCountryOutputFromData() in create_structs file
+*/
 func TestCreateCountryOutputFromData(t *testing.T) {
 
 	//Example data
@@ -121,7 +123,9 @@ func TestCreateCountryOutputFromData(t *testing.T) {
 	}
 }
 
-// Unit test for CreateMeanCountryOutputFromData() in create_structs file
+/*
+Unit test for CreateMeanCountryOutputFromData() in create_structs file
+*/
 func TestCreateMeanCountryOutputFromData(t *testing.T) {
 
 	//Example data
@@ -152,7 +156,9 @@ func TestCreateMeanCountryOutputFromData(t *testing.T) {
 	}
 }
 
-// Unit test for CreateWebhookFromData() in create_structs file
+/*
+Unit test for CreateWebhookFromData() in create_structs file
+*/
 func TestCreateWebhookFromData(t *testing.T) {
 	// Define test data as a slice of maps, where each map represents a webhook
 	data := []map[string]interface{}{
@@ -203,7 +209,9 @@ func TestCreateWebhookFromData(t *testing.T) {
 	}
 }
 
-// Unit test for Mean() in create_structs file
+/*
+Unit test for Mean() in create_structs file
+*/
 func TestMean(t *testing.T) {
 	//Variable storing 4 sets of test data, as well as the expected response for each set
 	tests := []struct {
@@ -225,7 +233,9 @@ func TestMean(t *testing.T) {
 	}
 }
 
-// Unit test for NewError() in error_struct file
+/*
+Unit test for NewError() in error_struct file
+*/
 func TestNewError(t *testing.T) {
 	// Test case 1: Create a new error with a non-nil original error
 
@@ -300,7 +310,9 @@ func TestNewError(t *testing.T) {
 	}
 }
 
-// Unit test for WrappedError_Error() in error_struct file
+/*
+Unit test for WrappedError_Error() in error_struct file
+*/
 func TestWrappedError_Error(t *testing.T) {
 	// Create a new instance of WrappedError with a specific error message
 	errMsg := "Original Error Message"
