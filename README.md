@@ -34,7 +34,7 @@ All the requirements are implemented, including all advanced tasks.
   * When testing the application uses stubbing of the third-party endpoints to ensure test reliability (removing dependency on external services).
   * Testing includes testing of handlers using the httptest package, as well as unit tests. 
   * Test coverage of packages: 
-    * handlers: 67.3% 
+    * handlers: 69.4% 
     * structs: 90.5%
     * gateway: 91.6%
     * div: 100%
