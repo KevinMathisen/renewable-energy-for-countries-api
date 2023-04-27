@@ -6,13 +6,21 @@ import (
 	"assignment2/utils/gateway"
 	"assignment2/utils/params"
 	"assignment2/utils/structs"
+	"fmt"
 	"net/http"
+	"time"
 )
 
 /*
 Handler for history endpoint
 */
 func RenewablesHistory(w http.ResponseWriter, r *http.Request) error {
+	// Check if database is online. If not, give standard error response.
+	if !db.DbState {
+		usrMsg := fmt.Sprintf("The database is currently unavailable. Please try again later. Reattempting database connection in %v seconds.", time.Until(db.DbRestartTimerStartTime.Add(1*time.Minute)).Round(time.Second)) //Create message with time since timer was activated
+		return structs.NewError(nil, http.StatusServiceUnavailable, usrMsg, "")      
+	}
+	
 	var response []structs.CountryOutput
 
 	// Send error message if request method is not get
