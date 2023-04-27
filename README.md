@@ -33,7 +33,12 @@ All the requirements are implemented, including all advanced tasks.
 * All endpoints are tested using automated testing facilities provided by Golang. 
   * When testing the application uses stubbing of the third-party endpoints to ensure test reliability (removing dependency on external services).
   * Testing includes testing of handlers using the httptest package, as well as unit tests. 
-  * Test coverage of TODO ----------------- !!!!!!!!!!! percent.
+  * Test coverage of packages: 
+    * handlers: 67.3% 
+    * structs: 90.5%
+    * gateway: 91.6%
+    * div: 100%
+    * db: 45.9%
 * Repeated invocations for a given country and date are cached on firebase to minimise invocation on the third-party libraries. These are deleted if the cached requests are older than a constant that can be set by the user. The default value is 4 hours. 
 
 Allocation of tasks: 

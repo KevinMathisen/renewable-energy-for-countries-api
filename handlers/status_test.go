@@ -86,6 +86,9 @@ func TestCreateStatusResponseBadUrl(t *testing.T) {
 	assert.IsType(t, float64(0), res.Uptime, "Response uptime should be of type float64.")
 }
 
+/*
+Tests the status handler
+*/
 func TestHttpStatus(t *testing.T) {
 	// Set up Firestore
 	db.InitializeFirestore(constants.CREDENTIALS_FILE_TESTING)
@@ -122,4 +125,62 @@ func TestHttpStatus(t *testing.T) {
 	if err != nil {
 		t.Fatal("Error during decoding:" + err.Error())
 	}
+
+	//Asserts response
+	assert.Equal(t, "200 OK", resObject.NotificationDb, "Response status code should be 200.")
+	assert.NotNil(t, resObject.CountriesApi, "Response countries api should not be nil.")
+	assert.NotNil(t, resObject.Webhooks, "Response webhooks should not be nil.")
+	assert.NotNil(t, resObject.Version, "Response cached requests should not be nil.")
+	assert.NotNil(t, resObject.Uptime, "Response should be nil.")
+	assert.IsType(t, float64(0), resObject.Uptime, "Response uptime should be of type float64.")
+}
+
+/*
+Tests the status handler with a bad database connection
+*/
+func TestHttpStatusWithBadDatabase(t *testing.T) {
+	// Set up Firestore
+	db.InitializeFirestore(constants.CREDENTIALS_FILE_TESTING)
+	// Clears cache
+	db.DeleteAllDocumentsInCollectionFromFirestore(constants.CACHE_COLLECTION)
+	// Close down client before service is done running
+	db.CloseFirebaseClient()
+
+	//Creates instance of Status handler
+	handler := RootHandler(Status)
+
+	//Runs handler instance as server
+	server := httptest.NewServer(http.HandlerFunc(handler.ServeHTTP))
+	defer server.Close()
+
+	//Creates client to speak with server
+	client := http.Client{}
+	defer client.CloseIdleConnections()
+
+	log.Println("URL: ", server.URL)
+
+	url := server.URL + constants.STATUS_PATH
+	log.Println("Testing URL: \"" + url + "\"...")
+
+	//Sends Get request
+	res, err := client.Get(url)
+	if err != nil {
+		t.Fatal("Get request to URL failed:" + err.Error())
+	}
+
+	var resObject structs.Status
+	//Recieves values, and decodes into slice
+	err = json.NewDecoder(res.Body).Decode(&resObject)
+	if err != nil {
+		t.Fatal("Error during decoding:" + err.Error())
+	}
+
+	//Asserts response
+	assert.Equal(t, "503 Service Unavailable", resObject.NotificationDb, "Response status code should be 503.")
+	assert.NotNil(t, resObject.CountriesApi, "Response countries api should not be nil.")
+	assert.NotNil(t, resObject.Webhooks, "Response webhooks should not be nil.")
+	assert.Equal(t, -1, resObject.Webhooks, "Response webhooks should be -1.")
+	assert.NotNil(t, resObject.Version, "Response cached requests should not be nil.")
+	assert.NotNil(t, resObject.Uptime, "Response should be nil.")
+	assert.IsType(t, float64(0), resObject.Uptime, "Response uptime should be of type float64.")
 }
