@@ -35,7 +35,7 @@ const WEBHOOKS_COLLECTION = "webhooks"     // Name of webhooks collection
 const CACHE_COLLECTION = "cache"           // Name of cache collection
 
 // Name of files
-const RENEWABLES_CSV_FILE = "./res/renewable-share-energy.csv"             // Path to CSV file
+const RENEWABLES_CSV_FILE = "/go/src/app/res/renewable-share-energy.csv"   // Path to CSV file
 const CREDENTIALS_FILE = "/credentials/production_credentials.json"        // Path to credentials file
 const CREDENTIALS_FILE_TESTING = "../credentials/testing_credentials.json" // Path to credentials file for testing
 const RESTCOUNTRIES_MOCK = "./res/restcountries-mock.json"                 // Path to mock file for restcountries API
