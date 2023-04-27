@@ -42,14 +42,14 @@ Allocation of tasks:
 |All endpoints | Kevin |
 |Error handling | Mostly Raphael, also Sondre and Kevin  |
 |Webhooks | Kevin |
-|Restcountries interaction | Raphael |
+|Restcountries interaction | Mostly Raphael, also Sondre |
 |Cache | Kevin |
 |Firestore setup and connectivity | Kevin |
 |Http testing | Torje |
 |Unit testing | Sondre, Torje |
 |Stubbing of third-party services| Sondre |
-|Openstack deployment | Rapahael  |
-|Dockerfile and docker compose | Rapahael  |
+|Openstack deployment | Raphael  |
+|Dockerfile and docker compose | Raphael  |
 |Readme.md | Kevin, Raphael |
 |Debugging | Everyone |
 

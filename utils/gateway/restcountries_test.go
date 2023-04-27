@@ -523,8 +523,8 @@ func TestGetCountry(t *testing.T) {
 	defer ts.Close()
 
 	expected := &structs.Country{
-		Name:      "Norway",
-		IsoCode:   "NOR",
+		Name:    "Norway",
+		IsoCode: "NOR",
 		Borders: []string{"FIN", "SWE", "RUS"},
 	}
 	country, err := getCountry(ts.URL + constants.COUNTRY_CODE_SEARCH_PATH + "NOR")

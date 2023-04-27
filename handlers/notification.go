@@ -19,9 +19,9 @@ func Notification(w http.ResponseWriter, r *http.Request) error {
 	// Check if database is online. If not, give standard error response.
 	if !db.DbState {
 		usrMsg := fmt.Sprintf("The database is currently unavailable. Please try again later. Reattempting database connection in %v seconds.", time.Until(db.DbRestartTimerStartTime.Add(1*time.Minute)).Round(time.Second)) //Create message with time since timer was activated
-		return structs.NewError(nil, http.StatusServiceUnavailable, usrMsg, "")      
+		return structs.NewError(nil, http.StatusServiceUnavailable, usrMsg, "")
 	}
-	
+
 	var err error
 
 	// Send request to different functions based on method

@@ -21,9 +21,9 @@ func RespondToGetRequestWithJSON(w http.ResponseWriter, jsonBody interface{}, st
 	// Encode content and write to response
 	err := json.NewEncoder(w).Encode(jsonBody)
 	if err != nil {
-		return structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "There was an error when decoding JSON.")
+		return structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "There was an error when encoding JSON.")
 	}
-	
+
 	return nil
 }
 
