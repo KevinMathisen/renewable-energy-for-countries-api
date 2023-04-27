@@ -1,4 +1,4 @@
-package gateway
+﻿package gateway
 
 import (
 	"assignment2/utils/constants"
@@ -23,9 +23,7 @@ func RespondToGetRequestWithJSON(w http.ResponseWriter, jsonBody interface{}, st
 	if err != nil {
 		return structs.NewError(err, http.StatusInternalServerError, constants.DEFAULT500, "There was an error when decoding JSON.")
 	}
-
-	// Manually set response http status code to ok
-	w.WriteHeader(status)
+	
 	return nil
 }
 
