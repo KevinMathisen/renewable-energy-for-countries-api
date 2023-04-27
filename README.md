@@ -55,34 +55,37 @@ Allocation of tasks:
 
 # Running the assignment
 
-## Openstack instance
 
-The easiest method of accessing the assignment is to use the official deployment.
+# Running the Assignment
 
-1) Ensure you are on a NTNU network, either physically or through a VPN tunnel.
-2) Use address http://10.212.171.254:80 to access API.
+## Openstack Instance
+
+The easiest way to access the assignment is by using the official deployment.
+
+1. Ensure you are connected to the NTNU network, either physically or through a VPN tunnel.
+2. Use the following URL to access the API: http://10.212.171.254:80
 
 ## Docker
 
-The application may also be run locally as a docker container if docker is installed on the computer. To run the project locally, you must first set up a database. 
+The application can also be run locally as a Docker container if Docker is installed on your computer. To run the project locally, you must first set up a database.
 
-1) Sign up to https://firebase.google.com/, and create a new firestone database. 
-2) Then, pull the service account json from the project settings tab on the firstone web-ui, and place it within the ".secrets" folder of the repository. If this folder doesn't exist, create one in the root of the repository. 
-3) Rename the file to "production_credentials.json"
-3) When this is complete, run the command ```docker compose up -d``` (on linux) while having the root of the repository as your working directory. 
-
-After a few minutes of loading, you will see that 6 containers have been created, whereas one of them is immediatly deleted. At this point the innstallation is complete. You'll notice that a new collection has been added to your firebase database containing some country information. Navigate to "localhost:80" to access the api.
+1. Sign up for https://firebase.google.com/ and create a new Firestore database.
+2. Pull the service account JSON from the project settings tab on the Firestore web UI, and place it within the ".secrets" folder of the repository. If this folder doesn't exist, create one in the root of the repository.
+3. Rename the file to "production_credentials.json".
+4. Once the previous steps are complete, run the command `docker-compose up -d` while having the root of the repository as your working directory (on Linux).
+5. After a few minutes of loading, you will see that six containers have been created, whereas one of them is immediately deleted. At this point, the installation is complete. A new collection containing some country information will have been added to your Firestore database. Navigate to "localhost:80" to access the API.
 
 ## Manual Compile
-The application may also be run locally using the "go run" command. This method is not reccomended, as it is required to navigate into the source code for it to be able to run.
 
-1) As with the docker method, you must first create a new firebase database before continuing.
-2) Create a new folder within the repository root named "credentials". Place the firebase service accound json within this folder.
-3) Rename the service account file to "production_credentials.json"
-5) Open the file ``/utils/constants/constants.go``. Change the CREDENTIALS_FILE constant variable to equal ``./credentials/production_credentials.json``
-6) In the command line interface, enter the following commands: ``go get assignment2/utils/db``, ``go get assignment2/handlers`` and ``go get github.com/stretchr/testify/assert``. This will install external liberaries necessary to run the application.
-7) Enter ``go run ./cmd/main.go`` in the command line interface to compile and run the application.
-8) The API is now avalibale at `localhost:8080`, or a different port if specified in environment. 
+The application can also be run locally using the "go run" command. This method is not recommended, as it requires you to navigate into the source code for it to be able to run.
+
+1. As with the Docker method, you must first create a new Firestore database before continuing.
+2. Create a new folder within the repository root named "credentials". Place the Firebase service account JSON within this folder.
+3. Rename the service account file to "production_credentials.json".
+4. Open the file `/utils/constants/constants.go`. Change the `CREDENTIALS_FILE` constant variable to equal `./credentials/production_credentials.json`.
+5. In the command line interface, enter the following commands: `go get assignment2/utils/db`, `go get assignment2/handlers`, and `go get github.com/stretchr/testify/assert`. This will install external libraries necessary to run the application.
+6. Enter `go run ./cmd/main.go` in the command line interface to compile and run the application.
+7. The API is now available at "localhost:8080", or a different port if specified in the environment.
 
 
 # How to use the API
