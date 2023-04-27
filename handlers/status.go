@@ -5,6 +5,8 @@ import (
 	"assignment2/utils/db"
 	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
+	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -47,19 +49,22 @@ func createStatusResponse(countriesApiURL string, start time.Time) (structs.Stat
 	// Get request from countries api
 	resCountry, err := gateway.HttpRequestFromUrl(countriesApiURL, http.MethodHead)
 	if err != nil {
-		return structs.Status{}, err
+		statusCode := http.StatusServiceUnavailable
+		resCountry.Status = fmt.Sprintf("%d %s", statusCode, http.StatusText(statusCode))
+		log.Printf("Could not get response from countries api: %v", err.Error())
 	}
 
 	// Get request from notification db api
-	resDB, err := db.GetWebhookResponse()
+	resDB, err := db.GetDbResponse()
 	if err != nil {
-		return structs.Status{}, structs.NewError(err, http.StatusGatewayTimeout, "Error when accesing the database", "Error when accesing the database")
+		log.Printf("Could not get response from notification db: %v", err.Error())
 	}
 
 	// Get amount of webhooks
 	amountOfWebhooks, err := db.CountWebhooks()
 	if err != nil {
-		return structs.Status{}, err
+		amountOfWebhooks = -1
+		log.Printf("Could not count webhooks: %v", err.Error())
 	}
 
 	// Initialize the status response struct

@@ -6,10 +6,9 @@ import (
 	"assignment2/utils/gateway"
 	"assignment2/utils/structs"
 	"context"
-	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"sync"
 	"time"
 
@@ -20,8 +19,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
-
-var projectID string
 
 // Firebase context used by Firestore functions
 var firestoreContext context.Context
@@ -378,30 +375,27 @@ func sleepAndRestartDb() {
 /*
 * Returns the status code of the database.
  */
-func GetWebhookResponse() (http.Response, error) {
-	if projectID == "" {
-		// Read and parse the credentials file.
-		data, err := os.ReadFile(credentials)
-		if err != nil {
-			log.Fatalf("Failed to read credentials file: %v", err)
-		}
+func GetDbResponse() (http.Response, error) {
+	collectionID := constants.WEBHOOKS_COLLECTION
+	docID := "non-existent-doc"
 
-		var creds struct {
-			ProjectID string `json:"project_id"`
-		}
-		err = json.Unmarshal(data, &creds)
-		if err != nil {
-			log.Fatalf("Failed to parse credentials file: %v", err)
-		}
+	_, err := firebaseClient.Collection(collectionID).Doc(docID).Get(firestoreContext)
+	st, _ := status.FromError(err)
+
+	// Check if the error is related to the document not being found
+	if st.Code() == codes.NotFound {
+		statusCode := http.StatusOK
+		return http.Response{
+			Status:     fmt.Sprintf("%d %s", statusCode, http.StatusText(statusCode)),
+			StatusCode: statusCode,
+		}, nil
 	}
-
-	webhooksURL := "https://console.firebase.google.com/u/1/project/" + projectID + "/firestore/data/~2F" + constants.WEBHOOKS_COLLECTION
-	res, err := gateway.HttpRequestFromUrl(webhooksURL, http.MethodHead)
-	if err != nil {
-		return res, err
-	}
-
-	return res, nil
+	// If the error is not related to the document not being found, return a 503
+	statusCode := http.StatusServiceUnavailable
+	return http.Response{
+		Status:     fmt.Sprintf("%d %s", statusCode, http.StatusText(statusCode)),
+		StatusCode: statusCode,
+	}, structs.NewError(err, statusCode, constants.DEFAULT503, "Could not retrieve doc from database.")
 }
 
 /*
@@ -409,7 +403,7 @@ func GetWebhookResponse() (http.Response, error) {
 * Returns true if database is healthy, false if database is unhealthy.
  */
 func checkDbState() bool {
-	res, _ := GetWebhookResponse()
+	res, _ := GetDbResponse()
 	if res.StatusCode == 200 {
 		return true
 	} else {
