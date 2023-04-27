@@ -5,6 +5,7 @@ import (
 	"assignment2/utils/db"
 	"assignment2/utils/structs"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +16,26 @@ import (
 
 // Slice of all webhooks registered during testing
 var gRegisteredWebhooks []structs.Webhook
+
+/*
+Sends post request to given url with req as body
+*/
+func postWebhook(client http.Client, url string, req io.Reader) (structs.Webhook, string) {
+	var resObject structs.Webhook
+	//Sends Post request
+	res, err := client.Post(url, constants.CONT_TYPE_JSON, req)
+	if err != nil {
+		return resObject, ("Post request to URL failed:" + err.Error())
+	}
+
+	//Recieves values, and decodes into slice
+	err = json.NewDecoder(res.Body).Decode(&resObject)
+	if err != nil {
+		return resObject, ("Error during decoding:" + err.Error())
+	}
+
+	return resObject, ""
+}
 
 /*
 Handles opening and closing of server, alongside creating and closing client
@@ -50,13 +71,14 @@ func TestHttpNotification(t *testing.T) {
 	defer db.CloseFirebaseClient()
 
 	handleNotificationLogistics(t, registerWebhook)
-	handleNotificationLogistics(t, registerWebhook) //Register another webhook for increased robustness
+	handleNotificationLogistics(t, registerYearWebhook)
+	handleNotificationLogistics(t, registerAnyWebhook)
 	handleNotificationLogistics(t, getAWebhook)
 	handleNotificationLogistics(t, getAllWebhooks)
 	handleNotificationLogistics(t, deleteWebhook)
 }
 
-// Tests registration of new webhook
+// Tests registration of new webhook with specified country
 func registerWebhook(t *testing.T, url string, client http.Client) {
 	req := strings.NewReader("{\"url\": \"https://webhook.site/09469c1c-abc7-4532-9175-7df9549f7d71\",\"country\": \"NOR\",\"calls\": 2}")
 
@@ -64,30 +86,67 @@ func registerWebhook(t *testing.T, url string, client http.Client) {
 	log.Println("Testing Post to URL: \"" + url + "\"...")
 
 	//Sends Post request
-	res, err := client.Post(url, constants.CONT_TYPE_JSON, req)
-	if err != nil {
-		t.Fatal("Post request to URL failed:" + err.Error())
-	}
-
-	var resObject structs.Webhook
-	//Recieves values, and decodes into slice
-	err = json.NewDecoder(res.Body).Decode(&resObject)
-	if err != nil {
-		t.Fatal("Error during decoding:" + err.Error())
+	res, err := postWebhook(client, url, req)
+	if err != "" {
+		t.Fatal(err)
 	}
 
 	//If there is no WebhookId
-	if resObject.WebhookId == "" {
+	if res.WebhookId == "" {
 		t.Fatal("Registered webhook does not have associated WebhookId.")
 	}
 
 	//Temporarily stores recieved webhook
-	gRegisteredWebhooks = append(gRegisteredWebhooks, resObject)
+	gRegisteredWebhooks = append(gRegisteredWebhooks, res)
+}
+
+// Tests registration of new webhook with specified country and year
+func registerYearWebhook(t *testing.T, url string, client http.Client) {
+	req := strings.NewReader("{\"url\": \"https://webhook.site/09469c1c-abc7-4532-9175-7df9549f7d71\",\"country\": \"NOR\",\"calls\": 3, \"year\": 1998}")
+
+	//Posts a webhook
+	log.Println("Testing Post to URL: \"" + url + "\"...")
+
+	//Sends Post request
+	res, err := postWebhook(client, url, req)
+	if err != "" {
+		t.Fatal(err)
+	}
+
+	//If there is no WebhookId
+	if res.WebhookId == "" {
+		t.Fatal("Registered webhook does not have associated WebhookId.")
+	}
+
+	//Temporarily stores recieved webhook
+	gRegisteredWebhooks = append(gRegisteredWebhooks, res)
+}
+
+// Tests registration of new webhook with no specified country
+func registerAnyWebhook(t *testing.T, url string, client http.Client) {
+	req := strings.NewReader("{\"url\": \"https://webhook.site/09469c1c-abc7-4532-9175-7df9549f7d71\",\"calls\": 4, \"year\": 1998}")
+
+	//Posts a webhook
+	log.Println("Testing Post to URL: \"" + url + "\"...")
+
+	//Sends Post request
+	res, err := postWebhook(client, url, req)
+	if err != "" {
+		t.Fatal(err)
+	}
+
+	//If there is no WebhookId
+	if res.WebhookId == "" {
+		t.Fatal("Registered webhook does not have associated WebhookId.")
+	}
+
+	//Temporarily stores recieved webhook
+	gRegisteredWebhooks = append(gRegisteredWebhooks, res)
 }
 
 // Tests getting a specified webhook
 func getAWebhook(t *testing.T, url string, client http.Client) {
-	url = url + gRegisteredWebhooks[0].WebhookId
+	url = url + gRegisteredWebhooks[1].WebhookId
 
 	log.Println("Testing Get to URL: \"" + url + "\"...")
 
@@ -105,7 +164,7 @@ func getAWebhook(t *testing.T, url string, client http.Client) {
 	}
 
 	//Checks if the webhook registered in registerWebhook() is retrievable
-	if resObject.WebhookId != gRegisteredWebhooks[0].WebhookId {
+	if resObject.WebhookId != gRegisteredWebhooks[1].WebhookId {
 		t.Fatal("Earlier registered webhook not found.")
 	}
 }
@@ -138,7 +197,7 @@ func getAllWebhooks(t *testing.T, url string, client http.Client) {
 	//Looks through resObject to see if gRegisteredWebhooks[0] is there
 	found := false
 	for _, v := range resObject {
-		if v.WebhookId == gRegisteredWebhooks[0].WebhookId {
+		if v.WebhookId == gRegisteredWebhooks[1].WebhookId {
 			found = true
 		}
 	}
@@ -151,7 +210,7 @@ func getAllWebhooks(t *testing.T, url string, client http.Client) {
 // Tests deleting a specified webhook
 func deleteWebhook(t *testing.T, url string, client http.Client) {
 	//Deletes only the first webhook
-	url = url + gRegisteredWebhooks[0].WebhookId
+	url = url + gRegisteredWebhooks[1].WebhookId
 
 	log.Println("Testing Delete to URL: \"" + url + "\"...")
 
