@@ -1,4 +1,4 @@
-﻿package db
+package db
 
 import (
 	"assignment2/utils/constants"
@@ -95,17 +95,6 @@ func DocumentInCollection(id string, collection string) bool {
 	}
 	// If the document was found
 	return true
-}
-
-func Firestore_test() error {
-	res := firebaseClient.Collection(constants.RENEWABLES_COLLECTION).Doc("NOR")
-
-	doc, _ := res.Get(firestoreContext)
-
-	message := doc.Data()
-	log.Println(message)
-
-	return nil
 }
 
 /*

@@ -1,4 +1,4 @@
-﻿package params
+package params
 
 import (
 	"assignment2/utils/constants"
