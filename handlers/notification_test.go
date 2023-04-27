@@ -21,11 +21,14 @@ Handles opening and closing of server, alongside creating and closing client
 Then calls given function for testing individual endpoints
 */
 func handleNotificationLogistics(t *testing.T, f func(*testing.T, string, http.Client)) {
+	//Creates instance of Notification handler
 	handler := RootHandler(Notification)
 
+	//Runs handler instance as server
 	server := httptest.NewServer(http.HandlerFunc(handler.ServeHTTP))
 	defer server.Close()
 
+	//Creates client to speak with server
 	client := http.Client{}
 	defer client.CloseIdleConnections()
 
