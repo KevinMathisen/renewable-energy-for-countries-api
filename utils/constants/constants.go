@@ -9,7 +9,7 @@ const SERVICE_PATH = "/energy/" + VERSION                     // Service path
 const RENEWABLES_PATH = SERVICE_PATH + "/renewables"          // Renewables path
 const RENEWABLES_CURRENT_PATH = RENEWABLES_PATH + "/current/" // Renewables current path
 const RENEWABLES_HISTORY_PATH = RENEWABLES_PATH + "/history/" // Renewables history path
-const NOTIFICATION_PATH = SERVICE_PATH + "/notification/"     // Notification path
+const NOTIFICATION_PATH = SERVICE_PATH + "/notifications/"    // Notification path
 const STATUS_PATH = SERVICE_PATH + "/status"                  // Status path
 
 // Content type
