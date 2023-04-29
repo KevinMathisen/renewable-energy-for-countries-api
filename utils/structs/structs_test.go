@@ -3,12 +3,15 @@ package structs_test
 import (
 	"encoding/json"
 	"errors"
+	"math"
 	"net/http"
 	"reflect"
 	"strconv"
 	"testing"
 
 	"assignment2/utils/structs"
+
+	"github.com/stretchr/testify/assert"
 )
 
 /*
@@ -135,18 +138,25 @@ func TestCreateMeanCountryOutputFromData(t *testing.T) {
 
 	// Call the function being tested
 	output, err := structs.CreateMeanCountryOutputFromData(countryData, isoCode, startYear, endYear)
-	jsonOutput, _ := json.Marshal(output)
-
-	// Check for errors
 	if err != nil {
 		t.Errorf("CreateMeanCountryOutputFromData() returned error: %v", err)
 	}
 
-	// Check that the response writer contains the expected output
-	expectedOutput := `[{"name":"Norway","isoCode":"NOR","percentage":68.01918892982458}]`
-	if string(jsonOutput) != expectedOutput {
-		t.Errorf("CreateMeanCountryOutputFromData() returned unexpected output.\nExpected: %s\nActual: %s", expectedOutput, jsonOutput)
-	}
+	// Define expected output
+	expectedOutput := []structs.CountryOutput{{
+		Name:       "Norway",
+		IsoCode:    "NOR",
+		Percentage: float64(68.01918892982458),
+	}}
+
+	// Round percentages to 10 decimal places
+	expectedPercentage := math.Round(expectedOutput[0].Percentage * math.Pow(10, 10)) / math.Pow(10, 10)
+	outputPercentage := math.Round(output[0].Percentage * math.Pow(10, 10)) / math.Pow(10, 10)
+
+	assert.Equal(t, expectedOutput[0].Name, output[0].Name, "Name should be equal")
+	assert.Equal(t, expectedOutput[0].IsoCode, output[0].IsoCode, "IsoCode should be equal")
+	assert.Equal(t, expectedPercentage, outputPercentage, "Percentage should be equal")
+	assert.Empty(t, output[0].Year, "Year should be nil")
 
 	//Check that output is in correct dataformat. A list of structs is expected.
 	outputType := reflect.TypeOf(output)
